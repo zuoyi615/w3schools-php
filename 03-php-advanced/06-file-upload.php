@@ -19,6 +19,7 @@
       font-size: 12px;
       background: aliceblue;
     }
+
     .form {
       margin: 60px auto;
       width: 600px;
@@ -29,9 +30,11 @@
     <form action="upload.php" method="post" enctype="multipart/form-data" class="form">
       <label for="file" class="image">
         Upload
-        <input type="file" name="file" id="file" hidden />
+        <input type="file" name="file" id="file" hidden accept="image/*" />
       </label>
-      <div><input type="submit" /></div>
+      <div>
+        <input type="submit" value="Upload Image" name="submit" />
+      </div>
     </form>
   </body>
 </html>
