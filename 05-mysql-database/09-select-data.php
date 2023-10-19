@@ -10,6 +10,7 @@
   </head>
   <body>
     <?php
+      include '../07-php-ajax/Rows.php';
       echo "<table style='border: solid 1px lightgray;text-align: left;padding: 12px; border-radius: 4px;'>";
       echo "<tr>
               <th style='padding: 4px 12px;'>Id</th>
@@ -17,24 +18,6 @@
               <th style='padding: 4px 12px;'>Lastname</th>
               <th style='padding: 4px 12px;'>email</th>
             </tr>";
-
-      class TableRows extends RecursiveIteratorIterator {
-        function __construct(Traversable $iterator) {
-          parent::__construct($iterator);
-        }
-
-        function current(): string {
-          return '<td style="width: 150px;padding: 4px 12px;">' . parent::current() . '</td>';
-        }
-
-        function beginChildren(): void {
-          echo '<tr>';
-        }
-
-        function endChildren(): void {
-          echo '</tr>';
-        }
-      }
 
       // $host = '192.168.1.18'
       $host = 'localhost';
@@ -48,8 +31,8 @@
 
         $stmt = $con->prepare('SELECT id, firstname, lastname, email FROM guests');
         $stmt->execute();
-        $results = $stmt->setFetchMode(PDO::FETCH_ASSOC);
-        foreach (new TableRows(new RecursiveArrayIterator($stmt->fetchAll())) as $field => $value) {
+        $stmt->setFetchMode(PDO::FETCH_ASSOC);
+        foreach (new Rows(new RecursiveArrayIterator($stmt->fetchAll())) as $field => $value) {
           echo $value;
         }
       } catch (PDOException $e) {
