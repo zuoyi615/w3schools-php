@@ -45,9 +45,9 @@
       try {
         $con = new PDO("mysql:host=$host;dbname=$dbname", $user, $pass);
         $con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
         $stmt = $con->prepare('SELECT id, firstname, lastname, email FROM guests');
         $stmt->execute();
-
         $results = $stmt->setFetchMode(PDO::FETCH_ASSOC);
         foreach (new TableRows(new RecursiveArrayIterator($stmt->fetchAll())) as $field => $value) {
           echo $value;
