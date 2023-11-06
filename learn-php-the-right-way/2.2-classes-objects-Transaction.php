@@ -2,6 +2,7 @@
   declare(strict_types=1);
 
   class Transaction {
+    // php class properties are not allowed to be callable type, but function arguments are allowed to be.
     public function __construct(private float $amount, public string $description) {}
 
     public function addTax(float $rate): Transaction {
