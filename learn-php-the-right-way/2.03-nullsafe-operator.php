@@ -40,4 +40,4 @@
   echo $transaction->getCustomer()?->getPaymentProfile()?->id ?? 'Foo';
   // echo $transaction->getCustomer()->getPaymentProfile()->id ?? 'Foo'; // not work
   echo '<br />';
-  echo var_dump($transaction->getCustomer()?->getPaymentProfile()?->id);
+  var_dump($transaction->getCustomer()?->getPaymentProfile()?->id);
