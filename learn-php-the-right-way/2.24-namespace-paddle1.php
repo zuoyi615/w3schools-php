@@ -2,4 +2,6 @@
 
   namespace PaymentGateway\Paddle;
 
-  class Transaction { }
+  class CustomerProfile { }
+
+  class DateTime { }
