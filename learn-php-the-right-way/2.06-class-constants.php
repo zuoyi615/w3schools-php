@@ -4,6 +4,8 @@
 
   namespace Constants;
 
+  require_once './2.06-class-constants1.php';
+
   use InvalidArgumentException;
 
   class Transaction {
