@@ -1,5 +1,4 @@
 {
-    "name": "abstraction",
     "autoload": {
         "psr-4": {
             "Abstraction\\": "src/"
