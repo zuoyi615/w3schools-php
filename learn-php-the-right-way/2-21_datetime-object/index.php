@@ -12,7 +12,7 @@
     ->setTime(10, 30, 12);
   echo $datetime->getTimezone()->getName()."\t".$datetime->format('Y-m-d g:i:A'), PHP_EOL;
 
-  // $date = '05/15/15//2021 3:30pm'; // may cause parse arror, use Datetime::createFromFormat()解决
+  // $date = '05/15/15/2021 3:30pm'; // may cause parse arror, use Datetime::createFromFormat()解决
   // $datetime = new DateTime($date);
   // $date = '15/05/2021 3:30pm';
   // $datetime = new DateTime(str_replace('/', '-', $date));
@@ -52,8 +52,8 @@
   // echo $from->format('Y/m/d').' - '.$to->format('Y/m/d');
 
   $from = new DateTimeImmutable();
-  $to   = $from->add(new DateInterval('P1M')); // a new DateTimeImmutable object
-  var_dump($from === $to);                     // false
+  $to   = $from->add(new DateInterval('P1M'));  // a new DateTimeImmutable object
+  var_dump($from === $to);                        // false
   echo $from->format('Y/m/d').' - '.$to->format('Y/m/d');
 
   $datetime = new DateTimeImmutable('2023-11-16 00:00:00');
