@@ -7,7 +7,7 @@
   class Router {
     private array $routes = [];
 
-    public function register(string $route, callable $action): self {
+    public function register(string $route, callable|array $action): self {
       $this->routes[$route] = $action;
       return $this;
     }
@@ -22,7 +22,25 @@
         return call_user_func($action);
       }
 
-      throw  new RouteNotFoundException();
+      if (!is_array($action)) {
+        throw  new RouteNotFoundException();
+      }
+
+      if (count($action) !== 2) {
+        throw  new RouteNotFoundException();
+      }
+
+      [$class, $method] = $action;
+      if (!class_exists($class)) {
+        throw  new RouteNotFoundException();
+      }
+
+      $instance = new $class();
+      if (!method_exists($instance, $method)) {
+        throw  new RouteNotFoundException();
+      }
+
+      return call_user_func_array([$instance, $method], []);
     }
   }
 
