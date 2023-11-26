@@ -10,12 +10,13 @@
 
   $router = new Router();
   $router
-    ->register('/', [Home::class, 'index'])
-    ->register('/invoices/create', [Invoice::class, 'create'])
-    ->register('/invoices', [Invoice::class, 'index']);
+    ->get('/', [Home::class, 'index'])
+    ->get('/invoices/create', [Invoice::class, 'create'])
+    ->get('/invoices', [Invoice::class, 'index'])
+    ->post('/invoices', [Invoice::class, 'store']);
 
   try {
-    echo $router->resolve($_SERVER['REQUEST_URI']);
+    echo $router->resolve($_SERVER['REQUEST_URI'], strtolower($_SERVER['REQUEST_METHOD']));
   } catch (RouteNotFoundException $e) {
     echo $e->getMessage();
   }
