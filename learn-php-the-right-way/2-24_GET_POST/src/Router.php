@@ -18,13 +18,11 @@
 
     public function get(string $route, callable|array $action): self {
       $this->register('get', $route, $action);
-      $this->routes[$route] = $action;
       return $this;
     }
 
     public function post(string $route, callable|array $action): self {
       $this->register('post', $route, $action);
-      $this->routes[$route] = $action;
       return $this;
     }
 
