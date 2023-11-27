@@ -6,24 +6,40 @@
 
   class Home {
     public function index(): string {
-      echo '<pre>';
-      print_r($_GET);
-      echo '</pre>';
+      // echo '<pre>';
+      // print_r($_GET);
+      // echo '</pre>';
 
-      echo '<pre>';
-      print_r($_POST);
-      echo '</pre>';
+      // echo '<pre>';
+      // print_r($_POST);
+      // echo '</pre>';
 
-      return (
-      <<<Form
-          <form method="post" action="/?name=Jon&age=16&gender=male">
-            <div>
-              <label for="amount">Amount</label>
-              <input id="amount" type="text" name="amount" />
-              <input type="submit" />
-            </div>
-          </form>
-        Form
+      // echo '<pre>';
+      // print_r($_REQUEST);
+      // echo '</pre>';
+
+      $_SESSION['count'] = ($_SESSION['count'] ?? 0) + 1;
+      setcookie(
+        'name',
+        'Jon',
+        time() + (24 * 60 * 60),
+        '/',
+        '',
+        false,
+        false,
       );
+
+      setcookie(
+        'age',
+        '16',
+        [
+          'expires' => time() + 10,
+          'path' => '/',
+          'domain' => '',
+          'secure' => false,
+          'httponly' => false
+        ]
+      );
+      return 'Home';
     }
   }

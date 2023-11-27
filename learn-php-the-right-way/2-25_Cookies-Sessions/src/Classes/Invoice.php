@@ -6,6 +6,16 @@
 
   class Invoice {
     public function index(): string {
+      unset($_SESSION['count']);
+      setcookie(
+        'name',
+        'Jon',
+        time() - (24 * 60 * 60),
+        '/',
+        '',
+        false,
+        false,
+      );
       return 'invoices';
     }
 

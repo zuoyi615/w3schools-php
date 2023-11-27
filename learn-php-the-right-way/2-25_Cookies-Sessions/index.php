@@ -8,6 +8,7 @@
 
   require_once 'vendor/autoload.php';
 
+  session_start();
   $router = new Router();
   $router
     ->get('/', [Home::class, 'index'])
@@ -16,9 +17,12 @@
     ->post('/invoices', [Invoice::class, 'store']);
 
   try {
-    echo $router->resolve($_SERVER['REQUEST_URI'], strtolower($_SERVER['REQUEST_METHOD']));
+    $method = strtolower($_SERVER['REQUEST_METHOD']);
+    $uri    = $_SERVER['REQUEST_URI'];
+    echo $router->resolve($uri, $method);
   } catch (RouteNotFoundException $e) {
     echo $e->getMessage();
+  } finally {
   }
 
   // php -S localhost:8080 // run the command in terminal, starting a localhost server
@@ -32,3 +36,9 @@
   // after 6s echo 123 on screen;
   // wait script executed or buffered content reaches 4096 bytes
   // echo ini_get('output_buffering');
+
+  echo '<br />';
+  print_r($_SESSION);
+
+  echo '<br />';
+  print_r($_COOKIE);
