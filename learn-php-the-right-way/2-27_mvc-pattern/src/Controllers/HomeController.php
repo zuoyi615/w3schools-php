@@ -14,7 +14,7 @@
     public function index(): View {
       // return View::make('index')->render();
       // return (string)View::make('index');
-      return View::make('index', ['foo' => 'bar']);
+      return View::make('index', ['foo' => 'bar', 'name' => 'Jon', 'age' => 16]);
     }
 
     public function upload(): void {
