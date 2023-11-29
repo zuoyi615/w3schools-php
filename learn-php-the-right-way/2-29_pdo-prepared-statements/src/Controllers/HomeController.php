@@ -5,14 +5,10 @@
   namespace PDOPreparedStatements\Controllers;
 
   use PDOException;
-  use PDOPreparedStatements\Exceptions\ViewNotFoundException;
   use PDOPreparedStatements\View;
   use PDO;
 
   class HomeController {
-    /**
-     * @throws ViewNotFoundException
-     */
     public function index(): View {
       try {
         // $db    = new PDO('mysql:host=192.168.1.18;dbname=learn_php_the_right_way', 'root', '123456',);
