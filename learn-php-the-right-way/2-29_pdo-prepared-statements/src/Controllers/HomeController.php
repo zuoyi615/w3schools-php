@@ -16,26 +16,55 @@
     public function index(): View {
       try {
         // $db    = new PDO('mysql:host=192.168.1.18;dbname=learn_php_the_right_way', 'root', '123456',);
-        $db    = new PDO(
+        $db = new PDO(
           'mysql:host=192.168.1.18;dbname=php_tutorial',
           'root',
           '123456',
-          [
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ,      // fetch each row as php standard object
-            // PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC, // associative array
-            // PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_CLASS, // related to a class
-          ]
+          []
         );
-        $query = 'SELECT * FROM guests';
-        $stmt  = $db->query($query);
-        // $list  = $stmt->fetchAll(PDO::FETCH_OBJ);
-        foreach ($stmt as $guest) {
-          echo '<pre>';
-          var_dump($guest);
-          echo '</pre>';
-        }
+        // $query = 'SELECT * FROM guests WHERE id=?';
+        // $query = 'INSERT INTO guests (firstname,lastname,email) VALUES (?,?,?)';
+        $query = 'INSERT INTO guests (firstname,lastname,email) VALUES (:firstname,:lastname,:email)';
+        $stmt  = $db->prepare($query);
+        // $stmt->bindValue('firstname', 'Zoe');
+        // $stmt->bindValue('lastname', 'K');
+        // $stmt->bindValue('email', 'king@example.com');
+        $firstname = 'Orange';
+        $lastname  = 'Green';
+        $email     = 'orange@green.com';
+
+        $stmt->bindParam(':firstname', $firstname);
+        $stmt->bindParam(':lastname', $lastname);
+        $stmt->bindParam(':email', $email);
+        $stmt->execute();
+
+        $firstname = 'Orange01';
+        $lastname  = 'Green01';
+        $email     = 'orange01@green01.com';
+        $stmt->execute();
+
+        $firstname = 'Orange02';
+        $lastname  = 'Green02';
+        $email     = 'orange02@green02.com';
+        $stmt->execute();
+
+        $firstname = 'Orange03';
+        $lastname  = 'Green03';
+        $email     = 'orange03@green03.com';
+        $stmt->execute();
+
+        // $stmt->execute([
+        //  'email'     => 'dom@321.com',
+        //  'firstname' => 'Jack',
+        //  'lastname'  => 'T'
+        // ]);
+        $id    = $db->lastInsertId();
+        $guest = $db->query('SELECT * FROM guests WHERE id='.$id)->fetch();
+        echo '<pre>';
+        var_dump($guest);
+        echo '</pre>';
       } catch (PDOException $e) {
-        throw new PDOException($e->getMessage(), $e->getCode());
+        throw new PDOException($e->getMessage(), (int)$e->getCode());
       }
       return View::make('index', ['foo' => 'bar', 'name' => 'Jon', 'age' => 16]);
     }
