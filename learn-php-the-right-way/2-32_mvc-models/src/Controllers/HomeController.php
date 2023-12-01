@@ -10,7 +10,7 @@
 
   class HomeController {
     public function index(): View {
-      $email  = 'test0001@example.com';
+      $email  = 'test0002@example.com';
       $name   = 'Jon';
       $amount = 25;
 

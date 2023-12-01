@@ -12,20 +12,11 @@
   const UPLOAD_PATH = __DIR__.DIRECTORY_SEPARATOR.'uploads';
   const VIEW_PATH   = __DIR__.DIRECTORY_SEPARATOR.'views';
 
-  $dotenv = Dotenv::createImmutable(__DIR__);
-  $dotenv->load();
-
+  $dotenv  = Dotenv::createImmutable(__DIR__);
   $router  = new Router();
   $request = ['uri' => $_SERVER['REQUEST_URI'], 'method' => $_SERVER['REQUEST_METHOD']];
-  $config  = [
-    'host'   => $_ENV['DB_HOST'],
-    'dbname' => $_ENV['DB_DATABASE'],
-    'user'   => $_ENV['DB_USER'],
-    'pass'   => $_ENV['DB_PASS'],
-    'driver' => $_ENV['DB_DRIVER'] ?? 'mysql',
-  ];
 
-
+  $dotenv->load();
   $router
     ->get('/', [HomeController::class, 'index'])
     ->get('/download', [HomeController::class, 'download'])
@@ -37,4 +28,3 @@
   $app = new App($router, $request, new Config($_ENV));
 
   $app->run();
-
