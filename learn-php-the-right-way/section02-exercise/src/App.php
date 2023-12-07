@@ -18,7 +18,7 @@
         $uri    = $this->request['uri'];
         $method = strtolower($this->request['method']);
         echo $this->router->resolve($uri, $method);
-      } catch (Exception) {
+      } catch (Exception $e) {
         http_response_code(404);
         echo View::make('error/404');
       }

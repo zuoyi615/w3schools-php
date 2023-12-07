@@ -14,10 +14,12 @@
   const UPLOAD_PATH = __DIR__.DIRECTORY_SEPARATOR.'uploads';
   const VIEW_PATH   = __DIR__.DIRECTORY_SEPARATOR.'views';
 
+  ini_set('upload_tmp_dir', UPLOAD_PATH);
+
   $router = new Router();
   $router
     ->get('/', [Home::class, 'index'])
-    ->get('/upload', [Home::class, 'upload'])
+    ->post('/upload', [Home::class, 'upload'])
     ->get('/transactions', [Home::class, 'transactions']);
 
   $request = ['uri' => $_SERVER['REQUEST_URI'], 'method' => $_SERVER['REQUEST_METHOD']];

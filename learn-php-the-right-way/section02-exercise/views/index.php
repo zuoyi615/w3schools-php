@@ -15,7 +15,20 @@
   </head>
   <body class="dark:bg-gray-900 p-4">
     <div class="container mx-auto">
-      <h1 class="text-white">Home</h1>
+      <h1 class="text-white">Upload Transactions</h1>
+      <form method="post" action="/upload" class="mt-10" enctype="multipart/form-data">
+        <div class="text-white space-x-2 mb-2">
+          <label class="cursor-pointer">
+            <span>Click to choose a Transaction file (.csv)</span>
+            <input type="file" name="file" hidden required />
+          </label>
+        </div>
+        <input
+          type="submit"
+          class="rounded border py-2 px-3 border-blue-200 cursor-pointer text-xs bg-blue-300 hover:bg-blue-500 hover:border-blue-500 hover:text-slate-200"
+          value="Upload"
+        />
+      </form>
     </div>
   </body>
 </html>
