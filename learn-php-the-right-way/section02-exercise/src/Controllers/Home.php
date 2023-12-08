@@ -4,8 +4,7 @@
 
   namespace Exercise02\Controllers;
 
-  use Exercise02\Exceptions\FileNotFoundException;
-  use Exercise02\Exceptions\FileNotUploadedException;
+  use Exercise02\Exceptions\{FileNotFoundException, FileNotUploadedException};
   use Exercise02\Models\Transaction;
   use Exercise02\View;
 
@@ -32,13 +31,13 @@
      * @throws FileNotFoundException
      */
     public function transactions(): View {
-      $transactionModel = new Transaction();
-      $files            = Transaction::scan(UPLOAD_PATH);
-      $transactionModel->loadAll($files);
-      $transactions = $transactionModel->getTransactions();
+      $model = new Transaction();
+      $model->loadAll(Transaction::scan(UPLOAD_PATH));
+      $transactions = $model->getTransactions();
+
       return View::make('transactions', [
         'transactions'       => $transactions,
-        'totals'             => $transactionModel->calculateTotals(),
+        'totals'             => $model->calculateTotals(),
         'formatDollarAmount' => function (float $amount): string {
           $isNegative = $amount < 0;
           return ($isNegative ? '-' : '').'$'.number_format(abs($amount), 2);

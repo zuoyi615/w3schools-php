@@ -32,7 +32,7 @@
     /**
      * @throws FileNotFoundException
      */
-    private function loadTransactionsFromFile(string $filename): array {
+    private static function loadTransactionsFromFile(string $filename): array {
       if (!file_exists($filename)) {
         throw new FileNotFoundException();
       }
@@ -40,7 +40,7 @@
       $transactions = [];
       $file         = fopen($filename, 'r');
 
-      fgetcsv($file);
+      fgetcsv($file); // the first line is header
       while (($transaction = fgetcsv($file)) !== false) {
         $transaction    = static::extractTransaction($transaction);
         $transactions[] = $transaction;
@@ -56,7 +56,7 @@
       foreach ($files as $file) {
         $this->transactions = array_merge(
           $this->transactions,
-          $this->loadTransactionsFromFile($file)
+          static::loadTransactionsFromFile($file)
         );
       }
     }
@@ -75,6 +75,7 @@
 
     public function calculateTotals(): array {
       $totals = ['netTotal' => 0, 'totalIncome' => 0, 'totalExpense' => 0];
+
       foreach ($this->transactions as $transaction) {
         $amount             = $transaction['amount'];
         $totals['netTotal'] += $amount;
@@ -84,6 +85,7 @@
           $totals['totalExpense'] += $amount;
         }
       }
+
       return $totals;
     }
   }
