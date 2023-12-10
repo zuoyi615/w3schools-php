@@ -66,8 +66,8 @@
     }
 
     /**
-     * @test
      * @dataProvider \PHPUnitTest\Tests\DataProviders\RouterDataProvider::routeNotFoundCases()
+     * @test
      */
     public function it_throws_route_not_found_exception(string $uri, string $method) {
       $users = new class () {
@@ -80,5 +80,37 @@
       $this->router->get('/users', ['Users', 'index']);
       $this->expectException(RouteNotFoundException::class);
       $this->router->resolve($uri, $method);
+    }
+
+    /**
+     * @throws RouteNotFoundException
+     * @test
+     */
+    public function it_resolves_route_from_a_closure() {
+      $this->router->get('/users', fn() => [1, 2, 3]);
+      $this->assertEquals(
+        [1, 2, 3],
+        $this->router->resolve('/users', 'get'),
+      );
+    }
+
+    /**
+     * @throws RouteNotFoundException
+     * @test
+     */
+    public function it_resolves_route() {
+      $users = new class () {
+        public function index(): array {
+          return [1, 2, 3];
+        }
+
+        public function store(): bool {
+          return true;
+        }
+      };
+      $this->router->get('/users', [$users::class, 'index']);
+      $this->router->post('/users', [$users::class, 'store']);
+      $this->assertEquals([1, 2, 3], $this->router->resolve('/users', 'get'));
+      $this->assertSame(true, $this->router->resolve('/users', 'post'));
     }
   }
