@@ -9,7 +9,11 @@
   class Router {
     private array $routes = [];
 
-    private function register(string $route, string $method, callable|array $action): void {
+    public function routes(): array {
+      return $this->routes;
+    }
+
+    public function register(string $route, string $method, callable|array $action): void {
       $this->routes[$route][$method] = $action;
     }
 
