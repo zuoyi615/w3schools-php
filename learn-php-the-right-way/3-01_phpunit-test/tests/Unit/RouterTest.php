@@ -67,7 +67,7 @@
 
     /**
      * @test
-     * @dataProvider routeNotFoundCases
+     * @dataProvider \PHPUnitTest\Tests\DataProviders\RouterDataProvider::routeNotFoundCases()
      */
     public function it_throws_route_not_found_exception(string $uri, string $method) {
       $users = new class () {
@@ -80,14 +80,5 @@
       $this->router->get('/users', ['Users', 'index']);
       $this->expectException(RouteNotFoundException::class);
       $this->router->resolve($uri, $method);
-    }
-
-    public static function routeNotFoundCases(): array {
-      return [
-        ['/users', 'put'],
-        ['/invoices', 'post'],
-        ['/users', 'get'],
-        ['/users', 'post'],
-      ];
     }
   }
