@@ -2,8 +2,9 @@
 
   declare(strict_types=1);
 
-  namespace Tests\Unit;
+  namespace PHPUnitTest\Tests\Unit;
 
+  use PHPUnitTest\Exceptions\RouteNotFoundException;
   use PHPUnitTest\Router;
   use PHPUnit\Framework\TestCase;
 
@@ -62,5 +63,31 @@
      */
     public function there_are_no_routes_when_router_is_created() {
       $this->assertEmpty($this->router->routes());
+    }
+
+    /**
+     * @test
+     * @dataProvider routeNotFoundCases
+     */
+    public function it_throws_route_not_found_exception(string $uri, string $method) {
+      $users = new class () {
+        public function delete(): bool {
+          return true;
+        }
+      };
+
+      $this->router->post('/users', [$users::class, 'store']);
+      $this->router->get('/users', ['Users', 'index']);
+      $this->expectException(RouteNotFoundException::class);
+      $this->router->resolve($uri, $method);
+    }
+
+    public static function routeNotFoundCases(): array {
+      return [
+        ['/users', 'put'],
+        ['/invoices', 'post'],
+        ['/users', 'get'],
+        ['/users', 'post'],
+      ];
     }
   }
