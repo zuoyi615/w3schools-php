@@ -8,13 +8,19 @@
   use PHPUnit\Framework\TestCase;
 
   class RouterTest extends TestCase {
+    private Router $router;
+
+    protected function setUp(): void {
+      parent::setUp();
+      $this->router = new Router();
+    }
 
     public function test_that_it_registers_a_route(): void {
       // given that we have a router object
-      $router = new Router();
+      // $router = new Router();
 
       // when we call a register method
-      $router->register('/users', 'get', ['Users', 'index']);
+      $this->router->register('/users', 'get', ['Users', 'index']);
 
       // then we assert route was registered
       $expected = [
@@ -22,42 +28,39 @@
           'get' => ['Users', 'index']
         ]
       ];
-      $this->assertEquals($expected, $router->routes());
+      $this->assertEquals($expected, $this->router->routes());
     }
 
     /**
      * @test
      */
     public function it_registers_a_get_route() {
-      $router = new Router();
-      $router->get('/users', ['Users', 'index']);
+      $this->router->get('/users', ['Users', 'index']);
       $expected = [
         '/users' => [
           'get' => ['Users', 'index']
         ]
       ];
-      $this->assertEquals($expected, $router->routes());
+      $this->assertEquals($expected, $this->router->routes());
     }
 
     /**
      * @test
      */
     public function it_registers_a_post_route() {
-      $router = new Router();
-      $router->post('/users', ['Users', 'index']);
+      $this->router->post('/users', ['Users', 'index']);
       $expected = [
         '/users' => [
           'post' => ['Users', 'index']
         ]
       ];
-      $this->assertEquals($expected, $router->routes());
+      $this->assertEquals($expected, $this->router->routes());
     }
 
     /**
      * @test
      */
     public function there_are_no_routes_when_router_is_created() {
-      $router = new Router();
-      $this->assertEmpty($router->routes());
+      $this->assertEmpty($this->router->routes());
     }
   }
