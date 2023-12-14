@@ -5,7 +5,7 @@
   namespace PHPUnitMocking\Services;
 
   class InvoiceService {
-    public function __construct(
+    public function __construct( // constructor injection
       protected SalesTaxService $salesTaxService,
       protected PaymentGatewayService $gatewayService,
       protected EmailService $emailService
