@@ -1,0 +1,18 @@
+{
+  "autoload": {
+    "psr-4": {
+      "PHPUnitMocking\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "PHPUnitMocking\\Tests\\": "tests/"
+    }
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^10"
+  },
+  "require": {
+    "vlucas/phpdotenv": "^5.6"
+  }
+}
