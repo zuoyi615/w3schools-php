@@ -5,7 +5,7 @@
   use Dotenv\Dotenv;
   use PHPUnitTest\{App, Router};
   use PHPUnitTest\Config;
-  use PHPUnitTest\Controllers\{HomeController, InvoiceController};
+  use PHPUnitTest\Controllers\{HomeController};
 
   require_once 'vendor/autoload.php';
 
@@ -17,13 +17,7 @@
   $request = ['uri' => $_SERVER['REQUEST_URI'], 'method' => $_SERVER['REQUEST_METHOD']];
 
   $dotenv->load();
-  $router
-    ->get('/', [HomeController::class, 'index'])
-    ->get('/download', [HomeController::class, 'download'])
-    ->post('/upload', [HomeController::class, 'upload'])
-    ->get('/invoices/create', [InvoiceController::class, 'create'])
-    ->get('/invoices', [InvoiceController::class, 'index'])
-    ->post('/invoices', [InvoiceController::class, 'store']);
+  $router->get('/', [HomeController::class, 'index']);
 
   $app = new App($router, $request, new Config($_ENV));
 
