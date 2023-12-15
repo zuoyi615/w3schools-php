@@ -22,7 +22,7 @@
      */
     public function get(string $id) {
       if (!$this->has($id)) {
-        return $this->resove($id);
+        return $this->resolve($id);
       }
 
       $entry = $this->entries[$id];
@@ -37,7 +37,7 @@
      * @throws ReflectionException
      * @throws ContainerException
      */
-    public function resove(string $id): mixed {
+    public function resolve(string $id): mixed {
       // 1. Inspect the class that we are trying to get from the container
       $reflectionClass = new ReflectionClass($id);
       if (!$reflectionClass->isInstantiable()) {
