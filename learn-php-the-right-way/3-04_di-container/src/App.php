@@ -17,6 +17,7 @@
       static::$db        = new DB($config->db ?? []);
       static::$container = new Container();
 
+      // also instantiate dependencies explicit
       static::$container->set(SalesTaxService::class, fn() => new SalesTaxService());
       static::$container->set(PaymentGatewayService::class, fn() => new PaymentGatewayService());
       static::$container->set(EmailService::class, fn() => new EmailService());
