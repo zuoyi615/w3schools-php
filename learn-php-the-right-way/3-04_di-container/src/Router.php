@@ -9,6 +9,8 @@
   class Router {
     private array $routes = [];
 
+    public function __construct(private readonly Container $container) {}
+
     public function routes(): array {
       return $this->routes;
     }
@@ -50,7 +52,7 @@
         throw new RouteNotFoundException();
       }
 
-      $instance = new $class();
+      $instance = $this->container->get($class);
       if (!method_exists($instance, $method)) {
         throw new RouteNotFoundException();
       }
