@@ -5,12 +5,18 @@
   namespace DIContainer\Controllers;
 
   use DIContainer\App;
+  use DIContainer\Container;
+  use DIContainer\Exceptions\Container\ContainerException;
   use DIContainer\Services\InvoiceService;
   use DIContainer\View;
 
   class HomeController {
+    /**
+     * @throws \ReflectionException
+     * @throws ContainerException
+     */
     public function index(): View {
-      App::container()->get(InvoiceService::class)->process([], 25);
+      (new Container())->get(InvoiceService::class)->process([], 25);
       return View::make('index');
     }
   }

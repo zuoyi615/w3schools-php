@@ -3,31 +3,13 @@
   namespace DIContainer;
 
   use DIContainer\Exceptions\RouteNotFoundException;
-  use DIContainer\Services\EmailService;
-  use DIContainer\Services\InvoiceService;
-  use DIContainer\Services\PaymentGatewayService;
-  use DIContainer\Services\SalesTaxService;
 
   class App {
 
-    private static DB        $db;
-    private static Container $container;
+    private static DB $db;
 
     public function __construct(protected Router $router, protected array $request, protected Config $config) {
-      static::$db        = new DB($config->db ?? []);
-      static::$container = new Container();
-
-      // also instantiate dependencies explicit
-      static::$container->set(SalesTaxService::class, fn() => new SalesTaxService());
-      static::$container->set(PaymentGatewayService::class, fn() => new PaymentGatewayService());
-      static::$container->set(EmailService::class, fn() => new EmailService());
-      static::$container->set(InvoiceService::class, function (Container $c) {
-        return new InvoiceService(
-          $c->get(SalesTaxService::class),
-          $c->get(PaymentGatewayService::class),
-          $c->get(EmailService::class),
-        );
-      });
+      static::$db = new DB($config->db ?? []);
     }
 
     public function run(): void {
@@ -43,9 +25,5 @@
 
     public static function db(): DB {
       return static::$db;
-    }
-
-    public static function container(): Container {
-      return static::$container;
     }
   }
