@@ -33,10 +33,6 @@
       return isset($this->entries[$id]);
     }
 
-    public function set(string $id, callable $concrete): void {
-      $this->entries[$id] = $concrete;
-    }
-
     /**
      * @throws ReflectionException
      * @throws ContainerException
