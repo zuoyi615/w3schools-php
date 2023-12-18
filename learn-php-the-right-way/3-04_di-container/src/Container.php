@@ -16,6 +16,10 @@
 
     private array $entries = [];
 
+    public function entries(): array {
+      return $this->entries;
+    }
+
     /**
      * @throws ReflectionException
      * @throws ContainerException
