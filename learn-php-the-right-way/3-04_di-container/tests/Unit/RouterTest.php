@@ -4,6 +4,7 @@
 
   namespace DIContainer\Tests\Unit;
 
+  use DIContainer\Container;
   use DIContainer\Exceptions\RouteNotFoundException;
   use DIContainer\Router;
   use PHPUnit\Framework\TestCase;
@@ -13,7 +14,8 @@
 
     protected function setUp(): void {
       parent::setUp();
-      $this->router = new Router();
+      $container    = new Container();
+      $this->router = new Router($container);
     }
 
     public function test_that_it_registers_a_route(): void {
