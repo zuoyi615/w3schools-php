@@ -3,13 +3,21 @@
   namespace DIContainer;
 
   use DIContainer\Exceptions\RouteNotFoundException;
+  use DIContainer\Interfaces\PaymentGatewayInterface;
+  use DIContainer\Services\PaymentGatewayService;
 
   class App {
 
     private static DB $db;
 
-    public function __construct(protected Router $router, protected array $request, protected Config $config) {
+    public function __construct(
+      protected Container $container,
+      protected Router $router,
+      protected array $request,
+      protected Config $config
+    ) {
       static::$db = new DB($config->db ?? []);
+      $this->container->set(PaymentGatewayInterface::class, PaymentGatewayService::class);
     }
 
     public function run(): void {

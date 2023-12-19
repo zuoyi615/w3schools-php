@@ -20,6 +20,6 @@
   $dotenv->load();
   $router->get('/', [HomeController::class, 'index']);
 
-  $app = new App($router, $request, new Config($_ENV));
+  $app = new App($container, $router, $request, new Config($_ENV));
 
   $app->run();

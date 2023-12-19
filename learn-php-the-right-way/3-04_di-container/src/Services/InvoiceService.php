@@ -4,10 +4,12 @@
 
   namespace DIContainer\Services;
 
+  use DIContainer\Interfaces\PaymentGatewayInterface;
+
   class InvoiceService {
     public function __construct( // constructor injection, loosely coupled
       protected SalesTaxService $salesTaxService,
-      protected PaymentGatewayService $gatewayService,
+      protected PaymentGatewayInterface $gatewayService,
       protected EmailService $emailService
     ) {}
 
@@ -21,9 +23,10 @@
       }
 
       // 3. send receipt
-      $this->emailService->send($customer, 'receipt');
+      $result = $this->emailService->send($customer, 'receipt');
+      $result = $result ? 'successfully' : 'failed';
 
-      echo "Invoice has been processed<br/>";
+      echo "Invoice has been processed $result.<br/>";
 
       return true;
     }

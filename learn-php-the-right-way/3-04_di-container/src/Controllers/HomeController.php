@@ -4,19 +4,14 @@
 
   namespace DIContainer\Controllers;
 
-  use DIContainer\App;
-  use DIContainer\Container;
-  use DIContainer\Exceptions\Container\ContainerException;
   use DIContainer\Services\InvoiceService;
   use DIContainer\View;
 
-  class HomeController {
-    /**
-     * @throws \ReflectionException
-     * @throws ContainerException
-     */
+  readonly class HomeController {
+    public function __construct(private InvoiceService $invoiceService) {}
+
     public function index(): View {
-      (new Container())->get(InvoiceService::class)->process([], 25);
+      $this->invoiceService->process([], 25);
       return View::make('index');
     }
   }

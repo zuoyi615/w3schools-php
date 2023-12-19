@@ -5,10 +5,9 @@
   namespace DIContainer\Tests\Unit;
 
   use DIContainer\Container;
-  use DIContainer\Exceptions\Container\ContainerException;
+  use DIContainer\Exceptions\Container\{ContainerException, NotFoundException};
   use DIContainer\Interfaces\PaymentGatewayInterface;
   use DIContainer\Services\InvoiceService;
-  use ReflectionException;
   use DIContainer\Services\EmailService;
   use PHPUnit\Framework\TestCase;
 
@@ -68,7 +67,7 @@
      * @test
      */
     public function it_throws_a_reflection_exception_when_class_not_exists() {
-      $this->expectException(ReflectionException::class);
+      $this->expectException(NotFoundException::class);
       $this->container->resolve('NotExistedClass');
     }
 

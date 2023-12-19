@@ -10,7 +10,7 @@
   use ReflectionNamedType;
   use ReflectionParameter;
   use ReflectionUnionType;
-  use DIContainer\Exceptions\Container\ContainerException;
+  use DIContainer\Exceptions\Container\{ContainerException, NotFoundException};
 
   class Container implements ContainerInterface {
 
@@ -22,7 +22,7 @@
 
     /**
      * @throws ReflectionException
-     * @throws ContainerException
+     * @throws ContainerException|NotFoundException
      */
     public function get(string $id) {
       if (!$this->has($id)) {
@@ -30,11 +30,15 @@
       }
 
       $entry = $this->entries[$id];
-      return $entry($this);
+      if (is_callable($entry)) {
+        return $entry($this);
+      }
+
+      return $this->resolve($entry);
     }
 
-    public function set(string $id, callable $entry): void {
-      $this->entries[$id] = $entry;
+    public function set(string $id, callable|string $concrete): void {
+      $this->entries[$id] = $concrete;
     }
 
     public function has(string $id): bool {
@@ -44,9 +48,15 @@
     /**
      * @throws ReflectionException
      * @throws ContainerException
+     * @throws NotFoundException
      */
     public function resolve(string $id): mixed {
-      $reflectionClass = new ReflectionClass($id);
+      try {
+        $reflectionClass = new ReflectionClass($id);
+      } catch (ReflectionException $e) {
+        throw new NotFoundException($e->getMessage(), $e->getCode(), $e);
+      }
+
       if (!$reflectionClass->isInstantiable()) {
         throw new ContainerException("Class $id is not instantiable");
       }
