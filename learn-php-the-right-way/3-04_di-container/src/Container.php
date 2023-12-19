@@ -33,6 +33,10 @@
       return $entry($this);
     }
 
+    public function set(string $id, callable $entry): void {
+      $this->entries[$id] = $entry;
+    }
+
     public function has(string $id): bool {
       return isset($this->entries[$id]);
     }
@@ -42,26 +46,21 @@
      * @throws ContainerException
      */
     public function resolve(string $id): mixed {
-      // 1. Inspect the class that we are trying to get from the container
       $reflectionClass = new ReflectionClass($id);
       if (!$reflectionClass->isInstantiable()) {
         throw new ContainerException("Class $id is not instantiable");
       }
 
-      // 2. Inspect the constructor of the class
       $constructor = $reflectionClass->getConstructor();
       if ($constructor === null) {
         return new $id();
-        // return $reflectionClass->newInstance();
       }
 
-      // 3. Inspect the constructor parameters (dependencies)
       $parameters = $constructor->getParameters();
       if (count($parameters) === 0) {
         return new $id();
       }
 
-      // 4. If the constructor parameter is a class then try to resolve that class using the container
       $dependencies = array_map(function (ReflectionParameter $parameter) use ($id) {
         $name = $parameter->getName();
         $type = $parameter->getType();
