@@ -18,7 +18,15 @@
   $request   = ['uri' => $_SERVER['REQUEST_URI'], 'method' => $_SERVER['REQUEST_METHOD']];
 
   $dotenv->load();
-  $router->get('/', [HomeController::class, 'index']);
+
+  try {
+    $router->registerRoutesFromControllerAttributes(
+      [
+        HomeController::class,
+      ]
+    );
+  } catch (ReflectionException $e) {
+  }
 
   $app = new App($container, $router, $request, new Config($_ENV));
 

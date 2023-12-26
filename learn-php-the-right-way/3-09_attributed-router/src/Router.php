@@ -4,7 +4,11 @@
 
   namespace AttributedRouter;
 
+  use AttributedRouter\Attributes\Route;
   use AttributedRouter\Exceptions\RouteNotFoundException;
+  use ReflectionAttribute;
+  use ReflectionClass;
+  use ReflectionException;
 
   class Router {
     private array $routes = [];
@@ -15,7 +19,24 @@
       return $this->routes;
     }
 
-    public function registerRoutesFromControllerAttributes(array $controllers) {}
+    /**
+     * @throws ReflectionException
+     */
+    public function registerRoutesFromControllerAttributes(array $controllers): void {
+      foreach ($controllers as $controller) {
+        $reflectionController = new ReflectionClass($controller);
+        foreach ($reflectionController->getMethods() as $method) {
+          $attributes = $method->getAttributes(Route::class, ReflectionAttribute::IS_INSTANCEOF);
+          if (count($attributes) !== 0) {
+            foreach ($attributes as $attribute) {
+              /**@var Route $route */
+              $route = $attribute->newInstance();
+              $this->register($route->getPath(), $route->getMethod(), [$controller, $method->getName()]);
+            }
+          }
+        }
+      }
+    }
 
     public function register(string $route, string $method, callable|array $action): void {
       $this->routes[$route][$method] = $action;
