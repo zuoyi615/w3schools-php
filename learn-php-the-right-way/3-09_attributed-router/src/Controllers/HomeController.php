@@ -12,6 +12,7 @@
     public function __construct(private InvoiceService $invoiceService) {}
 
     #[Get('/')]
+    #[Get('/home')]
     public function index(): View {
       $this->invoiceService->process([], 25);
       return View::make('index');

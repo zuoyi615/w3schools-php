@@ -30,4 +30,8 @@
 
   $app = new App($container, $router, $request, new Config($_ENV));
 
+  // echo '<pre>';
+  // print_r($router->routes());
+  // echo '</pre>';
+
   $app->run();
