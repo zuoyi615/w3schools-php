@@ -20,11 +20,8 @@
   $dotenv->load();
 
   try {
-    $router->registerRoutesFromControllerAttributes(
-      [
-        HomeController::class,
-      ]
-    );
+    $routes = [HomeController::class,];
+    $router->registerRoutesFromControllerAttributes($routes);
   } catch (ReflectionException $e) {
   }
 

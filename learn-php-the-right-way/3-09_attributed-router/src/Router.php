@@ -5,6 +5,7 @@
   namespace AttributedRouter;
 
   use AttributedRouter\Attributes\Route;
+  use AttributedRouter\Enums\HttpMethod;
   use AttributedRouter\Exceptions\RouteNotFoundException;
   use ReflectionAttribute;
   use ReflectionClass;
@@ -43,12 +44,12 @@
     }
 
     public function get(string $route, callable|array $action): static {
-      $this->register($route, 'get', $action);
+      $this->register($route, HttpMethod::GET->value, $action);
       return $this;
     }
 
     public function post(string $route, callable|array $action): static {
-      $this->register($route, 'post', $action);
+      $this->register($route, HttpMethod::POST->value, $action);
       return $this;
     }
 
