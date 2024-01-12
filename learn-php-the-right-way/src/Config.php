@@ -6,6 +6,7 @@ namespace App;
 
 /**
  * @property-read ?array db
+ * @property-read ?array mailer
  */
 class Config
 {
@@ -17,13 +18,16 @@ class Config
     public function __construct(array $env)
     {
         $this->config = [
-          'db' => [
-            'host'   => $env['DB_HOST'],
-            'dbname' => $env['DB_DATABASE'],
-            'user'   => $env['DB_USER'],
-            'pass'   => $env['DB_PASS'],
-            'driver' => $env['DB_DRIVER'] ?? 'mysql',
-          ]
+            'db' => [
+                'host'   => $env['DB_HOST'],
+                'dbname' => $env['DB_DATABASE'],
+                'user'   => $env['DB_USER'],
+                'pass'   => $env['DB_PASS'],
+                'driver' => $env['DB_DRIVER'] ?? 'mysql',
+            ],
+            'mailer' => [
+                'dsn' => $env['MAILER_DSN']
+            ]
         ];
     }
 

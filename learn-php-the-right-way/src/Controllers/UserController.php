@@ -6,12 +6,12 @@ namespace App\Controllers;
 
 use App\Attributes\{Get, Post};
 use App\View;
-use Symfony\Component\Mailer\{Mailer, Transport};
+use Symfony\Component\Mailer\{Mailer, Transport,MailerInterface};
 use Symfony\Component\Mime\Email;
 
 class UserController
 {
-    public function __construct()
+    public function __construct(protected MailerInterface $mailer)
     {
     }
 
@@ -25,7 +25,7 @@ class UserController
     public function register(): void
     {
         $name      = $_POST['name'];
-        $emailAddress     = $_POST['email'];
+        $address     = $_POST['email'];
         $firstName = explode(' ', $name)[0];
 
         $text = <<<Body
@@ -50,19 +50,15 @@ class UserController
         </div>
         HTMLBody;
 
-        $dsn = 'smtp://localhost:11025';
-
-        $mailer = new Mailer(Transport::fromDsn($dsn));
-
         $email = (new Email())
           ->from('support@example.com')
-          ->to($emailAddress)
+          ->to($address)
           ->subject('Welcome!')
           ->attach('Hello World!', 'welcome.txt')
           ->text($text)
           ->html($html);
 
-        $mailer->send($email);
+        $this->mailer->send($email);
 
         echo 'email sent successfully, please check your email';
     }
