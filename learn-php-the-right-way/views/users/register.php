@@ -4,39 +4,32 @@ html, body {
   width: 100%;
   margin: 0;
 }
-
 body {
   display: flex;
   background-color: #f5f9ff;
 }
-
 .register-container {
   margin: auto;
 }
-
 .register-container form {
   display: flex;
   flex-direction: column;
   row-gap: 1rem;
 }
-
 .register-container input {
   padding: 10px;
   border: none;
   font-size: 18px;
 }
-
 .register-container label {
   width: 100%;
   text-align: right;
   display: inline-block;
   font-size: 18px;
 }
-
 .register-container .btn-container {
   text-align: right;
 }
-
 .register-container .btn {
   background-color: #00a3c2;
   border: none;
@@ -47,7 +40,6 @@ body {
   cursor: pointer;
   width: 76%;
 }
-
 .register-container .btn:hover {
   background-color: #01cef3;
 }

@@ -1,16 +1,18 @@
 <?php
 
-    declare(strict_types=1);
+declare(strict_types=1);
 
-    namespace App\Attributes;
+namespace App\Attributes;
 
-    use Attribute;
+use Attribute;
 
-    #[Attribute(Attribute::TARGET_METHOD | Attribute::IS_REPEATABLE)]
-    readonly class Get extends Route
+#[Attribute(Attribute::TARGET_METHOD | Attribute::IS_REPEATABLE)]
+readonly class Get extends Route
+{
+
+    public function __construct(string $path)
     {
-        public function __construct(string $path)
-        {
-            parent::__construct($path);
-        }
+        parent::__construct($path);
     }
+
+}

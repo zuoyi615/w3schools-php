@@ -1,12 +1,14 @@
 <?php
 
-    declare(strict_types=1);
+declare(strict_types=1);
 
-    namespace App\Exceptions;
+namespace App\Exceptions;
 
-    use Exception;
+use Exception;
 
-    class RouteNotFoundException extends Exception
-    {
-        protected $message = '404 Not Found';
-    }
+class RouteNotFoundException extends Exception
+{
+
+    protected $message = '404 Not Found';
+
+}

@@ -1,21 +1,23 @@
 <?php
 
-    declare(strict_types=1);
+declare(strict_types=1);
 
-    namespace App\Models;
+namespace App\Models;
 
-    use App\Model;
-    use Generator;
+use App\Model;
+use Generator;
 
-    class Ticket extends Model
+class Ticket extends Model
+{
+
+    public function all(): Generator
     {
-        public function all(): Generator
-        {
-            $stmt = $this->db->query(
-              'SELECT id, title, content
+        $stmt = $this->db->query(
+            'SELECT id, title, content
              FROM tickets'
-            );
+        );
 
-            return $this->fetchLazy($stmt);
-        }
+        return $this->fetchLazy($stmt);
     }
+
+}

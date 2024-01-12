@@ -10,9 +10,8 @@ use Generator;
 
 class GeneratorExampleController
 {
-    public function __construct(private Ticket $ticketModel)
-    {
-    }
+
+    public function __construct(private Ticket $ticketModel) {}
 
     #[Route('/examples/generator')]
     public function index(): void
@@ -33,4 +32,5 @@ class GeneratorExampleController
             yield $i;
         }
     }
+
 }

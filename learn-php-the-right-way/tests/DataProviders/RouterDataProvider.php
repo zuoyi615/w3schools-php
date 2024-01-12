@@ -1,18 +1,20 @@
 <?php
 
-    declare(strict_types=1);
+declare(strict_types=1);
 
-    namespace App\Tests\DataProviders;
+namespace App\Tests\DataProviders;
 
-    class RouterDataProvider
+class RouterDataProvider
+{
+
+    public static function routeNotFoundCases(): array
     {
-        public static function routeNotFoundCases(): array
-        {
-            return [
-              ['/users', 'put'],
-              ['/invoices', 'post'],
-              ['/users', 'get'],
-              ['/users', 'post'],
-            ];
-        }
+        return [
+            ['/users', 'put'],
+            ['/invoices', 'post'],
+            ['/users', 'get'],
+            ['/users', 'post'],
+        ];
     }
+
+}

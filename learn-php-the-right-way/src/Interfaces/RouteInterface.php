@@ -1,8 +1,8 @@
 <?php
 
-    namespace App\Interfaces;
+namespace App\Interfaces;
 
-    interface RouteInterface
-    {
+interface RouteInterface
+{
 
-    }
+}

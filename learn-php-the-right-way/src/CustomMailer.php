@@ -1,16 +1,17 @@
 <?php
 
-declare(strict_type=1);
+declare(strict_types=1);
 
 namespace App;
 
-use Symfony\Component\Mailer\{Envelope,MailerInterface};
+use Symfony\Component\Mailer\{Envelope, MailerInterface};
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\RawMessage;
 
 class CustomMailer implements MailerInterface
 {
+
     private TransportInterface $transport;
 
     public function __construct(protected string $dsn)
@@ -23,7 +24,7 @@ class CustomMailer implements MailerInterface
         // ... some logic
 
         $this->transport->send($message, $envelope);
-
         // ... some more logic
     }
+
 }

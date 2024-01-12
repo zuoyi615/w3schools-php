@@ -1,20 +1,22 @@
 <?php
 
-    declare(strict_types=1);
+declare(strict_types=1);
 
-    namespace App\Attributes;
+namespace App\Attributes;
 
-    use App\Enums\HttpMethod;
-    use Attribute;
+use App\Enums\HttpMethod;
+use Attribute;
 
-    #[Attribute]
-    readonly class Post extends Route
+#[Attribute]
+readonly class Post extends Route
+{
+
+    public function __construct(string $path)
     {
-        public function __construct(string $path)
-        {
-            parent::__construct(
-              $path,
-              HttpMethod::POST
-            );
-        }
+        parent::__construct(
+            $path,
+            HttpMethod::POST
+        );
     }
+
+}

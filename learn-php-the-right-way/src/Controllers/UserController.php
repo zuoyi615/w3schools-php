@@ -5,15 +5,12 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Attributes\{Get, Post};
+use App\Models\Email;
 use App\View;
-use Symfony\Component\Mailer\{Mailer, Transport,MailerInterface};
-use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Address;
 
 class UserController
 {
-    public function __construct(protected MailerInterface $mailer)
-    {
-    }
 
     #[Get('/users/create')]
     public function create(): View
@@ -25,14 +22,13 @@ class UserController
     public function register(): void
     {
         $name      = $_POST['name'];
-        $address     = $_POST['email'];
+        $address   = $_POST['email'];
         $firstName = explode(' ', $name)[0];
 
         $text = <<<Body
         Hello $firstName,
         Thank you for signing up!
         Body;
-
         $html = <<<HTMLBody
         <div>
             <h1 style="color: pink;">Welcome</h1>
@@ -46,20 +42,23 @@ class UserController
                 width="300" 
                 height="300" 
                 style="border-radius: 20px;"
+                alt="email"
             />
         </div>
         HTMLBody;
 
-        $email = (new Email())
-          ->from('support@example.com')
-          ->to($address)
-          ->subject('Welcome!')
-          ->attach('Hello World!', 'welcome.txt')
-          ->text($text)
-          ->html($html);
+        $to      = new Address($address);
+        $from    = new Address('support@example.com', 'Support');
+        $subject = 'Welcome';
 
-        $this->mailer->send($email);
-
-        echo 'email sent successfully, please check your email';
+        $emailModel = new Email();
+        $emailModel->queue(
+            to: $to,
+            from: $from,
+            subject: $subject,
+            html: $html,
+            text: $text
+        );
     }
+
 }

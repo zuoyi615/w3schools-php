@@ -1,17 +1,19 @@
 <?php
 
-    namespace App\Attributes;
+namespace App\Attributes;
 
-    use App\Enums\HttpMethod;
+use App\Enums\HttpMethod;
 
-    #[\Attribute]
-    readonly class Put extends Route
+#[\Attribute]
+readonly class Put extends Route
+{
+
+    public function __construct(string $path)
     {
-        public function __construct(string $path)
-        {
-            parent::__construct(
-              $path,
-              HttpMethod::PUT
-            );
-        }
+        parent::__construct(
+            $path,
+            HttpMethod::PUT
+        );
     }
+
+}

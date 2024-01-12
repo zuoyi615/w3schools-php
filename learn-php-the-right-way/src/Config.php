@@ -10,6 +10,7 @@ namespace App;
  */
 class Config
 {
+
     protected array $config = [];
 
     /**
@@ -18,7 +19,7 @@ class Config
     public function __construct(array $env)
     {
         $this->config = [
-            'db' => [
+            'db'     => [
                 'host'   => $env['DB_HOST'],
                 'dbname' => $env['DB_DATABASE'],
                 'user'   => $env['DB_USER'],
@@ -26,8 +27,8 @@ class Config
                 'driver' => $env['DB_DRIVER'] ?? 'mysql',
             ],
             'mailer' => [
-                'dsn' => $env['MAILER_DSN']
-            ]
+                'dsn' => $env['MAILER_DSN'],
+            ],
         ];
     }
 
@@ -38,4 +39,5 @@ class Config
     {
         return $this->config[$name] ?? null;
     }
+
 }

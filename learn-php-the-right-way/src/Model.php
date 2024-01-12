@@ -1,15 +1,17 @@
 <?php
 
-    declare(strict_types=1);
+declare(strict_types=1);
 
-    namespace App;
+namespace App;
 
-    abstract class Model
+abstract class Model
+{
+
+    protected DB $db;
+
+    public function __construct()
     {
-        protected DB $db;
-
-        public function __construct()
-        {
-            $this->db = App::db();
-        }
+        $this->db = App::db();
     }
+
+}
