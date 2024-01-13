@@ -59,6 +59,8 @@ class UserController
             html: $html,
             text: $text
         );
+
+        echo "Subscribe Successfully!";
     }
 
 }
