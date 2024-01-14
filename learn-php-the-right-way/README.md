@@ -1,6 +1,12 @@
-# Send email in PHP
+# Doctrine in PHP
 
-use [symfony/mailer](https://symfony.com/doc/current/mailer.html) to send email.
+## DataBase Abstraction Layer
 
-and use [MailHog](https://github.com/mailhog/MailHog) as local mail server receiving emails
+- ORM: Object Relational Mapping
+- DBAL: DataBase Abstraction Layer
+- Entities
+- Data Mapper & Active Record Patterns
 
+```bash 
+composer require doctrine/dbal
+```
