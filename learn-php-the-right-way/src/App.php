@@ -32,6 +32,9 @@ class App
         return static::$db;
     }
 
+    /**
+     * @throws \Doctrine\DBAL\Exception
+     */
     public function boot(): static
     {
         $dotenv = Dotenv::createImmutable(dirname(__DIR__));

@@ -31,14 +31,16 @@ table tr th, table tr td {
   </thead>
   <tbody>
   <?php
+  use App\Enums\InvoiceStatus;
+
   foreach ($invoices as $invoice): ?>
     <tr>
-      <td><?= $invoice->invoice_number ?></td>
-      <td>$<?= number_format($invoice->amount, 2) ?></td>
+      <td><?= $invoice['invoice_number'] ?></td>
+      <td>$<?= number_format($invoice['amount'], 2) ?></td>
       <td
-        class="<?= \App\Enums\InvoiceStatus::tryFrom($invoice->status)->color()
+        class="<?= InvoiceStatus::tryFrom($invoice['status'])->color()
             ->getClass() ?>">
-          <?= \App\Enums\InvoiceStatus::tryFrom($invoice->status)->toString() ?>
+          <?= InvoiceStatus::tryFrom($invoice['status'])->toString() ?>
       </td>
     </tr>
   <?php
