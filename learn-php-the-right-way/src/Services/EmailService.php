@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Enums\EmailStatus;
 use App\Models\Email;
+use Doctrine\DBAL\Exception;
 use Symfony\Component\Mailer\MailerInterface;
 
 class EmailService
@@ -18,6 +19,8 @@ class EmailService
 
     /**
      * @throws \Symfony\Component\Mailer\Exception\TransportExceptionInterface
+     * @throws Exception
+     * @throws \Exception
      */
     public function sendQueuedEmails(): void
     {
@@ -26,16 +29,16 @@ class EmailService
             ->getEmailByStatus(EmailStatus::QUEUE);
 
         foreach ($emails as $email) {
-            $meta = json_decode($email->meta_json, true);
+            $meta = json_decode($email['meta_json'], true);
 
             $message = (new \Symfony\Component\Mime\Email())
                 ->from($meta['from'])
                 ->to($meta['to'])
-                ->subject($email->subject)
-                ->text($email->text_body)
-                ->html($email->html_body);
+                ->subject($email['subject'])
+                ->text($email['text_body'])
+                ->html($email['html_body']);
             $this->mailer->send($message);
-            $this->emailModel->markEmailSent($email->id);
+            $this->emailModel->markEmailSent($email['id']);
         }
     }
 

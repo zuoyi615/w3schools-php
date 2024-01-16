@@ -6,11 +6,15 @@ namespace App\Models;
 
 use App\Enums\EmailStatus;
 use App\Model;
+use Doctrine\DBAL\Exception;
 use Symfony\Component\Mime\Address;
 
 class Email extends Model
 {
 
+    /**
+     * @throws Exception
+     */
     public function queue(
         Address $to,
         Address $from,
@@ -25,29 +29,22 @@ class Email extends Model
             ->db
             ->createQueryBuilder()
             ->insert('emails')
-            ->values(
-                [
-                    'subject'    => '?',
-                    'status'     => '?',
-                    'html_body'  => '?',
-                    'text_body'  => '?',
-                    'meta_json'  => '?',
-                    'created_at' => 'NOW()',
-                ]
-            )
-            ->setParameters(
-                [
-                    'subject'   => $subject,
-                    'status'    => EmailStatus::QUEUE->value,
-                    'html_body' => $html,
-                    'text_body' => $text,
-                    'meta_json' => json_encode($meta),
-                ]
-            );
+            ->setValue('subject', '?')
+            ->setValue('status', '?')
+            ->setValue('html_body', '?')
+            ->setValue('text_body', '?')
+            ->setValue('meta_json', '?')
+            ->setValue('created_at', 'NOW()')
+            ->setParameter(0, $subject)
+            ->setParameter(1, EmailStatus::QUEUE->value)
+            ->setParameter(2, $html)
+            ->setParameter(3, $text)
+            ->setParameter(4, json_encode($meta))
+            ->executeStatement();
     }
 
     /**
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     public function getEmailByStatus(EmailStatus $status): array
     {
@@ -61,6 +58,9 @@ class Email extends Model
             ->fetchAllAssociative();
     }
 
+    /**
+     * @throws Exception
+     */
     public function markEmailSent(int $id): void
     {
         $this
@@ -68,10 +68,11 @@ class Email extends Model
             ->createQueryBuilder()
             ->update('emails')
             ->set('status', '?')
-            ->setParameter(0, EmailStatus::SENT->value)
             ->set('sent_at', 'NOW()')
             ->where('id=?')
-            ->setParameter(1, $id);
+            ->setParameter(0, EmailStatus::SENT->value)
+            ->setParameter(1, $id)
+            ->executeStatement();
     }
 
 }
