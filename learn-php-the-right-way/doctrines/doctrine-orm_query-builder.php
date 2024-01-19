@@ -1,5 +1,6 @@
 <?php
 
+use App\Entities\Invoice;
 use Doctrine\DBAL\{DriverManager, Exception};
 use Doctrine\ORM\{EntityManager, ORMSetup};
 use Doctrine\ORM\Exception\{MissingMappingDriverImplementation};
@@ -24,6 +25,40 @@ try {
         __DIR__.'/../src/Entities',
     ]);
     $entityManager = new EntityManager($connection, $config);
+
+    $queryBuilder = $entityManager->createQueryBuilder();
+
+    // building and writing something called DQL: doctrine query language, in terms of entities and mapped properties
+    $query = $queryBuilder
+        // ->select('i.createdAt', 'i.amount')
+        ->select('i')
+        ->from(Invoice::class, 'i')
+        ->where('i.amount>:amount')
+        ->setParameter('amount', 30)
+        ->orderBy('i.createdAt', 'desc')
+        ->getQuery(); // convert query builder into a query object
+
+    // $dql = $query->getDQL();
+    // $sql = $query->getSQL();
+    // var_dump($dql);
+    // var_dump($sql);
+
+    // $dql
+    //       = 'SELECT i.createdAt, i.amount FROM App\Entities\Invoice i WHERE i.amount>:amount ORDER BY i.createdAt desc';
+    // $query = $entityManager->createQuery($dql);
+    // $query->getResult();
+
+    // $invoices = $query->getArrayResult();
+    // var_dump($invoices);
+
+    $invoices = $query->getResult();
+
+    foreach ($invoices as $invoice) {
+        /** @var Invoice $invoice */
+        echo $invoice->getCreatedAt()->format('Y/m/d H:m:s').', '
+            .$invoice->getAmount().', '.$invoice->getStatus()->toString()
+            .PHP_EOL;
+    }
 } catch (MissingMappingDriverImplementation|Exception $e) {
     var_dump($e);
 }
