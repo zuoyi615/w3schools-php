@@ -1,6 +1,7 @@
 <?php
 
 use App\Entities\Invoice;
+use App\Enums\InvoiceStatus;
 use Doctrine\DBAL\{DriverManager, Exception};
 use Doctrine\ORM\{EntityManager, ORMSetup};
 use Doctrine\ORM\Exception\{MissingMappingDriverImplementation};
@@ -28,28 +29,36 @@ try {
 
     $queryBuilder = $entityManager->createQueryBuilder();
 
-    // building and writing something called DQL: doctrine query language, in terms of entities and mapped properties
+    // WHERE amount >: amount AND (status = :status OR created_at >= :date)
+    // SELECT i FROM App\Entities\Invoice i WHERE i.amount > :amount AND (i.status = :status OR i.createdAt >= :date) ORDER BY i.createdAt desc
     $query = $queryBuilder
-        // ->select('i.createdAt', 'i.amount')
         ->select('i')
         ->from(Invoice::class, 'i')
-        ->where('i.amount>:amount')
+        ->where(
+            $queryBuilder
+                ->expr()
+                ->andX(
+                    $queryBuilder->expr()->gt('i.amount', ':amount'),
+                    $queryBuilder
+                        ->expr()
+                        ->orX(
+                            $queryBuilder->expr()->eq('i.status', ':status'),
+                            $queryBuilder->expr()->gte('i.createdAt', ':date'),
+                        )
+                )
+        )
+        // ->andWhere('i.status = :status') // incorrect
+        // ->orWhere('i.createdAt >= :date') // incorrect
         ->setParameter('amount', 30)
+        ->setParameter('status', InvoiceStatus::Paid->value)
+        ->setParameter('date', '2024-01-19 00:00:00')
         ->orderBy('i.createdAt', 'desc')
         ->getQuery(); // convert query builder into a query object
 
-    // $dql = $query->getDQL();
     // $sql = $query->getSQL();
-    // var_dump($dql);
     // var_dump($sql);
-
-    // $dql
-    //       = 'SELECT i.createdAt, i.amount FROM App\Entities\Invoice i WHERE i.amount>:amount ORDER BY i.createdAt desc';
-    // $query = $entityManager->createQuery($dql);
-    // $query->getResult();
-
-    // $invoices = $query->getArrayResult();
-    // var_dump($invoices);
+    $dql = $query->getDQL();
+    var_dump($dql);
 
     $invoices = $query->getResult();
 
