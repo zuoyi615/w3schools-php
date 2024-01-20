@@ -27,6 +27,15 @@ try {
     ]);
     $entityManager = new EntityManager($connection, $config);
 
+    // Transaction
+    // $entityManager->beginTransaction();
+    // $entityManager->commit();
+    // $entityManager->rollback();
+    // $entityManager->wrapInTransaction();
+
+    // native sql
+    // $entityManager->createNativeQuery();
+
     $queryBuilder = $entityManager->createQueryBuilder();
 
     $query = $queryBuilder
