@@ -6,7 +6,15 @@ use App\Enums\InvoiceStatus;
 use DateTime;
 use Doctrine\Common\Collections\{ArrayCollection, Collection};
 use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\Mapping\{Column, Entity, GeneratedValue, Id, OneToMany, Table};
+use Doctrine\ORM\Mapping\{Column,
+    Entity,
+    GeneratedValue,
+    HasLifecycleCallbacks,
+    Id,
+    OneToMany,
+    PrePersist,
+    Table};
+use Doctrine\Persistence\Event\LifecycleEventArgs;
 
 /**
  * # Entity
@@ -15,6 +23,7 @@ use Doctrine\ORM\Mapping\{Column, Entity, GeneratedValue, Id, OneToMany, Table};
  */
 #[Entity]
 #[Table('invoices')]
+#[HasLifecycleCallbacks]
 class Invoice
 {
 
@@ -50,6 +59,12 @@ class Invoice
         ]
     )]
     private Collection    $items;
+
+    #[PrePersist]
+    public function onPrePersist(LifecycleEventArgs $args): void
+    {
+        $this->createdAt = new DateTime();
+    }
 
     public function getId(): int
     {
