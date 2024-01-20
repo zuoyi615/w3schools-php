@@ -1,6 +1,6 @@
 <?php
 
-use App\Entities\Invoice;
+use App\Entities\{Invoice, InvoiceItem};
 use App\Enums\InvoiceStatus;
 use Doctrine\DBAL\{DriverManager, Exception};
 use Doctrine\ORM\{EntityManager, ORMSetup};
@@ -29,11 +29,10 @@ try {
 
     $queryBuilder = $entityManager->createQueryBuilder();
 
-    // WHERE amount >: amount AND (status = :status OR created_at >= :date)
-    // SELECT i FROM App\Entities\Invoice i WHERE i.amount > :amount AND (i.status = :status OR i.createdAt >= :date) ORDER BY i.createdAt desc
     $query = $queryBuilder
-        ->select('i')
+        ->select('i', 'it')
         ->from(Invoice::class, 'i')
+        ->join('i.items', 'it')
         ->where(
             $queryBuilder
                 ->expr()
@@ -47,26 +46,30 @@ try {
                         )
                 )
         )
-        // ->andWhere('i.status = :status') // incorrect
-        // ->orWhere('i.createdAt >= :date') // incorrect
         ->setParameter('amount', 30)
         ->setParameter('status', InvoiceStatus::Paid->value)
         ->setParameter('date', '2024-01-19 00:00:00')
         ->orderBy('i.createdAt', 'desc')
-        ->getQuery(); // convert query builder into a query object
+        ->getQuery();
 
-    // $sql = $query->getSQL();
-    // var_dump($sql);
-    $dql = $query->getDQL();
-    var_dump($dql);
-
+    // var_dump($query->getArrayResult());
     $invoices = $query->getResult();
 
     foreach ($invoices as $invoice) {
         /** @var Invoice $invoice */
-        echo $invoice->getCreatedAt()->format('Y/m/d H:m:s').', '
-            .$invoice->getAmount().', '.$invoice->getStatus()->toString()
+        echo $invoice
+                ->getCreatedAt()->format('Y/m/d H:m:s').', '
+            .$invoice->getAmount().', '
+            .$invoice->getStatus()->toString()
             .PHP_EOL;
+
+        foreach ($invoice->getItems() as $item) {
+            /** @var InvoiceItem $item */
+            echo ' - '.$item->getDescription()
+                .', '.$item->getQuantity()
+                .', '.$item->getUnitPrice()
+                .PHP_EOL;
+        }
     }
 } catch (MissingMappingDriverImplementation|Exception $e) {
     var_dump($e);
