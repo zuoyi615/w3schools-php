@@ -100,7 +100,7 @@ class Bug
         return $this->engineer;
     }
 
-    public function setEngineer(User $engineer): User
+    public function setEngineer(User $engineer): Bug
     {
         $this->engineer = $engineer;
         $engineer->assignedToBug($this);
@@ -113,7 +113,7 @@ class Bug
         return $this->reporter;
     }
 
-    public function setReporter(User $reporter): User
+    public function setReporter(User $reporter): Bug
     {
         $this->reporter = $reporter;
         $reporter->addReportedBug($this);
@@ -123,7 +123,7 @@ class Bug
 
     public function assignToProduct(Product $product): void
     {
-        $this->products = $this->products;
+        $this->products[] = $product;
     }
 
     /** @return Collection<int, Product> */
