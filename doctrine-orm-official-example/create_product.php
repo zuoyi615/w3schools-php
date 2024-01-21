@@ -24,4 +24,3 @@ try {
 } catch (ORMException|Exception $e) {
     var_dump($e);
 }
-
