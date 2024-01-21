@@ -10,4 +10,6 @@ php create_product.php ORM
 php create_product.php DBAL
 
 php create_user.php beberlei
+
+php create_bug.php 1 1 1
 ```
