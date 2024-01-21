@@ -19,10 +19,10 @@ class Product
     #[Id]
     #[Column(type: Types::INTEGER)]
     #[GeneratedValue]
-    private int|null $id = null;
+    private ?int   $id = null;
 
     #[Column(type: Types::STRING)]
-    private string   $name;
+    private string $name;
 
     public function getId(): ?int
     {
