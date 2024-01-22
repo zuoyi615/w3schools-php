@@ -3,6 +3,7 @@
 namespace App\Entities;
 
 use App\Enums\BugStatus;
+use App\Repositories\BugRepository;
 use DateTime;
 use Doctrine\Common\Collections\{ArrayCollection, Collection};
 use Doctrine\DBAL\Types\Types;
@@ -14,7 +15,7 @@ use Doctrine\ORM\Mapping\ManyToMany;
 use Doctrine\ORM\Mapping\ManyToOne;
 use Doctrine\ORM\Mapping\Table;
 
-#[Entity]
+#[Entity(repositoryClass: BugRepository::class)]
 #[Table(name: 'bugs')]
 class Bug
 {
