@@ -9,7 +9,8 @@ class BugRepository extends EntityRepository
 
     public function getRecentBugs($number = 30)
     {
-        $dql   = 'SELECT b, e, r FROM App\Entities\Bug b '
+        $dql   = 'SELECT b, e, r '
+            .'FROM App\Entities\Bug b '
             .'INNER JOIN b.engineer e '
             .'INNER JOIN b.reporter r '
             .'ORDER BY b.createdAt DESC';
@@ -21,7 +22,8 @@ class BugRepository extends EntityRepository
 
     public function getRecentBugsArray($number = 30): array
     {
-        $dql = 'SELECT b, e, r, p FROM App\Entities\Bug b '
+        $dql = 'SELECT b, e, r, p '
+            .'FROM App\Entities\Bug b '
             .'INNER JOIN b.engineer e '
             .'INNER JOIN b.reporter r '
             .'INNER JOIN b.products p '
@@ -36,7 +38,8 @@ class BugRepository extends EntityRepository
 
     public function getUserBugs(int $userId, $number = 15)
     {
-        $dql = 'SELECT b, e, r FROM App\Entities\Bug b '
+        $dql = 'SELECT b, e, r '
+            .'FROM App\Entities\Bug b '
             .'INNER JOIN b.engineer e '
             .'INNER JOIN b.reporter r '
             .'WHERE b.status = 0 AND (e.id = :id OR r.id = :id) '
@@ -52,8 +55,11 @@ class BugRepository extends EntityRepository
 
     public function getOpenBugsByProduct(): array
     {
-        $dql
-            = 'SELECT p.id, p.name, count(b.id) AS openBugs FROM App\Entities\Bug b INNER JOIN b.products p WHERE b.status=0 GROUP BY p.id';
+        $dql = 'SELECT p.id, p.name, count(b.id) AS openBugs '
+            .'FROM App\Entities\Bug b '
+            .'INNER JOIN b.products p '
+            .'WHERE b.status=0 '
+            .'GROUP BY p.id';
 
         return $this
             ->getEntityManager()
