@@ -1,9 +1,9 @@
-# ORM
+# Doctrine Migration
 
-ORM is the shorts of Object relational mapping, a layer sits between application and the storage layer like database
+Installation
 
-There are two common patterns in ORM:
+```bash
+composer require "doctrine/migrations"
+```
 
-- Active Record
-- Data Mapper
-
+create `migrations.php` and `cli-config.php` for ` ./vendor/bin/doctrine-migrations generate`
