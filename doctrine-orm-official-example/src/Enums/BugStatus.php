@@ -12,7 +12,7 @@ enum BugStatus: int
     {
         return match ($this) {
             self::Open => 'open',
-            self::Closed => 'close'
+            self::Closed => 'closed'
         };
     }
 

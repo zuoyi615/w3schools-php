@@ -132,4 +132,9 @@ class Bug
         return $this->products;
     }
 
+    public function close(): void
+    {
+        $this->status = BugStatus::Closed;
+    }
+
 }
