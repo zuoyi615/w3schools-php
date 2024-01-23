@@ -13,14 +13,10 @@ use Doctrine\ORM\Mapping\{Column,
     Id,
     OneToMany,
     PrePersist,
+    PreUpdate,
     Table};
 use Doctrine\Persistence\Event\LifecycleEventArgs;
 
-/**
- * # Entity
- * - should not be final Class
- * - should not be final Method
- */
 #[Entity]
 #[Table('invoices')]
 #[HasLifecycleCallbacks]
@@ -51,6 +47,9 @@ class Invoice
     #[Column(name: 'updated_at', type: Types::DATETIME_MUTABLE)]
     private DateTime      $updatedAt;
 
+    #[Column(name: 'due_date', type: Types::DATETIME_MUTABLE)]
+    private DateTime      $dueDate;
+
     #[OneToMany(
         mappedBy: 'invoice',
         targetEntity: InvoiceItem::class,
@@ -64,6 +63,12 @@ class Invoice
     public function onPrePersist(LifecycleEventArgs $args): void
     {
         $this->createdAt = new DateTime();
+    }
+
+    #[PreUpdate]
+    public function onPreUpdate(LifecycleEventArgs $args): void
+    {
+        $this->updatedAt = new DateTime();
     }
 
     public function getId(): int
@@ -156,6 +161,16 @@ class Invoice
         $this->items->add($item);
 
         return $this;
+    }
+
+    public function getDueDate(): DateTime
+    {
+        return $this->dueDate;
+    }
+
+    public function setDueDate(DateTime $dueDate): void
+    {
+        $this->dueDate = $dueDate;
     }
 
 }
