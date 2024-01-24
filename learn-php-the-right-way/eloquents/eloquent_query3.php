@@ -20,9 +20,18 @@ try {
                     .', '
                     .$invoice->status->toString()
                     .', '
-                    .$invoice->created_at->format('Y-m-d H:m:s');
+                    .$invoice->created_at->format('Y-m-d H:m:s')
+                    .PHP_EOL;
 
-                $invoice->items()->get();
+                // all records selected in memory, and take first
+                // There is N+1 problem next line, can be solved by eager loading
+                $item = $invoice->items->first();
+                // var_dump($item->id);
+
+                // $item = $invoice->items()->first(); // also works, sql select limit 1 record, and take the first
+
+                $item->description = 'Foo Bar';
+                $item->save();
             });
     });
 } catch (Throwable $e) {
