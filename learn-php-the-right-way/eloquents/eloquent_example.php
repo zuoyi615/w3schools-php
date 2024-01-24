@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
+require_once __DIR__.'/../vendor/autoload.php';
+require_once __DIR__.'/../eloquent.php';
+
 use App\EloquentModel\Invoice;
 use App\EloquentModel\InvoiceItem;
 use App\Enums\InvoiceStatus;
 use Carbon\Carbon;
 use Illuminate\Database\Capsule\Manager as Capsule;
-
-require_once __DIR__.'/../vendor/autoload.php';
-require_once __DIR__.'/../eloquent.php';
 
 try {
     Capsule::connection()->transaction(function () {
