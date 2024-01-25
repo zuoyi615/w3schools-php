@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Attributes\Get;
-use App\EloquentModel\Invoice;
+use App\Models\Invoice;
 use App\Enums\InvoiceStatus;
 use App\View;
 

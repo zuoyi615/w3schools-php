@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Attributes\{Get, Post};
-use App\EloquentModel\Email;
+use App\Models\Email;
 use App\View;
 use Symfony\Component\Mime\Address;
 

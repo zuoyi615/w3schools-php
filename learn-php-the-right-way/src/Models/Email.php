@@ -5,16 +5,31 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\EmailStatus;
-use Doctrine\DBAL\Exception;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
 use Symfony\Component\Mime\Address;
 
-class Email
+/**
+ * @property int         $id
+ * @property string      subject
+ * @property EmailStatus status
+ * @property string      text_body
+ * @property string      html_body
+ * @property array       meta_json
+ * @property Carbon      created_at
+ * @property Carbon      updated_at
+ * @property Carbon      sent_at
+ */
+class Email extends Model
 {
 
-    /**
-     * @throws Exception
-     */
-    public function queue(
+    protected $casts
+        = [
+            'meta_json' => 'array',
+            'status'    => EmailStatus::class,
+        ];
+
+    public static function queue(
         Address $to,
         Address $from,
         string $subject,
@@ -24,54 +39,27 @@ class Email
         $meta['to']   = $to->toString();
         $meta['from'] = $from->toString();
 
-        $this
-            ->db
-            ->createQueryBuilder()
-            ->insert('emails')
-            ->setValue('subject', '?')
-            ->setValue('status', '?')
-            ->setValue('html_body', '?')
-            ->setValue('text_body', '?')
-            ->setValue('meta_json', '?')
-            ->setValue('created_at', 'NOW()')
-            ->setParameter(0, $subject)
-            ->setParameter(1, EmailStatus::QUEUE->value)
-            ->setParameter(2, $html)
-            ->setParameter(3, $text)
-            ->setParameter(4, json_encode($meta))
-            ->executeStatement();
+        $email            = new Email();
+        $email->subject   = $subject;
+        $email->status    = EmailStatus::QUEUE;
+        $email->html_body = $html;
+        $email->text_body = $text;
+        $email->meta_json = $meta;
+
+        $email->save();
     }
 
-    /**
-     * @throws Exception
-     */
-    public function getEmailByStatus(EmailStatus $status): array
+    public static function getEmailByStatus(EmailStatus $status): array
     {
-        return $this
-            ->db
-            ->createQueryBuilder()
-            ->select('*')
-            ->from('emails')
-            ->where('status=?')
-            ->setParameter(0, $status->value)
-            ->fetchAllAssociative();
+        return static::query()->where('status', '=', $status)->get()->toArray();
     }
 
-    /**
-     * @throws Exception
-     */
-    public function markEmailSent(int $id): void
+    public static function markEmailSent(int $id): void
     {
-        $this
-            ->db
-            ->createQueryBuilder()
-            ->update('emails')
-            ->set('status', '?')
-            ->set('sent_at', 'NOW()')
-            ->where('id=?')
-            ->setParameter(0, EmailStatus::SENT->value)
-            ->setParameter(1, $id)
-            ->executeStatement();
+        static::query()->where('id', '=', $id)->update([
+            'status'  => EmailStatus::SENT,
+            'sent_at' => new Carbon(),
+        ]);
     }
 
 }

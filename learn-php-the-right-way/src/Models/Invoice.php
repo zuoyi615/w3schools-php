@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\EloquentModel;
+namespace App\Models;
 
 use App\Enums\InvoiceStatus;
 use Carbon\Carbon;
