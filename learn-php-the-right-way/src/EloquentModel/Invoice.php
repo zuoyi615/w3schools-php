@@ -36,4 +36,14 @@ class Invoice extends Model
         return $this->hasMany(InvoiceItem::class);
     }
 
+    protected static function booted(): void
+    {
+        static::creating(function (Invoice $invoice) {
+            // set default value for due_date if not set value manually
+            if ($invoice->isClean('due_date')) {
+                $invoice->due_date = (new Carbon())->addDays(10);
+            }
+        });
+    }
+
 }

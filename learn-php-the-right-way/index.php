@@ -2,14 +2,13 @@
 
 declare(strict_types=1);
 
-use App\{App, Container, Router};
-use App\Controllers\{HomeController, InvoiceController};
-use App\Controllers\UserController;
+use App\{App, Router};
+use App\Controllers\{HomeController, InvoiceController, UserController};
+use Illuminate\Container\Container;
 
 require_once 'vendor/autoload.php';
 
-const UPLOAD_PATH = __DIR__.DIRECTORY_SEPARATOR.'uploads';
-const VIEW_PATH   = __DIR__.DIRECTORY_SEPARATOR.'views';
+const VIEW_PATH = __DIR__.DIRECTORY_SEPARATOR.'views';
 
 $container = new Container();
 $router    = new Router($container);
@@ -30,9 +29,5 @@ try {
 }
 
 $app = new App($container, $router, $request);
-
-// echo '<pre>';
-// print_r($router->routes());
-// echo '</pre>';
 
 $app->boot()->run();

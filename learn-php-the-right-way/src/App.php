@@ -2,24 +2,22 @@
 
 namespace App;
 
-use App\Exceptions\RouteNotFoundException;
-use App\Interfaces\PaymentGatewayInterface;
-use App\Services\PaymentGatewayService;
 use Dotenv\Dotenv;
-use ReflectionException;
+use Exception;
+use Illuminate\Container\Container;
+use Illuminate\Database\Capsule\Manager as Capsule;
+use Illuminate\Events\Dispatcher;
 use Symfony\Component\Mailer\MailerInterface;
 
 class App
 {
 
-    private static DB $db;
-
-    private Config    $config;
+    private Config $config;
 
     /**
-     * @param  \App\Container  $container
-     * @param  \App\Router|null  $router
-     * @param  array  $request
+     * @param  Container    $container
+     * @param  Router|null  $router
+     * @param  array        $request
      */
     public function __construct(
         protected Container $container,
@@ -27,14 +25,16 @@ class App
         protected array $request = [],
     ) {}
 
-    public static function db(): DB
+    public function initDB(array $config): void
     {
-        return static::$db;
+        $capsule = new Capsule();
+
+        $capsule->addConnection($config);
+        $capsule->setEventDispatcher(new Dispatcher($this->container));
+        $capsule->setAsGlobal();
+        $capsule->bootEloquent();
     }
 
-    /**
-     * @throws \Doctrine\DBAL\Exception
-     */
     public function boot(): static
     {
         $dotenv = Dotenv::createImmutable(dirname(__DIR__));
@@ -42,13 +42,9 @@ class App
 
         $this->config = new Config($_ENV);
 
-        static::$db = new DB($this->config->db ?? []);
+        $this->initDB($this->config->db ?? []);
 
-        $this->container->set(
-            PaymentGatewayInterface::class,
-            PaymentGatewayService::class
-        );
-        $this->container->set(
+        $this->container->bind(
             MailerInterface::class,
             fn() => new CustomMailer($this->config->mailer['dsn'])
         );
@@ -62,9 +58,9 @@ class App
             $uri    = $this->request['uri'];
             $method = strtolower($this->request['method']);
             echo $this->router?->resolve($uri, $method);
-        } catch (RouteNotFoundException|Exceptions\Container\ContainerException|Exceptions\Container\NotFoundException|ReflectionException) {
+        } catch (Exception $e) {
             http_response_code(404);
-            echo View::make('error/404');
+            var_dump($e);
         }
     }
 

@@ -6,20 +6,15 @@ namespace App\Controllers;
 
 use App\Attributes\{Get, Post, Put, Route};
 use App\Enums\HttpMethod;
-use App\Services\InvoiceService;
 use App\View;
 
-class HomeController
+readonly class HomeController
 {
-
-    public function __construct(private InvoiceService $invoiceService) {}
 
     #[Get('/')]
     #[Route('/home', HttpMethod::HEAD)]
     public function index(): View
     {
-        $this->invoiceService->process([], 25);
-
         return View::make('index');
     }
 

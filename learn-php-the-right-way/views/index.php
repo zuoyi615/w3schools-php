@@ -8,6 +8,10 @@
     <title>Document</title>
   </head>
   <body>
-    Home Page
+    <nav>
+      <a href="/">Home</a>
+      <a href="/users/create">Create User</a>
+      <a href="/invoices">invoices</a>
+    </nav>
   </body>
 </html>

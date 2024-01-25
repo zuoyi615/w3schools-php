@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App;
 
 use App\Attributes\Route;
-use App\Exceptions\Container\ContainerException;
-use App\Exceptions\Container\NotFoundException;
 use App\Exceptions\RouteNotFoundException;
+use Illuminate\Container\Container;
+use Psr\Container\{ContainerExceptionInterface, NotFoundExceptionInterface};
 use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;
@@ -32,14 +32,21 @@ class Router
         foreach ($controllers as $controller) {
             $reflectionController = new ReflectionClass($controller);
             foreach ($reflectionController->getMethods() as $method) {
-                $attributes = $method->getAttributes(Route::class,
-                    ReflectionAttribute::IS_INSTANCEOF);
+                $attributes = $method->getAttributes(
+                    Route::class,
+                    ReflectionAttribute::IS_INSTANCEOF
+                );
+
                 if (count($attributes) !== 0) {
                     foreach ($attributes as $attribute) {
                         /**@var Route $route */
                         $route = $attribute->newInstance();
-                        $this->register($route->getPath(), $route->getMethod(),
-                            [$controller, $method->getName()]);
+                        // echo $route->getPath().', '.$route->getMethod().', '.$method->getName().'<br />';
+                        $this->register(
+                            $route->getPath(),
+                            $route->getMethod(),
+                            [$controller, $method->getName()]
+                        );
                     }
                 }
             }
@@ -63,23 +70,22 @@ class Router
 
     /**
      * @param  string  $uri
-     * @param $method
+     * @param  string  $method
      *
      * @return mixed
-     * @throws ContainerException
-     * @throws NotFoundException
-     * @throws ReflectionException
      * @throws RouteNotFoundException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
-    public function resolve(string $uri, $method): mixed
+    public function resolve(string $uri, string $method): mixed
     {
-        $route = explode('?', $uri)[0];
+        $route  = explode('?', $uri)[0];
         $action = $this->routes[$route][$method] ?? null;
         if (is_callable($action)) {
             return call_user_func($action);
         }
 
-        if ( ! is_array($action)) {
+        if (!is_array($action)) {
             throw new RouteNotFoundException();
         }
 
@@ -88,12 +94,12 @@ class Router
         }
 
         [$class, $method] = $action;
-        if ( ! class_exists($class)) {
+        if (!class_exists($class)) {
             throw new RouteNotFoundException();
         }
 
         $instance = $this->container->get($class);
-        if ( ! method_exists($instance, $method)) {
+        if (!method_exists($instance, $method)) {
             throw new RouteNotFoundException();
         }
 

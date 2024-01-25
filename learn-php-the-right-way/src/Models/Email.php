@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\EmailStatus;
-use App\Model;
 use Doctrine\DBAL\Exception;
 use Symfony\Component\Mime\Address;
 
-class Email extends Model
+class Email
 {
 
     /**

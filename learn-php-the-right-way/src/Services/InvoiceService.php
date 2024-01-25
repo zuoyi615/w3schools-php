@@ -9,7 +9,7 @@ use App\Interfaces\PaymentGatewayInterface;
 class InvoiceService
 {
 
-    public function __construct( // constructor injection, loosely coupled
+    public function __construct(
         protected SalesTaxService $salesTaxService,
         protected PaymentGatewayInterface $gatewayService,
         protected EmailService $emailService
@@ -21,7 +21,7 @@ class InvoiceService
         $tax = $this->salesTaxService->calculate($amount, $customer);
 
         // 2. process invoice
-        if ( ! $this->gatewayService->charge($customer, $amount, $tax)) {
+        if (!$this->gatewayService->charge($customer, $amount, $tax)) {
             return false;
         }
 
