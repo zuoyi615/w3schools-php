@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Attributes\{Get, Post};
-use App\Models\Email;
+use App\EloquentModel\Email;
 use App\View;
 use Symfony\Component\Mime\Address;
 
@@ -51,8 +51,7 @@ class UserController
         $from    = new Address('support@example.com', 'Support');
         $subject = 'Welcome';
 
-        $emailModel = new Email();
-        $emailModel->queue(
+        Email::queue(
             to: $to,
             from: $from,
             subject: $subject,

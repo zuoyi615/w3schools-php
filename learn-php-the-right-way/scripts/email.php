@@ -3,10 +3,8 @@
 declare(strict_types=1);
 
 use App\App;
-use App\Exceptions\Container\{ContainerException, NotFoundException};
 use App\Services\EmailService;
 use Illuminate\Container\Container;
-use Psr\Container\ContainerExceptionInterface;
 
 require_once 'vendor/autoload.php';
 
@@ -17,5 +15,6 @@ $app->boot();
 
 try {
     $container->get(EmailService::class)->sendQueuedEmails();
-} catch (ContainerException|NotFoundException|ReflectionException|ContainerExceptionInterface) {
+} catch (Exception $e) {
+    var_dump($e);
 }
