@@ -13,7 +13,11 @@ class CurlController
         $handle = curl_init();
 
         // $url = 'https://jsonplaceholder.typicode.com/todos';
-        $url = 'https://picsum.photos/v2/list?page=2&limit=100';
+        $params = [
+            "page"  => 2,
+            "limit" => 100,
+        ];
+        $url    = 'https://picsum.photos/v2/list?'.http_build_query($params);
 
         curl_setopt($handle, CURLOPT_URL, $url);
         curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
@@ -23,7 +27,7 @@ class CurlController
         $content = curl_exec($handle);
 
         if ($error = curl_error($handle)) {
-            echo "Error happened: curl get `{$url}`, $error ";
+            echo "Error happened: curl get `$url`, $error ";
 
             return;
         }
