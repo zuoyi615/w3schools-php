@@ -12,7 +12,9 @@ class CurlController
     {
         $handle = curl_init();
 
-        $url = 'https://www.bilibili.com/';
+        // $url = 'https://jsonplaceholder.typicode.com/todos';
+        $url = 'https://picsum.photos/v2/list?page=2&limit=100';
+
         curl_setopt($handle, CURLOPT_URL, $url);
         curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($handle, CURLOPT_SSL_VERIFYPEER, false); // for https
@@ -26,10 +28,17 @@ class CurlController
             return;
         }
 
+        if ($content === false) {
+            echo "curl $url failed.";
+
+            return;
+        }
+
+        $data = json_decode($content, true);
+
         echo '<pre>';
-        print_r(curl_getinfo($handle));
+        var_dump($data);
         echo '</pre>';
-        // echo $content;
     }
 
 }
