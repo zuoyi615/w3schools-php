@@ -12,6 +12,7 @@
       <a href="/">Home</a>
       <a href="/users/create">Create User</a>
       <a href="/invoices">invoices</a>
+      <a href="/curl">curl</a>
     </nav>
   </body>
 </html>

@@ -20,6 +20,7 @@
     "symfony/cache": "^7.0",
     "doctrine/orm": "^2.17",
     "illuminate/database": "^10.41",
-    "illuminate/events": "^10.41"
+    "illuminate/events": "^10.41",
+    "ext-curl": "*"
   }
 }

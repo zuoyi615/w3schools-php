@@ -3,7 +3,10 @@
 declare(strict_types=1);
 
 use App\{App, Router};
-use App\Controllers\{HomeController, InvoiceController, UserController};
+use App\Controllers\{CurlController,
+    HomeController,
+    InvoiceController,
+    UserController};
 use Illuminate\Container\Container;
 
 require_once 'vendor/autoload.php';
@@ -23,6 +26,7 @@ try {
             HomeController::class,
             UserController::class,
             InvoiceController::class,
+            CurlController::class,
         ]
     );
 } catch (ReflectionException $e) {
