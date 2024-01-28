@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Services\TMDBMovieService;
 use Dotenv\Dotenv;
 use Exception;
 use Illuminate\Container\Container;
@@ -47,6 +48,10 @@ class App
         $this->container->bind(
             MailerInterface::class,
             fn() => new CustomMailer($this->config->mailer['dsn'])
+        );
+        $this->container->bind(
+            TMDBMovieService::class,
+            fn() => new TMDBMovieService($this->config->tmdb['token']),
         );
 
         return $this;

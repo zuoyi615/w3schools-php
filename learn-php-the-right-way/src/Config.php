@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace App;
 
 /**
- * @property-read ?array db
- * @property-read ?array mailer
+ * @property-read array db
+ * @property-read array mailer
+ * @property-read array tmdb
  */
 class Config
 {
@@ -31,6 +32,9 @@ class Config
             ],
             'mailer' => [
                 'dsn' => $env['MAILER_DSN'],
+            ],
+            'tmdb'   => [
+                'token' => $env['TMDB_TOKEN'] ?? null,
             ],
         ];
     }
