@@ -17,32 +17,34 @@ class TMDBMovieService implements TMDBMovieInterface
 
     private string $baseUrl = 'https://api.themoviedb.org/3/';
 
-    public function __construct(private readonly string $token) {}
+    private Client $client;
+
+    public function __construct(private readonly string $token)
+    {
+        $stack = HandlerStack::create();
+        $stack->push($this->getRetryMiddleware(3));
+
+        $this->client = new Client([
+            'base_uri' => $this->baseUrl,
+            'timeout'  => 5,
+            'handler'  => $stack,
+            'headers'  => [
+                'Authorization' => 'Bearer '.$this->token,
+                'accept'        => 'application/json',
+            ],
+            'proxy'    => [
+                'http'  => 'http://127.0.0.1:7890',
+                'https' => 'http://127.0.0.1:7890',
+            ],
+        ]);
+    }
 
     /**
      * @throws GuzzleException
      */
     public function authenticate(): array
     {
-        $stack = HandlerStack::create();
-        $stack->push($this->getRetryMiddleware(3));
-
-        $client = new Client([
-            'base_uri' => $this->baseUrl,
-            'timeout'  => 5,
-            'handler'  => $stack,
-        ]);
-
-        $response = $client->get('authentication', [
-            'headers' => [
-                'Authorization' => 'Bearer '.$this->token,
-                'accept'        => 'application/json',
-            ],
-            'proxy'   => [
-                'http'  => 'http://127.0.0.1:7890',
-                'https' => 'http://127.0.0.1:7890',
-            ],
-        ]);
+        $response = $this->client->get('authentication');
 
         return json_decode($response->getBody()->getContents(), true);
     }
@@ -70,6 +72,40 @@ class TMDBMovieService implements TMDBMovieInterface
 
             return false;
         });
+    }
+
+    /**
+     * @throws GuzzleException
+     */
+    public function getPopularMovies(): array
+    {
+        $params   = [
+            'language' => 'en-US',
+            'page'     => 1,
+        ];
+        $response = $this->client->get('person/popular', [
+            'query' => $params,
+        ]);
+
+        return json_decode($response->getBody()->getContents(), true);
+    }
+
+    /**
+     * @throws GuzzleException
+     */
+    public function searchMovies(string $query): array
+    {
+        $params   = [
+            'query'         => $query,
+            'include_adult' => false,
+            'language'      => 'en-US',
+            'page'          => 1,
+        ];
+        $response = $this->client->get('search/collection', [
+            'query' => $params,
+        ]);
+
+        return json_decode($response->getBody()->getContents(), true);
     }
 
 }

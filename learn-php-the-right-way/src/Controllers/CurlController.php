@@ -20,4 +20,24 @@ readonly class CurlController
         echo '</pre>';
     }
 
+    #[Get('/curl/search/collection')]
+    public function searchMovies(): void
+    {
+        $result = $this->movieService->searchMovies('Hallo');
+
+        echo '<pre>';
+        print_r($result);
+        echo '</pre>';
+    }
+
+    #[Get('/curl/person/popular')]
+    public function getPopularMovies(): void
+    {
+        $result = $this->movieService->getPopularMovies();
+
+        echo '<pre>';
+        print_r($result);
+        echo '</pre>';
+    }
+
 }
