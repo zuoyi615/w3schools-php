@@ -2,12 +2,15 @@
 
 namespace App;
 
+use App\Interfaces\TMDBMovieInterface;
 use App\Services\TMDBMovieService;
 use Dotenv\Dotenv;
 use Exception;
 use Illuminate\Container\Container;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Events\Dispatcher;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 
 class App
@@ -50,7 +53,7 @@ class App
             fn() => new CustomMailer($this->config->mailer['dsn'])
         );
         $this->container->bind(
-            TMDBMovieService::class,
+            TMDBMovieInterface::class,
             fn() => new TMDBMovieService($this->config->tmdb['token']),
         );
 
@@ -63,7 +66,7 @@ class App
             $uri    = $this->request['uri'];
             $method = strtolower($this->request['method']);
             echo $this->router?->resolve($uri, $method);
-        } catch (Exception $e) {
+        } catch (Exception|NotFoundExceptionInterface|ContainerExceptionInterface $e) {
             http_response_code(404);
             var_dump($e);
         }

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Interfaces\TMDBMovieInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\GuzzleException;
@@ -11,7 +12,7 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use RuntimeException;
 
-class TMDBMovieService
+class TMDBMovieService implements TMDBMovieInterface
 {
 
     private string $baseUrl = 'https://api.themoviedb.org/3/';
@@ -23,33 +24,13 @@ class TMDBMovieService
      */
     public function authenticate(): array
     {
-        $stack = new HandlerStack();
-        $stack->push(Middleware::retry(function (
-            int $retries,
-            RequestInterface $request,
-            ?ResponseInterface $response = null,
-            ?RuntimeException $e = null
-        ) {
-            $maxRetries = 5;
-            if ($retries >= $maxRetries) {
-                return false;
-            }
-
-            $retryStatuses = [249, 304, 302, 401, 503];
-            if (in_array($response?->getStatusCode(), $retryStatuses)) {
-                return true;
-            }
-
-            if ($e instanceof ConnectException) {
-                return true;
-            }
-
-            return false;
-        }));
+        $stack = HandlerStack::create();
+        $stack->push($this->getRetryMiddleware(3));
 
         $client = new Client([
             'base_uri' => $this->baseUrl,
             'timeout'  => 5,
+            'handler'  => $stack,
         ]);
 
         $response = $client->get('authentication', [
@@ -64,6 +45,31 @@ class TMDBMovieService
         ]);
 
         return json_decode($response->getBody()->getContents(), true);
+    }
+
+    public function getRetryMiddleware(int $maxRetry = 5): callable
+    {
+        return Middleware::retry(function (
+            int $retries,
+            RequestInterface $request,
+            ?ResponseInterface $response = null,
+            ?RuntimeException $e = null
+        ) use ($maxRetry) {
+            if ($retries >= $maxRetry) {
+                return false;
+            }
+
+            $retryStatuses = [249, 304, 302, 401, 503, 404];
+            if (in_array($response?->getStatusCode(), $retryStatuses)) {
+                return true;
+            }
+
+            if ($e instanceof ConnectException) {
+                return true;
+            }
+
+            return false;
+        });
     }
 
 }

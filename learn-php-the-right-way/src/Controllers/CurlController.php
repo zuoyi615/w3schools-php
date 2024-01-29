@@ -3,12 +3,12 @@
 namespace App\Controllers;
 
 use App\Attributes\Get;
-use App\Services\TMDBMovieService;
+use App\Interfaces\TMDBMovieInterface;
 
-class CurlController
+readonly class CurlController
 {
 
-    public function __construct(private TMDBMovieService $movieService) {}
+    public function __construct(private TMDBMovieInterface $movieService) {}
 
     #[Get('/curl')]
     public function index(): void
