@@ -16,11 +16,6 @@ readonly class Weight
         }
     }
 
-    private function throwException(string $name): InvalidArgumentException
-    {
-        throw new InvalidArgumentException("Invalid Dimension: $name");
-    }
-
     public function equalsTo(Weight $other): bool
     {
         return $this->value === $other->value;
