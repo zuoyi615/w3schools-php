@@ -2,5 +2,6 @@
 **/test*.txt
 **/uploads/
 **/vendor/
+**/cache/
 
 *.env

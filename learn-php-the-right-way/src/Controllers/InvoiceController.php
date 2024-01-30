@@ -7,20 +7,29 @@ namespace App\Controllers;
 use App\Attributes\Get;
 use App\Models\Invoice;
 use App\Enums\InvoiceStatus;
-use App\View;
+use Twig\Environment as Twig;
 
-class InvoiceController
+readonly class InvoiceController
 {
 
+    public function __construct(private Twig $twig) {}
+
     #[Get('/invoices')]
-    public function index(): View
+    public function index(): string
     {
         $invoices = Invoice::query()
             ->where('status', '=', InvoiceStatus::Paid)
             ->get()
-            ->toArray();
+            ->map(fn(Invoice $invoice) => [
+                'invoiceNumber' => $invoice->invoice_number,
+                'amount'        => $invoice->amount,
+                'status'        => $invoice->status->toString(),
+                'dueDate'       => $invoice->due_date->toDateTimeString(),
+            ]);
 
-        return View::make('invoices/index', ['invoices' => $invoices]);
+        return $this
+            ->twig
+            ->render('invoices/index.twig', ['invoices' => $invoices]);
     }
 
     #[Get('/invoices/create')]

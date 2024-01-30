@@ -6,12 +6,14 @@ use App\{App, Router};
 use App\Controllers\{CurlController,
     HomeController,
     InvoiceController,
-    UserController};
+    UserController
+};
 use Illuminate\Container\Container;
 
 require_once 'vendor/autoload.php';
 
-const VIEW_PATH = __DIR__.DIRECTORY_SEPARATOR.'views';
+const STORAGE_PATH = __DIR__.'/storage';
+const VIEW_PATH    = __DIR__.DIRECTORY_SEPARATOR.'views';
 
 $container = new Container();
 $router    = new Router($container);

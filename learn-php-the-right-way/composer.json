@@ -22,6 +22,8 @@
     "illuminate/database": "^10.41",
     "illuminate/events": "^10.41",
     "ext-curl": "*",
-    "guzzlehttp/guzzle": "^7.8"
+    "guzzlehttp/guzzle": "^7.8",
+    "twig/twig": "^3.8",
+    "twig/intl-extra": "^3.8"
   }
 }
