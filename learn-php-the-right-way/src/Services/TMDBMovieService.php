@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\DTO\AuthenticationResult;
+use App\DTO\SearchResult;
 use App\Interfaces\TMDBMovieInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
@@ -42,11 +44,17 @@ class TMDBMovieService implements TMDBMovieInterface
     /**
      * @throws GuzzleException
      */
-    public function authenticate(): array
+    public function authenticate(): AuthenticationResult
     {
         $response = $this->client->get('authentication');
 
-        return json_decode($response->getBody()->getContents(), true);
+        $result = json_decode($response->getBody()->getContents(), true);
+
+        return new AuthenticationResult(
+            success: $result['success'],
+            statusCode: $result['status_code'],
+            statusMessage: $result['status_message'],
+        );
     }
 
     public function getRetryMiddleware(int $maxRetry = 5): callable
@@ -93,7 +101,7 @@ class TMDBMovieService implements TMDBMovieInterface
     /**
      * @throws GuzzleException
      */
-    public function searchMovies(string $query): array
+    public function searchMovies(string $query): SearchResult
     {
         $params   = [
             'query'         => $query,
@@ -105,7 +113,12 @@ class TMDBMovieService implements TMDBMovieInterface
             'query' => $params,
         ]);
 
-        return json_decode($response->getBody()->getContents(), true);
+        $result = json_decode($response->getBody()->getContents(), true);
+
+        return new SearchResult(
+            page: $result['page'],
+            results: $result['results']
+        );
     }
 
 }
