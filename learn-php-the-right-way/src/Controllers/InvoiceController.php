@@ -5,47 +5,35 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Attributes\Get;
-use App\Models\Invoice;
-use App\Enums\InvoiceStatus;
-use Twig\Environment as Twig;
+use App\Services\InvoiceService;
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
+use Slim\Views\Twig;
+use Twig\Error\{SyntaxError, RuntimeError, LoaderError};
 
 readonly class InvoiceController
 {
 
-    public function __construct(private Twig $twig) {}
+    public function __construct(private InvoiceService $invoiceService) {}
 
+    /**
+     * @throws SyntaxError
+     * @throws RuntimeError
+     * @throws LoaderError
+     */
     #[Get('/invoices')]
-    public function index(): string
+    public function index(Request $request, Response $response): Response
     {
-        $invoices = Invoice::query()
-            ->where('status', '=', InvoiceStatus::Paid)
-            ->get()
-            ->map(fn(Invoice $invoice) => [
-                'invoiceNumber' => $invoice->invoice_number,
-                'amount'        => $invoice->amount,
-                'status'        => $invoice->status->toString(),
-                'dueDate'       => $invoice->due_date->toDateTimeString(),
-            ]);
-
-        return $this
-            ->twig
-            ->render('invoices/index.twig', ['invoices' => $invoices]);
+        return Twig
+            ::fromRequest($request)
+            ->render(
+                $response,
+                'invoices/index.twig',
+                ['invoices' => $this->invoiceService->getPaidInvoices()]
+            );
     }
 
     #[Get('/invoices/create')]
-    public function create(): void
-    {
-        $invoice = new Invoice();
-
-        $invoice->invoice_number = '001';
-        $invoice->amount         = 20;
-        $invoice->status         = InvoiceStatus::Pending;
-        $invoice->save();
-
-        echo 'Created an Invoice: '
-            .$invoice->id
-            .', '
-            .$invoice->due_date->format('Y-m-d H:m:s');
-    }
+    public function create(): void {}
 
 }

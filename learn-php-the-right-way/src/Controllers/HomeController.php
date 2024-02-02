@@ -17,9 +17,11 @@ readonly class HomeController
      * @throws RuntimeError
      * @throws LoaderError
      */
-    public function index(Request $request, Response $response, $args): Response
+    public function index(Request $request, Response $response): Response
     {
-        return Twig::fromRequest($request)->render($response, 'index.twig');
+        return Twig
+            ::fromRequest($request)
+            ->render($response, 'index.twig');
     }
 
 }

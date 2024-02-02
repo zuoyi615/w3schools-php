@@ -35,7 +35,7 @@ table tr th, table tr td {
         <tr>
             <td>{{ invoice.invoiceNumber }}</td>
             <td>{{ invoice.amount | format_currency('USD') }}</td>
-            <td>{{ invoice.status }}</td>
+            <td>Paid</td>
             <td>
                 {{ invoice.dueDate is empty? 'N/A':invoice.dueDate|date('Y-m-d') }}
             </td>
