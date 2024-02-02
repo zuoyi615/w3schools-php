@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace App;
 
 /**
- * @property-read array db
- * @property-read array mailer
- * @property-read array tmdb
+ * @property-read array   db
+ * @property-read array   mailer
+ * @property-read array   tmdb
+ * @property-read ?string environment
  */
 class Config
 {
@@ -20,19 +21,20 @@ class Config
     public function __construct(array $env)
     {
         $this->config = [
-            'db'     => [
+            'db'          => [
                 'host'     => $env['DB_HOST'],
                 'user'     => $env['DB_USER'],
                 'password' => $env['DB_PASS'],
                 'dbname'   => $env['DB_DATABASE'],
                 'driver'   => $env['DB_DRIVER'] ?? 'pdo_mysql',
             ],
-            'mailer' => [
+            'mailer'      => [
                 'dsn' => $env['MAILER_DSN'],
             ],
-            'tmdb'   => [
+            'tmdb'        => [
                 'token' => $env['TMDB_TOKEN'] ?? null,
             ],
+            'environment' => $env['APP_ENVIRONMENT'] ?? 'production',
         ];
     }
 

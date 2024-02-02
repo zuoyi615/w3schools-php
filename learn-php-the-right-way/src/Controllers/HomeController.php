@@ -12,6 +12,8 @@ use Twig\Error\{SyntaxError, RuntimeError, LoaderError};
 readonly class HomeController
 {
 
+    public function __construct(private Twig $twig) {}
+
     /**
      * @throws SyntaxError
      * @throws RuntimeError
@@ -19,9 +21,7 @@ readonly class HomeController
      */
     public function index(Request $request, Response $response): Response
     {
-        return Twig
-            ::fromRequest($request)
-            ->render($response, 'index.twig');
+        return $this->twig->render($response, 'index.twig');
     }
 
 }

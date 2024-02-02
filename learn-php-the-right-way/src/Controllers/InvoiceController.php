@@ -14,7 +14,10 @@ use Twig\Error\{SyntaxError, RuntimeError, LoaderError};
 readonly class InvoiceController
 {
 
-    public function __construct(private InvoiceService $invoiceService) {}
+    public function __construct(
+        private Twig $twig,
+        private InvoiceService $invoiceService
+    ) {}
 
     /**
      * @throws SyntaxError
@@ -24,8 +27,8 @@ readonly class InvoiceController
     #[Get('/invoices')]
     public function index(Request $request, Response $response): Response
     {
-        return Twig
-            ::fromRequest($request)
+        return $this
+            ->twig
             ->render(
                 $response,
                 'invoices/index.twig',
