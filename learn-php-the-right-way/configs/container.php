@@ -5,8 +5,7 @@ declare(strict_types=1);
 use DI\ContainerBuilder;
 
 $containerBuilder = new ContainerBuilder();
-$bindings         = __DIR__.'/container_bindings.php';
-$containerBuilder->addDefinitions($bindings);
+$containerBuilder->addDefinitions(__DIR__.'/container_bindings.php');
 
 try {
     return $containerBuilder->build();
