@@ -51,6 +51,9 @@ class Invoice
     #[Column(name: 'updated_at', type: Types::DATETIME_MUTABLE)]
     private DateTime      $updatedAt;
 
+    #[Column(name: 'due_date', type: Types::DATETIME_MUTABLE)]
+    private DateTime      $dueDate;
+
     #[OneToMany(
         mappedBy: 'invoice',
         targetEntity: InvoiceItem::class,
@@ -58,7 +61,7 @@ class Invoice
             'persist', 'remove',
         ]
     )]
-    private Collection    $items;
+    private Collection $items;
 
     #[PrePersist]
     public function onPrePersist(LifecycleEventArgs $args): void
@@ -156,6 +159,16 @@ class Invoice
         $this->items->add($item);
 
         return $this;
+    }
+
+    public function getDueDate(): DateTime
+    {
+        return $this->dueDate;
+    }
+
+    public function setDueDate(DateTime $dueDate): void
+    {
+        $this->dueDate = $dueDate;
     }
 
 }
