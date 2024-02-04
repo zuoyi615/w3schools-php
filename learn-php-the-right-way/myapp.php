@@ -53,7 +53,7 @@ try {
         new UpToDateCommand($dependencyFactory),
         new SyncMetadataCommand($dependencyFactory),
         new ListCommand($dependencyFactory),
-        new MyCommand(),
+        $container->get(MyCommand::class),
     ];
 
     $application = new Application('App Name', '0.0.1');
