@@ -3,6 +3,7 @@
 
 declare(strict_types=1);
 
+use App\Commands\MyCommand;
 use Doctrine\Migrations\Configuration\EntityManager\ExistingEntityManager;
 use Doctrine\Migrations\Configuration\Migration\PhpFile;
 use Doctrine\Migrations\DependencyFactory;
@@ -24,6 +25,7 @@ use Doctrine\ORM\Tools\Console\ConsoleRunner;
 use Doctrine\ORM\Tools\Console\EntityManagerProvider\SingleManagerProvider;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Symfony\Component\Console\Application;
 
 /** @var \Slim\App $app */
 $app       = require_once __DIR__.'/bootstrap.php';
@@ -51,12 +53,17 @@ try {
         new UpToDateCommand($dependencyFactory),
         new SyncMetadataCommand($dependencyFactory),
         new ListCommand($dependencyFactory),
+        new MyCommand(),
     ];
 
-    ConsoleRunner::run(
-        new SingleManagerProvider($entityManager),
-        $commands
+    $application = new Application('App Name', '0.0.1');
+    $application->addCommands($commands);
+    ConsoleRunner::addCommands(
+        $application,
+        new SingleManagerProvider($entityManager)
     );
-} catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
+
+    $application->run();
+} catch (Exception|NotFoundExceptionInterface|ContainerExceptionInterface $e) {
     var_dump($e);
 }
