@@ -15,7 +15,7 @@ use Doctrine\ORM\ORMSetup;
 use Dotenv\Dotenv;
 
 // Or use one of the Doctrine\Migrations\Configuration\Configuration\* loaders
-$config = new PhpFile('migrations.php');
+$config = new PhpFile(__DIR__.'/configs/migrations.php');
 $dotenv = Dotenv::createImmutable(__DIR__);
 
 $dotenv->load();
@@ -43,4 +43,6 @@ try {
     );
 } catch (Exception|MissingMappingDriverImplementation $e) {
     var_dump($e);
+
+    return null;
 }
