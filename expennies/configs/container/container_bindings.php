@@ -14,27 +14,45 @@ use Symfony\Component\Asset\Package;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\Asset\VersionStrategy\JsonManifestVersionStrategy;
 use Symfony\WebpackEncoreBundle\Asset\EntrypointLookup;
+use Symfony\WebpackEncoreBundle\Asset\EntrypointLookupCollectionInterface;
+use Symfony\WebpackEncoreBundle\Asset\EntrypointLookupInterface;
 use Symfony\WebpackEncoreBundle\Asset\TagRenderer;
 use Symfony\WebpackEncoreBundle\Twig\EntryFilesTwigExtension;
 use Twig\Extra\Intl\IntlExtension;
 
 use function DI\create;
 
+class CustomEntrypointLookup implements EntrypointLookupCollectionInterface
+{
+
+    function getEntrypointLookup(string $buildName = null
+    ): EntrypointLookupInterface {
+        return new EntrypointLookup(BUILD_PATH.'/entrypoints.json');
+    }
+
+}
+
 return [
-    Config::class                 => create(Config::class)->constructor(require CONFIG_PATH . '/app.php'),
+    Config::class        => create(Config::class)->constructor(require CONFIG_PATH
+        .'/app.php'),
     EntityManager::class => function (Config $conf) {
-        $config     = ORMSetup::createAttributeMetadataConfiguration(
+        $config = ORMSetup::createAttributeMetadataConfiguration(
             paths: $conf->get('doctrine.entity_dir'),
-            isDevMode:$conf->get('doctrine.dev_mode')
+            isDevMode: $conf->get('doctrine.dev_mode')
         );
         var_dump($conf->get('doctrine.connection'));
-        $connection = DriverManager::getConnection($conf->get('doctrine.connection'), $config);
+        $connection
+            = DriverManager::getConnection($conf->get('doctrine.connection'),
+            $config);
 
         return new EntityManager($connection, $config);
     },
-    Twig::class                   => function (Config $config, ContainerInterface $container) {
+    Twig::class          => function (
+        Config $config,
+        ContainerInterface $container
+    ) {
         $twig = Twig::create(VIEW_PATH, [
-            'cache'       => STORAGE_PATH . '/cache/templates',
+            'cache'       => STORAGE_PATH.'/cache/templates',
             'auto_reload' => AppEnvironment::isDevelopment($config->get('app_environment')),
         ]);
 
@@ -45,13 +63,20 @@ return [
         return $twig;
     },
     /**
-     * The following two bindings are needed for EntryFilesTwigExtension & AssetExtension to work for Twig
+     * The following bindings are needed for EntryFilesTwigExtension & AssetExtension to work for Twig
      */
-    'webpack_encore.packages'     => fn () => new Packages(
-        new Package(new JsonManifestVersionStrategy(BUILD_PATH . '/manifest.json'))
-    ),
-    'webpack_encore.tag_renderer' => fn (ContainerInterface $container) => new TagRenderer(
-        new EntrypointLookup(BUILD_PATH . '/entrypoints.json'),
-        $container->get('webpack_encore.packages')
-    ),
+
+    'webpack_encore.packages'     => function () {
+        $manifestPath = BUILD_PATH.'/manifest.json';
+        $strategy     = new JsonManifestVersionStrategy($manifestPath);
+        $in           = new Package($strategy);
+
+        return new Packages($in);
+    },
+    'webpack_encore.tag_renderer' => function (ContainerInterface $c) {
+        $packages   = $c->get('webpack_encore.packages');
+        $collection = new CustomEntrypointLookup();
+
+        return new TagRenderer($collection, $packages);
+    },
 ];
