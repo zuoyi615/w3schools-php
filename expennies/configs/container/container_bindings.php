@@ -36,14 +36,14 @@ return [
     Config::class        => create(Config::class)->constructor(require CONFIG_PATH
         .'/app.php'),
     EntityManager::class => function (Config $conf) {
-        $config = ORMSetup::createAttributeMetadataConfiguration(
+        $config     = ORMSetup::createAttributeMetadataConfiguration(
             paths: $conf->get('doctrine.entity_dir'),
             isDevMode: $conf->get('doctrine.dev_mode')
         );
-        var_dump($conf->get('doctrine.connection'));
-        $connection
-            = DriverManager::getConnection($conf->get('doctrine.connection'),
-            $config);
+        $connection = DriverManager::getConnection(
+            $conf->get('doctrine.connection'),
+            $config
+        );
 
         return new EntityManager($connection, $config);
     },
