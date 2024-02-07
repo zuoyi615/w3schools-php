@@ -10,11 +10,15 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\GeneratedValue;
+use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
 use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\OneToMany;
+use Doctrine\ORM\Mapping\PrePersist;
 use Doctrine\ORM\Mapping\Table;
+use Doctrine\Persistence\Event\LifecycleEventArgs;
 
 #[Entity, Table('users')]
+#[HasLifecycleCallbacks]
 class User
 {
 
@@ -135,6 +139,18 @@ class User
         $this->categories->add($category);
 
         return $this;
+    }
+
+    #[PrePersist]
+    public function updateTimestamps(LifecycleEventArgs $args): void
+    {
+        $time = new DateTime();
+
+        if (!isset($this->createdAt)) {
+            $this->createdAt = $time;
+        }
+
+        $this->updatedAt = $time;
     }
 
 }

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Entity\User;
+use Doctrine\ORM\EntityManager;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Views\Twig;
@@ -11,7 +13,10 @@ use Slim\Views\Twig;
 readonly class AuthController
 {
 
-    public function __construct(private Twig $twig) {}
+    public function __construct(
+        private Twig $twig,
+        private EntityManager $em
+    ) {}
 
     /**
      * @throws \Twig\Error\SyntaxError
@@ -25,6 +30,8 @@ readonly class AuthController
 
     public function logIn(Request $request, Response $response): Response
     {
+        var_dump($request->getParsedBody());
+
         return $response;
     }
 
@@ -38,8 +45,29 @@ readonly class AuthController
         return $this->twig->render($response, 'auth/register.twig');
     }
 
+    /**
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\ORM\Exception\ORMException
+     */
     public function register(Request $request, Response $response): Response
     {
+        $data = $request->getParsedBody();
+
+        $password       = $data['password'];
+        $hashedPassword = password_hash(
+            $password,
+            PASSWORD_BCRYPT,
+            ['cost' => 12]
+        );
+
+        $user = new User();
+        $user->setName($data['name']);
+        $user->setEmail($data['email']);
+        $user->setPassword($hashedPassword);
+
+        $this->em->persist($user);
+        $this->em->flush();
+
         return $response;
     }
 
