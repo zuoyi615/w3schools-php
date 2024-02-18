@@ -29,6 +29,13 @@ readonly class ValidationExceptionMiddleware implements MiddlewareInterface
 
             $_SESSION['errors'] = $e->errors;
 
+            $oldFormData        = $request->getParsedBody();
+            $sensitiveFields    = ['password', 'confirmPassword'];
+            $_SESSION['old']    = array_diff_key(
+                $oldFormData,
+                array_flip($sensitiveFields)
+            );
+
             return $response
                 ->withHeader('Location', $referer)
                 ->withStatus(302);
