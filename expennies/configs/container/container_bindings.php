@@ -8,6 +8,9 @@ use Doctrine\DBAL\DriverManager;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\ORMSetup;
 use Psr\Container\ContainerInterface;
+use Psr\Http\Message\ResponseFactoryInterface;
+use Slim\App;
+use Slim\Factory\AppFactory;
 use Slim\Views\Twig;
 use Symfony\Bridge\Twig\Extension\AssetExtension;
 use Symfony\Component\Asset\Package;
@@ -33,6 +36,18 @@ class CustomEntrypointLookup implements EntrypointLookupCollectionInterface
 }
 
 return [
+    App::class           => function (ContainerInterface $container) {
+        AppFactory::setContainer($container);
+        $app = AppFactory::create();
+
+        $router = require CONFIG_PATH.'/routes/web.php';
+        $router($app);
+
+        $addMiddlewares = require CONFIG_PATH.'/middleware.php';
+        $addMiddlewares($app);
+
+        return $app;
+    },
     Config::class        => create(Config::class)->constructor(require CONFIG_PATH
         .'/app.php'),
     EntityManager::class => function (Config $conf) {
@@ -63,7 +78,8 @@ return [
         return $twig;
     },
     /**
-     * The following bindings are needed for EntryFilesTwigExtension & AssetExtension to work for Twig
+     * The following bindings are needed for EntryFilesTwigExtension &
+     * AssetExtension to work for Twig
      */
 
     'webpack_encore.packages'     => function () {
@@ -78,5 +94,9 @@ return [
         $collection = new CustomEntrypointLookup();
 
         return new TagRenderer($collection, $packages);
+    },
+
+    ResponseFactoryInterface::class => function (App $app) {
+        return $app->getResponseFactory();
     },
 ];
