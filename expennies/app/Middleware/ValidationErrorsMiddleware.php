@@ -19,12 +19,13 @@ readonly class ValidationErrorsMiddleware implements MiddlewareInterface
         ServerRequestInterface $request,
         RequestHandlerInterface $handler
     ): ResponseInterface {
-        $errors = $_SESSION['errors'];
-        if (!empty($errors)) {
+        if (!empty($_SESSION['errors'])) {
+            $errors = $_SESSION['errors'];
             $this
                 ->twig
                 ->getEnvironment()
                 ->addGlobal('errors', $errors);
+            unset($_SESSION['errors']);
         }
 
         return $handler->handle($request);
