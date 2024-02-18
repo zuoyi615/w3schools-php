@@ -12,7 +12,8 @@ use Psr\Http\Server\RequestHandlerInterface;
 class StartSessionsMiddleware implements MiddlewareInterface
 {
 
-    #[Override] public function process(
+    #[Override]
+    public function process(
         ServerRequestInterface $request,
         RequestHandlerInterface $handler
     ): ResponseInterface {
