@@ -27,6 +27,8 @@ readonly class ValidationExceptionMiddleware implements MiddlewareInterface
             $params   = $request->getServerParams();
             $referer  = $params['HTTP_REFERER'];
 
+            $_SESSION['errors'] = $e->errors;
+
             return $response
                 ->withHeader('Location', $referer)
                 ->withStatus(302);
