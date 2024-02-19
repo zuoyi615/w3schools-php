@@ -32,9 +32,25 @@ readonly class AuthController
 
     public function login(Request $request, Response $response): Response
     {
-        var_dump($request->getParsedBody());
+        // 1. Validate the request data
+        $data      = $request->getParsedBody();
+        $validator = new Validator($data);
+        $validator->rule('required', ['email', 'password',]);
+        $validator->rule('email', 'email');
 
-        return $response;
+        // 2. Check user the credentials
+        $user = $this
+            ->em
+            ->getRepository(User::class)
+            ->findOneBy(['email' => $data['email']]);
+        if(!$user) {
+            throw new ValidationException('');
+        }
+
+        // 3. Save user's id in the session
+
+        // 4. Redirect the user to the home page
+        return $response->withHeader('Location', '/')->withStatus(302);
     }
 
     /**
