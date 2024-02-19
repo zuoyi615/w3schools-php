@@ -30,7 +30,7 @@ readonly class AuthController
         return $this->twig->render($response, 'auth/login.twig');
     }
 
-    public function logIn(Request $request, Response $response): Response
+    public function login(Request $request, Response $response): Response
     {
         var_dump($request->getParsedBody());
 
@@ -92,6 +92,13 @@ readonly class AuthController
 
         $this->em->persist($user);
         $this->em->flush();
+
+        return $response;
+    }
+
+    public function logout(Request $request, Response $response): Response
+    {
+        var_dump($request->getParsedBody());
 
         return $response;
     }

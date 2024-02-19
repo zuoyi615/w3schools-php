@@ -32,7 +32,11 @@ $cliApp = new Application(
 ConsoleRunner::addCommands($cliApp, new SingleManagerProvider($entityManager));
 
 $cliApp->addCommands($migrationCommands($dependencyFactory));
-$cliApp->addCommands(array_map(fn($command) => $container->get($command),
-    $customCommands));
+$cliApp->addCommands(
+    array_map(
+        fn($command) => $container->get($command),
+        $customCommands
+    )
+);
 
 $cliApp->run();
