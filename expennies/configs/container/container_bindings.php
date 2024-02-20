@@ -5,7 +5,9 @@ declare(strict_types=1);
 use App\Auth;
 use App\Config;
 use App\Contracts\AuthInterface;
+use App\Contracts\UserProviderServiceInterface;
 use App\Enum\AppEnvironment;
+use App\Services\UserProviderService;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\ORMSetup;
@@ -38,9 +40,8 @@ class CustomEntrypointLookup implements EntrypointLookupCollectionInterface
 }
 
 return [
-    App::class                      => function (ContainerInterface $container
-    ) {
-        AppFactory::setContainer($container);
+    App::class                          => function (ContainerInterface $c) {
+        AppFactory::setContainer($c);
         $app = AppFactory::create();
 
         $router = require CONFIG_PATH.'/routes/web.php';
@@ -51,9 +52,9 @@ return [
 
         return $app;
     },
-    Config::class                   => create(Config::class)->constructor(require CONFIG_PATH
+    Config::class                       => create(Config::class)->constructor(require CONFIG_PATH
         .'/app.php'),
-    EntityManager::class            => function (Config $conf) {
+    EntityManager::class                => function (Config $conf) {
         $config     = ORMSetup::createAttributeMetadataConfiguration(
             paths: $conf->get('doctrine.entity_dir'),
             isDevMode: $conf->get('doctrine.dev_mode')
@@ -65,9 +66,9 @@ return [
 
         return new EntityManager($connection, $config);
     },
-    Twig::class                     => function (
+    Twig::class                         => function (
         Config $config,
-        ContainerInterface $container
+        ContainerInterface $c
     ) {
         $twig = Twig::create(VIEW_PATH, [
             'cache'       => STORAGE_PATH.'/cache/templates',
@@ -75,28 +76,31 @@ return [
         ]);
 
         $twig->addExtension(new IntlExtension());
-        $twig->addExtension(new EntryFilesTwigExtension($container));
-        $twig->addExtension(new AssetExtension($container->get('webpack_encore.packages')));
+        $twig->addExtension(new EntryFilesTwigExtension($c));
+        $twig->addExtension(new AssetExtension($c->get('webpack_encore.packages')));
 
         return $twig;
     },
-    'webpack_encore.packages'       => function () {
+    'webpack_encore.packages'           => function () {
         $manifestPath = BUILD_PATH.'/manifest.json';
         $strategy     = new JsonManifestVersionStrategy($manifestPath);
         $in           = new Package($strategy);
 
         return new Packages($in);
     },
-    'webpack_encore.tag_renderer'   => function (ContainerInterface $c) {
+    'webpack_encore.tag_renderer'       => function (ContainerInterface $c) {
         $packages   = $c->get('webpack_encore.packages');
         $collection = new CustomEntrypointLookup();
 
         return new TagRenderer($collection, $packages);
     },
-    ResponseFactoryInterface::class => function (App $app) {
+    ResponseFactoryInterface::class     => function (App $app) {
         return $app->getResponseFactory();
     },
-    AuthInterface::class            => function (ContainerInterface $c) {
+    AuthInterface::class                => function (ContainerInterface $c) {
         return $c->get(Auth::class);
+    },
+    UserProviderServiceInterface::class => function (ContainerInterface $c) {
+        return $c->get(UserProviderService::class);
     },
 ];
