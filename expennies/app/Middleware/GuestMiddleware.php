@@ -2,7 +2,7 @@
 
 namespace App\Middleware;
 
-use Override;
+use App\Contracts\SessionInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -12,14 +12,16 @@ use Psr\Http\Server\RequestHandlerInterface;
 readonly class GuestMiddleware implements MiddlewareInterface
 {
 
-    public function __construct(private ResponseFactoryInterface $factory) {}
+    public function __construct(
+        private ResponseFactoryInterface $factory,
+        private SessionInterface $session,
+    ) {}
 
-    #[Override]
     public function process(
         ServerRequestInterface $request,
         RequestHandlerInterface $handler
     ): ResponseInterface {
-        if (!empty($_SESSION['user'])) {
+        if ($this->session->get('user')) {
             return $this
                 ->factory
                 ->createResponse(302)
