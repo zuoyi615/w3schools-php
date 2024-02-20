@@ -7,15 +7,12 @@ namespace App\Controllers;
 use App\Contracts\AuthInterface;
 use App\Contracts\RequestValidatorFactoryInterface;
 use App\DataObjects\RegisterUserData;
-use App\Entity\User;
 use App\Exception\ValidationException;
 use App\RequestValidators\RegisterUserRequestValidator;
 use App\RequestValidators\UserLoginRequestValidator;
-use Doctrine\ORM\EntityManager;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Views\Twig;
-use Valitron\Validator;
 
 readonly class AuthController
 {
