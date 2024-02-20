@@ -54,6 +54,7 @@ readonly class AuthController
         }
 
         // 3. Save user's id in the session
+        session_regenerate_id(); // decrease session hijacking and fixation
         $_SESSION['user'] = $user->getId();
 
         // 4. Redirect the user to the home page
