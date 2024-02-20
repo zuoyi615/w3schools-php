@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Contracts\AuthInterface;
+use App\DataObjects\RegisterUserData;
 use App\Entity\User;
 use App\Exception\ValidationException;
 use Doctrine\ORM\EntityManager;
@@ -57,10 +58,6 @@ readonly class AuthController
         return $this->twig->render($response, 'auth/register.twig');
     }
 
-    /**
-     * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws \Doctrine\ORM\Exception\ORMException
-     */
     public function register(Request $request, Response $response): Response
     {
         $data = $request->getParsedBody();
@@ -88,22 +85,14 @@ readonly class AuthController
             throw new ValidationException($validator->errors());
         }
 
-        $password       = $data['password'];
-        $hashedPassword = password_hash(
-            $password,
-            PASSWORD_BCRYPT,
-            ['cost' => 12]
+        $userData = new RegisterUserData(
+            name: $data['name'],
+            email: $data['email'],
+            password: $data['password']
         );
+        $this->auth->register($userData);
 
-        $user = new User();
-        $user->setName($data['name']);
-        $user->setEmail($data['email']);
-        $user->setPassword($hashedPassword);
-
-        $this->em->persist($user);
-        $this->em->flush();
-
-        return $response;
+        return $response->withHeader('Location', '/')->withStatus(302);
     }
 
     public function logout(Request $request, Response $response): Response

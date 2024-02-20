@@ -6,6 +6,7 @@ use App\Contracts\AuthInterface;
 use App\Contracts\SessionInterface;
 use App\Contracts\UserInterface;
 use App\Contracts\UserProviderServiceInterface;
+use App\DataObjects\RegisterUserData;
 
 class Auth implements AuthInterface
 {
@@ -38,27 +39,20 @@ class Auth implements AuthInterface
         return ($this->user = $user);
     }
 
-    public function attemptLogin(
-        array $data
-    ): bool {
-        $user = $this
-            ->userProvider
-            ->getByCredentials(['email' => $data['email']]);
-
+    public function attemptLogin(array $data): bool
+    {
+        $user = $this->userProvider->getByCredentials($data);
         if (!$this->checkCredentials($user, $data)) {
             return false;
         }
 
-        $this->session->regenerate();
-        $this->session->put('user', $user->getId());
+        $this->login($user);
 
         return true;
     }
 
-    public function checkCredentials(
-        ?UserInterface $user,
-        array $data
-    ): bool {
+    public function checkCredentials(?UserInterface $user, array $data): bool
+    {
         if (!$user) {
             return false;
         }
@@ -74,6 +68,22 @@ class Auth implements AuthInterface
         $this->session->forget('user');
         $this->session->regenerate();
         $this->user = null;
+    }
+
+    public function register(RegisterUserData $data): UserInterface
+    {
+        $user = $this->userProvider->createUser($data);
+
+        $this->login($user);
+
+        return $user;
+    }
+
+    public function login(UserInterface $user): void
+    {
+        $this->session->regenerate();
+        $this->session->put('user', $user->getId());
+        $this->user = $user;
     }
 
 }
