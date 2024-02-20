@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Contracts\AuthInterface;
+use App\Contracts\RequestValidatorFactoryInterface;
 use App\DataObjects\RegisterUserData;
 use App\Entity\User;
 use App\Exception\ValidationException;
+use App\RequestValidators\RegisterUserRequestValidator;
+use App\RequestValidators\UserLoginRequestValidator;
 use Doctrine\ORM\EntityManager;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -19,7 +22,7 @@ readonly class AuthController
 
     public function __construct(
         private Twig $twig,
-        private EntityManager $em,
+        private RequestValidatorFactoryInterface $factory,
         private AuthInterface $auth,
     ) {}
 
@@ -35,13 +38,12 @@ readonly class AuthController
 
     public function login(Request $request, Response $response): Response
     {
-        $data      = $request->getParsedBody();
-        $validator = new Validator($data);
-        $validator->rule('required', ['email', 'password',]);
-        $validator->rule('email', 'email');
+        $data = $this
+            ->factory
+            ->make(UserLoginRequestValidator::class)
+            ->validate($request->getParsedBody());
 
-        $success = $this->auth->attemptLogin($data);
-        if (!$success) {
+        if (!$this->auth->attemptLogin($data)) {
             throw new ValidationException(['password' => ['You have entered an invalid username or password']]);
         }
 
@@ -60,37 +62,18 @@ readonly class AuthController
 
     public function register(Request $request, Response $response): Response
     {
-        $data = $request->getParsedBody();
+        $data = $this
+            ->factory
+            ->make(RegisterUserRequestValidator::class)
+            ->validate($request->getParsedBody());
 
-        $validator = new Validator($data);
-        $validator->rule(
-            'required',
-            ['name', 'email', 'password', 'confirmPassword']
+        $this->auth->register(
+            new RegisterUserData(
+                name: $data['name'],
+                email: $data['email'],
+                password: $data['password']
+            )
         );
-        $validator->rule('email', 'email');
-        $validator
-            ->rule('equals', 'confirmPassword', 'password')
-            ->label('Confirm Password');
-        $validator
-            ->rule(function ($field, $value) {
-                return !$this
-                    ->em
-                    ->getRepository(User::class)
-                    ->count(['email' => $value]);
-            }, 'email')
-            ->message('User with the given email address already exists.');
-        if ($validator->validate()) {
-            echo "all fields are valid.";
-        } else {
-            throw new ValidationException($validator->errors());
-        }
-
-        $userData = new RegisterUserData(
-            name: $data['name'],
-            email: $data['email'],
-            password: $data['password']
-        );
-        $this->auth->register($userData);
 
         return $response->withHeader('Location', '/')->withStatus(302);
     }
