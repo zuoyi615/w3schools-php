@@ -2,8 +2,8 @@
 
 namespace App\Middleware;
 
+use App\Contracts\SessionInterface;
 use App\Exception\ValidationException;
-use Override;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -13,9 +13,11 @@ use Psr\Http\Server\RequestHandlerInterface;
 readonly class ValidationExceptionMiddleware implements MiddlewareInterface
 {
 
-    public function __construct(private ResponseFactoryInterface $factory) {}
+    public function __construct(
+        private ResponseFactoryInterface $factory,
+        private SessionInterface $session,
+    ) {}
 
-    #[Override]
     public function process(
         ServerRequestInterface $request,
         RequestHandlerInterface $handler
@@ -27,13 +29,15 @@ readonly class ValidationExceptionMiddleware implements MiddlewareInterface
             $params   = $request->getServerParams();
             $referer  = $params['HTTP_REFERER'];
 
-            $_SESSION['errors'] = $e->errors;
-
-            $oldFormData        = $request->getParsedBody();
-            $sensitiveFields    = ['password', 'confirmPassword'];
-            $_SESSION['old']    = array_diff_key(
-                $oldFormData,
-                array_flip($sensitiveFields)
+            $oldData         = $request->getParsedBody();
+            $sensitiveFields = ['password', 'confirmPassword'];
+            $this->session->flash('errors', $e->errors);
+            $this->session->flash(
+                'old',
+                array_diff_key(
+                    $oldData,
+                    array_flip($sensitiveFields)
+                )
             );
 
             return $response

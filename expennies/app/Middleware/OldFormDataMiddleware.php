@@ -2,7 +2,7 @@
 
 namespace App\Middleware;
 
-use Override;
+use App\Contracts\SessionInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -12,20 +12,20 @@ use Slim\Views\Twig;
 readonly class OldFormDataMiddleware implements MiddlewareInterface
 {
 
-    public function __construct(private Twig $twig) {}
+    public function __construct(
+        private Twig $twig,
+        private SessionInterface $session,
+    ) {}
 
-    #[Override]
     public function process(
         ServerRequestInterface $request,
         RequestHandlerInterface $handler
     ): ResponseInterface {
-        if (!empty($_SESSION['old'])) {
-            $errors = $_SESSION['old'];
+        if ($errors = $this->session->getFlash('old')) {
             $this
                 ->twig
                 ->getEnvironment()
                 ->addGlobal('old', $errors);
-            unset($_SESSION['old']);
         }
 
         return $handler->handle($request);

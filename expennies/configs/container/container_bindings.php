@@ -110,6 +110,7 @@ return [
     SessionInterface::class             => function (Config $config) {
         $options = new SessionConfig(
             name: $config->get('session.name', ''),
+            flashName: $config->get('session.flash_name', 'flash'),
             secure: $config->get('session.secure', true),
             httpOnly: $config->get('session.httponly', true),
             sameSite: SameSite::from($config->get('session.samesite', 'lax'))

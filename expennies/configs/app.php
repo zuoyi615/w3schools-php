@@ -28,9 +28,10 @@ return [
         ],
     ],
     'session'               => [
-        'name'     => strtoupper($appSnakeName.'_session'),
-        'secure'   => true,
-        'httponly' => true,
-        'samesite' => 'lax',
+        'name'       => strtoupper($appSnakeName.'_session'),
+        'flash_name' => strtoupper($appSnakeName.'_flash'),
+        'secure'     => true,
+        'httponly'   => true,
+        'samesite'   => 'lax',
     ],
 ];
