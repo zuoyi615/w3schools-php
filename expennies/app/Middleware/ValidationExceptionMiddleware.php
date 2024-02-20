@@ -4,6 +4,7 @@ namespace App\Middleware;
 
 use App\Contracts\SessionInterface;
 use App\Exception\ValidationException;
+use App\Services\RequestService;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -16,6 +17,7 @@ readonly class ValidationExceptionMiddleware implements MiddlewareInterface
     public function __construct(
         private ResponseFactoryInterface $factory,
         private SessionInterface $session,
+        private RequestService $requestService,
     ) {}
 
     public function process(
@@ -26,11 +28,11 @@ readonly class ValidationExceptionMiddleware implements MiddlewareInterface
             return $handler->handle($request);
         } catch (ValidationException $e) {
             $response = $this->factory->createResponse();
-            $params   = $request->getServerParams();
-            $referer  = $params['HTTP_REFERER'];
+            $referer  = $this->requestService->getReferer($request);
 
             $oldData         = $request->getParsedBody();
             $sensitiveFields = ['password', 'confirmPassword'];
+
             $this->session->flash('errors', $e->errors);
             $this->session->flash(
                 'old',

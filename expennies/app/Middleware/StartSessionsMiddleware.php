@@ -18,7 +18,14 @@ readonly class StartSessionsMiddleware implements MiddlewareInterface
         RequestHandlerInterface $handler
     ): ResponseInterface {
         $this->session->start();
+
         $response = $handler->handle($request);
+
+        // TODO: Check for ajax requests
+        if ($request->getMethod() === 'GET') {
+            $this->session->put('previousUrl', (string) $request->getUri());
+        }
+
         $this->session->save();
 
         return $response;
