@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 use App\Enum\AppEnvironment;
 
-$appEnv = $_ENV['APP_ENV'] ?? AppEnvironment::Production->value;
+$appEnv       = $_ENV['APP_ENV'] ?? AppEnvironment::Production->value;
+$appSnakeName = strtolower(str_replace(' ', '_', $_ENV['APP_NAME']));
 
 return [
     'app_name'              => $_ENV['APP_NAME'],
@@ -15,8 +16,8 @@ return [
     'log_error_details'     => true,
     'doctrine'              => [
         'dev_mode'   => AppEnvironment::isDevelopment($appEnv),
-        'cache_dir'  => STORAGE_PATH . '/cache/doctrine',
-        'entity_dir' => [APP_PATH . '/Entity'],
+        'cache_dir'  => STORAGE_PATH.'/cache/doctrine',
+        'entity_dir' => [APP_PATH.'/Entity'],
         'connection' => [
             'driver'   => $_ENV['DB_DRIVER'] ?? 'pdo_mysql',
             'host'     => $_ENV['DB_HOST'] ?? 'localhost',
@@ -25,5 +26,11 @@ return [
             'user'     => $_ENV['DB_USER'],
             'password' => $_ENV['DB_PASS'],
         ],
+    ],
+    'session'               => [
+        'name'     => strtoupper($appSnakeName.'_session'),
+        'secure'   => true,
+        'httponly' => true,
+        'samesite' => 'lax',
     ],
 ];

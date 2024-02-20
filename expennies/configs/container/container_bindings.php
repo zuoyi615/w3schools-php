@@ -5,9 +5,13 @@ declare(strict_types=1);
 use App\Auth;
 use App\Config;
 use App\Contracts\AuthInterface;
+use App\Contracts\SessionInterface;
 use App\Contracts\UserProviderServiceInterface;
+use App\DataObjects\SessionConfig;
 use App\Enum\AppEnvironment;
+use App\Enum\SameSite;
 use App\Services\UserProviderService;
+use App\Session;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\ORMSetup;
@@ -102,5 +106,15 @@ return [
     },
     UserProviderServiceInterface::class => function (ContainerInterface $c) {
         return $c->get(UserProviderService::class);
+    },
+    SessionInterface::class             => function (Config $config) {
+        $options = new SessionConfig(
+            name: $config->get('session.name', ''),
+            secure: $config->get('session.secure', true),
+            httpOnly: $config->get('session.httponly', true),
+            sameSite: SameSite::from($config->get('session.samesite', 'lax'))
+        );
+
+        return new Session($options);
     },
 ];
