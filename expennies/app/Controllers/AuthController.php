@@ -39,15 +39,22 @@ readonly class AuthController
         $validator->rule('email', 'email');
 
         // 2. Check user the credentials
-        $user = $this
+        $user  = $this
             ->em
             ->getRepository(User::class)
             ->findOneBy(['email' => $data['email']]);
-        if(!$user) {
-            throw new ValidationException('');
+        $match = $user
+            && password_verify(
+                $data['password'],
+                $user->getPassword()
+            );
+
+        if (!$match) {
+            throw new ValidationException(['password' => ['You have entered an invalid username or password']]);
         }
 
         // 3. Save user's id in the session
+        $_SESSION['user'] = $user->getId();
 
         // 4. Redirect the user to the home page
         return $response->withHeader('Location', '/')->withStatus(302);
