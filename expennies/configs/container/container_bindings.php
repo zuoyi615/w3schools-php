@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
+use App\Auth;
 use App\Config;
+use App\Contracts\AuthInterface;
 use App\Enum\AppEnvironment;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\ORM\EntityManager;
@@ -36,7 +38,8 @@ class CustomEntrypointLookup implements EntrypointLookupCollectionInterface
 }
 
 return [
-    App::class           => function (ContainerInterface $container) {
+    App::class                      => function (ContainerInterface $container
+    ) {
         AppFactory::setContainer($container);
         $app = AppFactory::create();
 
@@ -48,9 +51,9 @@ return [
 
         return $app;
     },
-    Config::class        => create(Config::class)->constructor(require CONFIG_PATH
+    Config::class                   => create(Config::class)->constructor(require CONFIG_PATH
         .'/app.php'),
-    EntityManager::class => function (Config $conf) {
+    EntityManager::class            => function (Config $conf) {
         $config     = ORMSetup::createAttributeMetadataConfiguration(
             paths: $conf->get('doctrine.entity_dir'),
             isDevMode: $conf->get('doctrine.dev_mode')
@@ -62,7 +65,7 @@ return [
 
         return new EntityManager($connection, $config);
     },
-    Twig::class          => function (
+    Twig::class                     => function (
         Config $config,
         ContainerInterface $container
     ) {
@@ -77,26 +80,23 @@ return [
 
         return $twig;
     },
-    /**
-     * The following bindings are needed for EntryFilesTwigExtension &
-     * AssetExtension to work for Twig
-     */
-
-    'webpack_encore.packages'     => function () {
+    'webpack_encore.packages'       => function () {
         $manifestPath = BUILD_PATH.'/manifest.json';
         $strategy     = new JsonManifestVersionStrategy($manifestPath);
         $in           = new Package($strategy);
 
         return new Packages($in);
     },
-    'webpack_encore.tag_renderer' => function (ContainerInterface $c) {
+    'webpack_encore.tag_renderer'   => function (ContainerInterface $c) {
         $packages   = $c->get('webpack_encore.packages');
         $collection = new CustomEntrypointLookup();
 
         return new TagRenderer($collection, $packages);
     },
-
     ResponseFactoryInterface::class => function (App $app) {
         return $app->getResponseFactory();
+    },
+    AuthInterface::class            => function (ContainerInterface $c) {
+        return $c->get(Auth::class);
     },
 ];

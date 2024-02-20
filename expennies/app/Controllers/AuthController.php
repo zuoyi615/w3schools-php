@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Contracts\AuthInterface;
 use App\Entity\User;
 use App\Exception\ValidationException;
 use Doctrine\ORM\EntityManager;
@@ -17,7 +18,8 @@ readonly class AuthController
 
     public function __construct(
         private Twig $twig,
-        private EntityManager $em
+        private EntityManager $em,
+        private AuthInterface $auth,
     ) {}
 
     /**
@@ -32,32 +34,16 @@ readonly class AuthController
 
     public function login(Request $request, Response $response): Response
     {
-        // 1. Validate the request data
         $data      = $request->getParsedBody();
         $validator = new Validator($data);
         $validator->rule('required', ['email', 'password',]);
         $validator->rule('email', 'email');
 
-        // 2. Check user the credentials
-        $user  = $this
-            ->em
-            ->getRepository(User::class)
-            ->findOneBy(['email' => $data['email']]);
-        $match = $user
-            && password_verify(
-                $data['password'],
-                $user->getPassword()
-            );
-
-        if (!$match) {
+        $success = $this->auth->attemptLogin($data);
+        if (!$success) {
             throw new ValidationException(['password' => ['You have entered an invalid username or password']]);
         }
 
-        // 3. Save user's id in the session
-        session_regenerate_id(); // decrease session hijacking and fixation
-        $_SESSION['user'] = $user->getId();
-
-        // 4. Redirect the user to the home page
         return $response->withHeader('Location', '/')->withStatus(302);
     }
 
@@ -122,9 +108,9 @@ readonly class AuthController
 
     public function logout(Request $request, Response $response): Response
     {
-        var_dump($request->getParsedBody());
+        $this->auth->logout();
 
-        return $response;
+        return $response->withHeader('Location', '/login')->withStatus(302);
     }
 
 }
