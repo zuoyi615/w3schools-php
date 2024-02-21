@@ -20,6 +20,7 @@ use Doctrine\ORM\ORMSetup;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Slim\App;
+use Slim\Csrf\Guard;
 use Slim\Factory\AppFactory;
 use Slim\Views\Twig;
 use Symfony\Bridge\Twig\Extension\AssetExtension;
@@ -127,5 +128,12 @@ return [
     RequestValidatorFactoryInterface::class => function (ContainerInterface $c
     ) {
         return $c->get(RequestValidatorFactory::class);
+    },
+
+    'csrf' => function (ResponseFactoryInterface $factory) {
+        return new Guard(
+            responseFactory: $factory,
+            persistentTokenMode: true,
+        );
     },
 ];
