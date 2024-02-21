@@ -30,14 +30,20 @@ readonly class CsrfFieldsMiddleware implements MiddlewareInterface
         $csrfValueKey = $csrf->getTokenValueKey();
         $csrfName     = $csrf->getTokenName();
         $csrfValue    = $csrf->getTokenValue();
+        $fields       = <<<CSRF_Fields
+<input type="hidden" name="$csrfNameKey" value="$csrfName">
+<input type="hidden" name="$csrfValueKey" value="$csrfValue">
+CSRF_Fields;
 
         $data = [
-            'keys'  => [
+            'keys'    => [
                 'name'  => $csrfNameKey,
                 'value' => $csrfValueKey,
             ],
-            'name'  => $csrfName,
-            'value' => $csrfValue,
+            'name'    => $csrfName,
+            'value'   => $csrfValue,
+            'fields' => $fields,
+
         ];
 
         $this->twig->getEnvironment()->addGlobal('csrf', $data);
