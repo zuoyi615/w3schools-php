@@ -6,7 +6,7 @@ use App\Contracts\RequestValidatorInterface;
 use App\Exception\ValidationException;
 use Valitron\Validator;
 
-class UserLoginRequestValidator implements RequestValidatorInterface
+readonly class UserLoginRequestValidator implements RequestValidatorInterface
 {
 
     public function validate(array $data): array
