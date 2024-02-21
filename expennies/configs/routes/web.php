@@ -33,7 +33,7 @@ return function (App $app) {
             $categories->get('', [CategoriesController::class, 'index']);
             $categories->post('', [CategoriesController::class, 'store']);
             $categories->delete(
-                '{id}',
+                '/{id}',
                 [CategoriesController::class, 'delete']
             );
         })

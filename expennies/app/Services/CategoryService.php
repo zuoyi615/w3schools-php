@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Entity\Category;
@@ -26,6 +28,24 @@ readonly class CategoryService
         $this->em->flush();
 
         return $category;
+    }
+
+    public function getAll(): array
+    {
+        return $this->em->getRepository(Category::class)->findAll();
+    }
+
+    /**
+     * @throws \Doctrine\ORM\Exception\ORMException
+     */
+    public function delete(int $id): void
+    {
+        $category = $this
+            ->em
+            ->getRepository(Category::class)
+            ->find($id);
+        $this->em->remove($category);
+        $this->em->flush();
     }
 
 }

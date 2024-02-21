@@ -29,7 +29,11 @@ readonly class CategoriesController
     {
         return $this
             ->twig
-            ->render($response, 'categories/index.twig');
+            ->render(
+                $response,
+                'categories/index.twig',
+                ['categories' => $this->categoryService->getAll()]
+            );
     }
 
     /**
@@ -51,8 +55,16 @@ readonly class CategoriesController
             ->withStatus(302);
     }
 
-    public function delete(Request $request, Response $response): Response
-    {
+    /**
+     * @throws \Doctrine\ORM\Exception\ORMException
+     */
+    public function delete(
+        Request $request,
+        Response $response,
+        array $args
+    ): Response {
+        $this->categoryService->delete((int) $args['id']);
+
         return $response
             ->withHeader('Location', '/categories')
             ->withStatus(302);
