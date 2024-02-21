@@ -40,7 +40,7 @@ readonly class CsrfFieldsMiddleware implements MiddlewareInterface
             'value' => $csrfValue,
         ];
 
-        $this->twig->getEnvironment()->getGlobal('csrf', $data);
+        $this->twig->getEnvironment()->addGlobal('csrf', $data);
 
         return $handler->handle($request);
     }
