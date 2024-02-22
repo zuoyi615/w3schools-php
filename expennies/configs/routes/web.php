@@ -32,12 +32,11 @@ return function (App $app) {
         ->group('/categories', function (RouteCollectorProxy $categories) {
             $categories->get('', [CategoriesController::class, 'index']);
             $categories->post('', [CategoriesController::class, 'store']);
-            $categories->delete(
-                '/{id}',
-                [CategoriesController::class, 'delete']
-            );
-            $categories->get('/{id}', [CategoriesController::class, 'get']);
-            $categories->post('/{id}', [CategoriesController::class, 'update']);
+
+            $id = '/{id:[0-9]+}';
+            $categories->delete($id, [CategoriesController::class, 'delete']);
+            $categories->get($id, [CategoriesController::class, 'get']);
+            $categories->post($id, [CategoriesController::class, 'update']);
         })
         ->add(AuthMiddleware::class);
 };

@@ -68,11 +68,7 @@ readonly class CategoriesController
     /**
      * @throws ORMException
      */
-    public function delete(
-        Request  $request,
-        Response $response,
-        array    $args
-    ): Response
+    public function delete(Request $request, Response $response, array $args): Response
     {
         $this->categoryService->delete((int)$args['id']);
 
@@ -81,15 +77,11 @@ readonly class CategoriesController
             ->withStatus(302);
     }
 
-    public function get(
-        Request  $request,
-        Response $response,
-        array    $args
-    ): Response
+    public function get(Request $request, Response $response, array $args): Response
     {
         $category = $this->categoryService->getById((int)$args['id']);
         if (!$category) {
-            return $response->withStatus(404);
+            return $this->formatter->asJson($response->withStatus(404), ['status' => 404, 'message' => 'Not Found']);
         }
 
         $data = [
