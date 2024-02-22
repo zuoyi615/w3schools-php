@@ -9,6 +9,8 @@ use App\RequestValidators\CreateCategoryRequestValidator;
 use App\RequestValidators\UpdateCategoryRequestValidator;
 use App\ResponseFormatter;
 use App\Services\CategoryService;
+use Doctrine\ORM\Exception\ORMException;
+use Doctrine\ORM\OptimisticLockException;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Views\Twig;
@@ -95,22 +97,20 @@ readonly class CategoriesController
         return $this->formatter->asJson($response, $data);
     }
 
-    public function update(
-        Request  $request,
-        Response $response,
-        array    $args
-    ): Response
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     */
+    public function update(Request $request, Response $response, array $args): Response
     {
-
-        $data = $this
-            ->factory
-            ->make(UpdateCategoryRequestValidator::class)
-            ->validate($request->getParsedBody());
+        $data = $this->factory->make(UpdateCategoryRequestValidator::class)->validate($request->getParsedBody());
 
         $category = $this->categoryService->getById((int)$args['id']);
         if (!$category) {
             return $response->withStatus(404);
         }
+
+        $this->categoryService->update($category, $data['name']);
 
         $data = ['status' => 'ok'];
 

@@ -7,11 +7,15 @@ namespace App\Services;
 use App\Entity\Category;
 use App\Entity\User;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Exception\ORMException;
+use Doctrine\ORM\OptimisticLockException;
 
 readonly class CategoryService
 {
 
-    public function __construct(private EntityManager $em) {}
+    public function __construct(private EntityManager $em)
+    {
+    }
 
     /**
      * @throws \Doctrine\ORM\OptimisticLockException
@@ -21,11 +25,9 @@ readonly class CategoryService
     {
         $category = new Category();
 
-        $category->setName($name);
         $category->setUser($user);
 
-        $this->em->persist($category);
-        $this->em->flush();
+        $this->update($category, $name);
 
         return $category;
     }
@@ -54,6 +56,20 @@ readonly class CategoryService
             ->em
             ->getRepository(Category::class)
             ->find($id);
+    }
+
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     */
+    public function update(Category $category, string $name): Category
+    {
+        $category->setName($name);
+
+        $this->em->persist($category);
+        $this->em->flush();
+
+        return $category;
     }
 
 }

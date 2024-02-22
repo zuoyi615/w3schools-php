@@ -11,13 +11,16 @@ use Valitron\Validator;
 readonly class UpdateCategoryRequestValidator implements RVI
 {
 
-    public function __construct(private EntityManager $em) {}
+    public function __construct(private EntityManager $em)
+    {
+    }
 
     public function validate(array $data): array
     {
         $v = new Validator($data);
-        $v->rule('required', 'name');
+        $v->rule('required', ['name', 'id']);
         $v->rule('lengthMax', 'name', 50);
+        $v->rule('integer', 'id');
 
         $v
             ->rule(function ($field, $value) {
