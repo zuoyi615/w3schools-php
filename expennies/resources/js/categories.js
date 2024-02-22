@@ -17,18 +17,22 @@ window.addEventListener('DOMContentLoaded', function () {
     document.querySelector('.save-category-btn').addEventListener('click', async function (event) {
         const id = event.currentTarget.getAttribute('data-id')
 
-        // TODO: Post update to the category
+        const csrfName = editCategoryModal._element.querySelector('input[name="csrf_name"]').value
+        const csrfValue = editCategoryModal._element.querySelector('input[name="csrf_value"]').value
+        const name = editCategoryModal._element.querySelector('input[name="name"]').value
 
         const res = await fetch(`/categories/${id}`, {
             method: 'POST',
             body: JSON.stringify({
-                name: editCategoryModal._element.querySelector('input[name="name"]').value,
+                name,
+                csrf_name: csrfName,
+                csrf_value: csrfValue,
             }),
             headers: {
                 'Content-Type': 'application/json',
             },
         })
-        console.log(await res.text())
+        console.log(await res.json())
     })
 })
 

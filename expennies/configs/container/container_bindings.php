@@ -8,6 +8,7 @@ use App\Contracts\AuthInterface;
 use App\Contracts\RequestValidatorFactoryInterface;
 use App\Contracts\SessionInterface;
 use App\Contracts\UserProviderServiceInterface;
+use App\Csrf;
 use App\DataObjects\SessionConfig;
 use App\Enum\AppEnvironment;
 use App\Enum\SameSite;
@@ -40,30 +41,31 @@ class CustomEntrypointLookup implements EntrypointLookupCollectionInterface
 {
 
     function getEntrypointLookup(string $buildName = null
-    ): EntrypointLookupInterface {
-        return new EntrypointLookup(BUILD_PATH.'/entrypoints.json');
+    ): EntrypointLookupInterface
+    {
+        return new EntrypointLookup(BUILD_PATH . '/entrypoints.json');
     }
 
 }
 
 return [
-    App::class                              => function (ContainerInterface $c
+    App::class => function (ContainerInterface $c
     ) {
         AppFactory::setContainer($c);
         $app = AppFactory::create();
 
-        $router = require CONFIG_PATH.'/routes/web.php';
+        $router = require CONFIG_PATH . '/routes/web.php';
         $router($app);
 
-        $addMiddlewares = require CONFIG_PATH.'/middleware.php';
+        $addMiddlewares = require CONFIG_PATH . '/middleware.php';
         $addMiddlewares($app);
 
         return $app;
     },
-    Config::class                           => create(Config::class)->constructor(require CONFIG_PATH
-        .'/app.php'),
-    EntityManager::class                    => function (Config $conf) {
-        $config     = ORMSetup::createAttributeMetadataConfiguration(
+    Config::class => create(Config::class)->constructor(require CONFIG_PATH
+        . '/app.php'),
+    EntityManager::class => function (Config $conf) {
+        $config = ORMSetup::createAttributeMetadataConfiguration(
             paths: $conf->get('doctrine.entity_dir'),
             isDevMode: $conf->get('doctrine.dev_mode')
         );
@@ -74,12 +76,12 @@ return [
 
         return new EntityManager($connection, $config);
     },
-    Twig::class                             => function (
-        Config $config,
+    Twig::class => function (
+        Config             $config,
         ContainerInterface $c
     ) {
         $twig = Twig::create(VIEW_PATH, [
-            'cache'       => STORAGE_PATH.'/cache/templates',
+            'cache' => STORAGE_PATH . '/cache/templates',
             'auto_reload' => AppEnvironment::isDevelopment($config->get('app_environment')),
             // 'autoescape'  => true,
         ]);
@@ -90,32 +92,32 @@ return [
 
         return $twig;
     },
-    'webpack_encore.packages'               => function () {
-        $manifestPath = BUILD_PATH.'/manifest.json';
-        $strategy     = new JsonManifestVersionStrategy($manifestPath);
-        $in           = new Package($strategy);
+    'webpack_encore.packages' => function () {
+        $manifestPath = BUILD_PATH . '/manifest.json';
+        $strategy = new JsonManifestVersionStrategy($manifestPath);
+        $in = new Package($strategy);
 
         return new Packages($in);
     },
-    'webpack_encore.tag_renderer'           => function (ContainerInterface $c
+    'webpack_encore.tag_renderer' => function (ContainerInterface $c
     ) {
-        $packages   = $c->get('webpack_encore.packages');
+        $packages = $c->get('webpack_encore.packages');
         $collection = new CustomEntrypointLookup();
 
         return new TagRenderer($collection, $packages);
     },
-    ResponseFactoryInterface::class         => function (App $app) {
+    ResponseFactoryInterface::class => function (App $app) {
         return $app->getResponseFactory();
     },
-    AuthInterface::class                    => function (ContainerInterface $c
+    AuthInterface::class => function (ContainerInterface $c
     ) {
         return $c->get(Auth::class);
     },
-    UserProviderServiceInterface::class     => function (ContainerInterface $c
+    UserProviderServiceInterface::class => function (ContainerInterface $c
     ) {
         return $c->get(UserProviderService::class);
     },
-    SessionInterface::class                 => function (Config $config) {
+    SessionInterface::class => function (Config $config) {
         $options = new SessionConfig(
             name: $config->get('session.name', ''),
             flashName: $config->get('session.flash_name', 'flash'),
@@ -131,9 +133,10 @@ return [
         return $c->get(RequestValidatorFactory::class);
     },
 
-    'csrf' => function (ResponseFactoryInterface $factory) {
+    'csrf' => function (ResponseFactoryInterface $factory, Csrf $csrf) {
         return new Guard(
             responseFactory: $factory,
+            failureHandler: $csrf->failureHandler(),
             persistentTokenMode: true,
         );
     },
