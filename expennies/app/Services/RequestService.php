@@ -8,7 +8,9 @@ use Psr\Http\Message\ServerRequestInterface;
 readonly class RequestService
 {
 
-    public function __construct(private SessionInterface $session) {}
+    public function __construct(private SessionInterface $session)
+    {
+    }
 
     public function getReferer(ServerRequestInterface $request): string
     {
@@ -23,6 +25,11 @@ readonly class RequestService
         }
 
         return $referer;
+    }
+
+    public function isXhr(ServerRequestInterface $request): bool
+    {
+        return $request->getHeaderLine('X-Requested-With') === 'XMLHttpRequest';
     }
 
 }

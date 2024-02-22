@@ -14,6 +14,9 @@ use Doctrine\ORM\OptimisticLockException;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Views\Twig;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 
 readonly class CategoriesController
 {
@@ -28,9 +31,9 @@ readonly class CategoriesController
     }
 
     /**
-     * @throws \Twig\Error\RuntimeError
-     * @throws \Twig\Error\SyntaxError
-     * @throws \Twig\Error\LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
+     * @throws LoaderError
      */
     public function index(Request $request, Response $response): Response
     {
@@ -44,8 +47,8 @@ readonly class CategoriesController
     }
 
     /**
-     * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws \Doctrine\ORM\Exception\ORMException
+     * @throws OptimisticLockException
+     * @throws ORMException
      */
     public function store(Request $request, Response $response): Response
     {
@@ -63,7 +66,7 @@ readonly class CategoriesController
     }
 
     /**
-     * @throws \Doctrine\ORM\Exception\ORMException
+     * @throws ORMException
      */
     public function delete(
         Request  $request,
@@ -103,9 +106,12 @@ readonly class CategoriesController
      */
     public function update(Request $request, Response $response, array $args): Response
     {
-        $data = $this->factory->make(UpdateCategoryRequestValidator::class)->validate($request->getParsedBody());
+        $data = $this
+            ->factory
+            ->make(UpdateCategoryRequestValidator::class)
+            ->validate($args + $request->getParsedBody());
 
-        $category = $this->categoryService->getById((int)$args['id']);
+        $category = $this->categoryService->getById((int)$data['id']);
         if (!$category) {
             return $response->withStatus(404);
         }
