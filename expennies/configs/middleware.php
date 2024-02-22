@@ -15,7 +15,7 @@ use Slim\Views\TwigMiddleware;
 
 return function (App $app) {
     $container = $app->getContainer();
-    $config    = $container->get(Config::class);
+    $config = $container->get(Config::class);
 
     $app->add(MethodOverrideMiddleware::class);
     $app->add(CsrfFieldsMiddleware::class);
@@ -25,9 +25,10 @@ return function (App $app) {
     $app->add(ValidationErrorsMiddleware::class);
     $app->add(OldFormDataMiddleware::class);
     $app->add(StartSessionsMiddleware::class);
+    $app->addBodyParsingMiddleware();
     $app->addErrorMiddleware(
-        (bool) $config->get('display_error_details'),
-        (bool) $config->get('log_errors'),
-        (bool) $config->get('log_error_details')
+        (bool)$config->get('display_error_details'),
+        (bool)$config->get('log_errors'),
+        (bool)$config->get('log_error_details')
     );
 };
