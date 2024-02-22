@@ -16,11 +16,13 @@ readonly class CategoriesController
 {
 
     public function __construct(
-        private Twig $twig,
+        private Twig                             $twig,
         private RequestValidatorFactoryInterface $factory,
-        private CategoryService $categoryService,
-        private ResponseFormatter $formatter,
-    ) {}
+        private CategoryService                  $categoryService,
+        private ResponseFormatter                $formatter,
+    )
+    {
+    }
 
     /**
      * @throws \Twig\Error\RuntimeError
@@ -61,11 +63,12 @@ readonly class CategoriesController
      * @throws \Doctrine\ORM\Exception\ORMException
      */
     public function delete(
-        Request $request,
+        Request  $request,
         Response $response,
-        array $args
-    ): Response {
-        $this->categoryService->delete((int) $args['id']);
+        array    $args
+    ): Response
+    {
+        $this->categoryService->delete((int)$args['id']);
 
         return $response
             ->withHeader('Location', '/categories')
@@ -73,19 +76,36 @@ readonly class CategoriesController
     }
 
     public function get(
-        Request $request,
+        Request  $request,
         Response $response,
-        array $args
-    ): Response {
-        $category = $this->categoryService->getById((int) $args['id']);
+        array    $args
+    ): Response
+    {
+        $category = $this->categoryService->getById((int)$args['id']);
         if (!$category) {
             return $response->withStatus(404);
         }
 
         $data = [
-            'id'   => $category->getId(),
+            'id' => $category->getId(),
             'name' => $category->getName(),
         ];
+
+        return $this->formatter->asJson($response, $data);
+    }
+
+    public function update(
+        Request  $request,
+        Response $response,
+        array    $args
+    ): Response
+    {
+        $category = $this->categoryService->getById((int)$args['id']);
+        if (!$category) {
+            return $response->withStatus(404);
+        }
+
+        $data = ['status' => 'ok'];
 
         return $this->formatter->asJson($response, $data);
     }

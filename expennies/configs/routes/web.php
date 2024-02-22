@@ -37,6 +37,7 @@ return function (App $app) {
                 [CategoriesController::class, 'delete']
             );
             $categories->get('/{id}', [CategoriesController::class, 'get']);
+            $categories->post('/{id}', [CategoriesController::class, 'update']);
         })
         ->add(AuthMiddleware::class);
 };
