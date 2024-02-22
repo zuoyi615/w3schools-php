@@ -8,7 +8,7 @@ use App\Exception\ValidationException;
 use Doctrine\ORM\EntityManager;
 use Valitron\Validator;
 
-readonly class CreateCategoryRequestValidate implements RVI
+readonly class UpdateCategoryRequestValidator implements RVI
 {
 
     public function __construct(private EntityManager $em) {}

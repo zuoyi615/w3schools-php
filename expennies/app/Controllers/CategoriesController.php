@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Contracts\RequestValidatorFactoryInterface;
-use App\RequestValidators\CreateCategoryRequestValidate;
+use App\RequestValidators\CreateCategoryRequestValidator;
+use App\RequestValidators\UpdateCategoryRequestValidator;
 use App\ResponseFormatter;
 use App\Services\CategoryService;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -48,7 +49,7 @@ readonly class CategoriesController
     {
         $data = $this
             ->factory
-            ->make(CreateCategoryRequestValidate::class)
+            ->make(CreateCategoryRequestValidator::class)
             ->validate($request->getParsedBody());
 
         $user = $request->getAttribute('user');
@@ -100,6 +101,12 @@ readonly class CategoriesController
         array    $args
     ): Response
     {
+
+        $data = $this
+            ->factory
+            ->make(UpdateCategoryRequestValidator::class)
+            ->validate($request->getParsedBody());
+
         $category = $this->categoryService->getById((int)$args['id']);
         if (!$category) {
             return $response->withStatus(404);
