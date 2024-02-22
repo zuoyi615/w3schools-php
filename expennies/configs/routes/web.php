@@ -36,6 +36,7 @@ return function (App $app) {
                 '/{id}',
                 [CategoriesController::class, 'delete']
             );
+            $categories->get('/{id}', [CategoriesController::class, 'get']);
         })
         ->add(AuthMiddleware::class);
 };
