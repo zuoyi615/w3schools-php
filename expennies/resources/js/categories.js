@@ -16,17 +16,13 @@ window.addEventListener('DOMContentLoaded', function () {
 
     document.querySelector('.save-category-btn').addEventListener('click', async function (event) {
         const id = event.currentTarget.getAttribute('data-id')
-
-        const csrfName = editCategoryModal._element.querySelector('input[name="csrf_name"]').value
-        const csrfValue = editCategoryModal._element.querySelector('input[name="csrf_value"]').value
         const name = editCategoryModal._element.querySelector('input[name="name"]').value
 
         const res = await fetch(`/categories/${id}`, {
             method: 'POST',
             body: JSON.stringify({
                 name,
-                csrf_name: csrfName,
-                csrf_value: csrfValue,
+                ...getCsrfFields()
             }),
             headers: {
                 'Content-Type': 'application/json',
@@ -42,4 +38,19 @@ function openEditCategoryModal (modal, { id, name }) {
 
     modal._element.querySelector('.save-category-btn').setAttribute('data-id', id)
     modal.show()
+}
+
+function getCsrfFields () {
+    const nameEl = document.querySelector('#csrfName')
+    const csrfNameKey = nameEl.getAttribute('name')
+    const csrfName = nameEl.content
+
+    const valueEl = document.querySelector('#csrfValue')
+    const csrfValueKey = valueEl.getAttribute('name')
+    const csrfValue = valueEl.content
+
+    return {
+        [csrfNameKey]: csrfName,
+        [csrfValueKey]: csrfValue
+    }
 }
