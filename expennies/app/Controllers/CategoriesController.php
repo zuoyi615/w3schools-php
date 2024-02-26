@@ -39,13 +39,7 @@ readonly class CategoriesController
      */
     public function index(Request $request, Response $response): Response
     {
-        return $this
-            ->twig
-            ->render(
-                $response,
-                'categories/index.twig',
-                ['categories' => $this->categoryService->getPaginatedCategories(0, 10)]
-            );
+        return $this->twig->render($response, 'categories/index.twig');
     }
 
     /**
@@ -120,7 +114,17 @@ readonly class CategoriesController
     {
         $params = $request->getQueryParams();
 
-        $categories = $this->categoryService->getPaginatedCategories((int)$params['start'], (int)$params['length']);
+        $orderBy = $params['columns'][$params['order'][0]['column']]['data'];
+        $orderDir = $params['order'][0]['dir'];
+
+        // var_dump($params['search']['value']);
+        $categories = $this->categoryService->getPaginatedCategories(
+            (int)$params['start'],
+            (int)$params['length'],
+            $orderBy,
+            $orderDir,
+            $params['search']['value']
+        );
 
         $transformer = function (Category $category) {
             return [

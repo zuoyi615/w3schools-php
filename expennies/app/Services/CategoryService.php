@@ -19,8 +19,8 @@ readonly class CategoryService
     }
 
     /**
-     * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws \Doctrine\ORM\Exception\ORMException
+     * @throws OptimisticLockException
+     * @throws ORMException
      */
     public function create(string $name, User $user): Category
     {
@@ -33,7 +33,7 @@ readonly class CategoryService
         return $category;
     }
 
-    public function getPaginatedCategories(int $start, int $length): Paginator
+    public function getPaginatedCategories(int $start, int $length, string $orderBy, string $orderDir, string $search): Paginator
     {
         $query = $this
             ->em
@@ -42,11 +42,21 @@ readonly class CategoryService
             ->setFirstResult($start)
             ->setMaxResults($length);
 
+        $orderBy = in_array($orderBy, ['name', 'createdAt', 'updatedAt']) ? $orderBy : 'createdAt';
+        $orderDir = strtolower($orderDir) === 'asc' ? 'asc' : 'desc';
+
+        if (!empty($search)) {
+            $search = addcslashes($search, '%_');
+            $query->where('c.name LIKE :name')->setParameter('name', '%' . $search . '%');
+        }
+
+        $query->orderBy('c.' . $orderBy, $orderDir);
+
         return new Paginator($query);
     }
 
     /**
-     * @throws \Doctrine\ORM\Exception\ORMException
+     * @throws ORMException
      */
     public function delete(int $id): void
     {
