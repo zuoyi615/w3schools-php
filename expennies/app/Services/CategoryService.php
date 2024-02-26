@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\DataObjects\DataTableQueryParams;
 use App\Entity\Category;
 use App\Entity\User;
 use Doctrine\ORM\EntityManager;
@@ -33,18 +34,20 @@ readonly class CategoryService
         return $category;
     }
 
-    public function getPaginatedCategories(int $start, int $length, string $orderBy, string $orderDir, string $search): Paginator
+    public function getPaginatedCategories(DataTableQueryParams $params): Paginator
     {
         $query = $this
             ->em
             ->getRepository(Category::class)
             ->createQueryBuilder('c')
-            ->setFirstResult($start)
-            ->setMaxResults($length);
+            ->setFirstResult($params->start)
+            ->setMaxResults($params->length);
 
+        $orderBy = $params->orderBy;
         $orderBy = in_array($orderBy, ['name', 'createdAt', 'updatedAt']) ? $orderBy : 'createdAt';
-        $orderDir = strtolower($orderDir) === 'asc' ? 'asc' : 'desc';
+        $orderDir = strtolower($params->orderDir) === 'asc' ? 'asc' : 'desc';
 
+        $search = $params->search;
         if (!empty($search)) {
             $search = addcslashes($search, '%_');
             $query->where('c.name LIKE :name')->setParameter('name', '%' . $search . '%');

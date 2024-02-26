@@ -10,6 +10,7 @@ use App\RequestValidators\CreateCategoryRequestValidator;
 use App\RequestValidators\UpdateCategoryRequestValidator;
 use App\ResponseFormatter;
 use App\Services\CategoryService;
+use App\Services\RequestService;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
 use Exception;
@@ -28,6 +29,7 @@ readonly class CategoriesController
         private RequestValidatorFactoryInterface $factory,
         private CategoryService                  $categoryService,
         private ResponseFormatter                $formatter,
+        private RequestService                   $requestService,
     )
     {
     }
@@ -112,19 +114,8 @@ readonly class CategoriesController
      */
     public function load(Request $request, Response $response): Response
     {
-        $params = $request->getQueryParams();
-
-        $orderBy = $params['columns'][$params['order'][0]['column']]['data'];
-        $orderDir = $params['order'][0]['dir'];
-
-        // var_dump($params['search']['value']);
-        $categories = $this->categoryService->getPaginatedCategories(
-            (int)$params['start'],
-            (int)$params['length'],
-            $orderBy,
-            $orderDir,
-            $params['search']['value']
-        );
+        $params = $this->requestService->getDataTableQueryParameters($request);
+        $categories = $this->categoryService->getPaginatedCategories($params);
 
         $transformer = function (Category $category) {
             return [
@@ -135,14 +126,12 @@ readonly class CategoriesController
             ];
         };
 
-        return $this->formatter->asJson(
+        $total = count($categories);
+        return $this->formatter->asDataTable(
             $response,
-            [
-                'data' => array_map($transformer, (array)$categories->getIterator()),
-                'draw' => (int)$params['draw'],
-                'recordsTotal' => count($categories),
-                'recordsFiltered' => count($categories),
-            ]
+            array_map($transformer, (array)$categories->getIterator()),
+            $params->draw,
+            $total,
         );
     }
 
