@@ -16,5 +16,9 @@
     "sass": "^1.54.9",
     "sass-loader": "^13.0.2",
     "webpack-notifier": "^1.15.0"
+  },
+  "dependencies": {
+    "datatables.net": "^1.13.1",
+    "datatables.net-dt": "^1.13.1"
   }
 }

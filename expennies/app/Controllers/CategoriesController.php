@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Contracts\RequestValidatorFactoryInterface;
+use App\Entity\Category;
 use App\RequestValidators\CreateCategoryRequestValidator;
 use App\RequestValidators\UpdateCategoryRequestValidator;
 use App\ResponseFormatter;
 use App\Services\CategoryService;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
+use Exception;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Views\Twig;
@@ -42,7 +44,7 @@ readonly class CategoriesController
             ->render(
                 $response,
                 'categories/index.twig',
-                ['categories' => $this->categoryService->getAll()]
+                ['categories' => $this->categoryService->getPaginatedCategories(0, 10)]
             );
     }
 
@@ -60,9 +62,7 @@ readonly class CategoriesController
         $user = $request->getAttribute('user');
         $this->categoryService->create($data['name'], $user);
 
-        return $response
-            ->withHeader('Location', '/categories')
-            ->withStatus(302);
+        return $response->withStatus(200);
     }
 
     /**
@@ -111,6 +111,35 @@ readonly class CategoriesController
         $data = ['status' => 'ok'];
 
         return $this->formatter->asJson($response, $data);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function load(Request $request, Response $response): Response
+    {
+        $params = $request->getQueryParams();
+
+        $categories = $this->categoryService->getPaginatedCategories((int)$params['start'], (int)$params['length']);
+
+        $transformer = function (Category $category) {
+            return [
+                'id' => $category->getId(),
+                'name' => $category->getName(),
+                'createdAt' => $category->getCreatedAt()->format('m/d/Y g:i A'),
+                'updatedAt' => $category->getCreatedAt()->format('m/d/Y g:i A'),
+            ];
+        };
+
+        return $this->formatter->asJson(
+            $response,
+            [
+                'data' => array_map($transformer, (array)$categories->getIterator()),
+                'draw' => (int)$params['draw'],
+                'recordsTotal' => count($categories),
+                'recordsFiltered' => count($categories),
+            ]
+        );
     }
 
 }

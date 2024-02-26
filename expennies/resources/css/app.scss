@@ -1,6 +1,7 @@
 @import "./variables.scss";
 @import "~bootstrap/scss/bootstrap";
 @import "~bootstrap-icons/font/bootstrap-icons";
+@import "~datatables.net-dt/css/jquery.dataTables.min.css";
 
 * {
   font-family: 'Roboto', sans-serif !important;
@@ -17,12 +18,10 @@ svg.icon {
 
 .nav-link {
   color: #9aa0a9;
-
   &.active {
     background-color: inherit !important;
     color: #57585A !important;
   }
-
   &:hover, &:focus {
     color: #57585A !important;
   }
