@@ -9,8 +9,10 @@ function init () {
     form.onsubmit = async function (event) {
         event.preventDefault();
 
-        const { id, name } = getFormData(form)
-        if (id) await edit(id, name)
+        const data = getFormData(form)
+        const { id, name } = data
+
+        if (id) await edit(data)
         else await create(name)
     }
 
@@ -27,10 +29,10 @@ function init () {
                 sortable: false,
                 data: row => `
                     <div class="d-flex flex-">
-                        <button type="submit" class="btn btn-outline-primary delete-category-btn" data-id="${row.id}">
+                        <button type="submit" class="btn btn-outline-primary delete-btn" data-id="${row.id}">
                             <i class="bi bi-trash3-fill"></i>
                         </button>
-                        <button class="ms-2 btn btn-outline-primary edit-category-btn" data-id="${row.id}">
+                        <button class="ms-2 btn btn-outline-primary edit-btn" data-id="${row.id}">
                             <i class="bi bi-pencil-fill"></i>
                         </button>
                     </div>
@@ -40,8 +42,8 @@ function init () {
     })
 
     tableEl.onclick = async function (event) {
-        const editBtn = event.target.closest('.edit-category-btn')
-        const deleteBtn = event.target.closest('.delete-category-btn')
+        const editBtn = event.target.closest('.edit-btn')
+        const deleteBtn = event.target.closest('.delete-btn')
 
         if (editBtn) {
             const id = editBtn.getAttribute('data-id')
@@ -61,7 +63,7 @@ function init () {
         }
     }
 
-    document.querySelector('#createCategoryBtn').onclick = async function () {
+    document.querySelector('#createBtn').onclick = async function () {
         form.reset()
         categoryModal.show()
     }
@@ -72,8 +74,8 @@ function init () {
         categoryModal.hide()
     }
 
-    async function edit (id, name) {
-        const res = await post(`/categories/${id}`, { name }, categoryModal._element)
+    async function edit (data) {
+        const res = await post(`/categories/${data.id}`, data, categoryModal._element)
         refresh(res)
     }
 

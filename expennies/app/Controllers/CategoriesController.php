@@ -58,7 +58,7 @@ readonly class CategoriesController
         $user = $request->getAttribute('user');
         $this->categoryService->create($data['name'], $user);
 
-        return $response->withStatus(200);
+        return $response->withStatus(201);
     }
 
     /**
@@ -104,9 +104,7 @@ readonly class CategoriesController
 
         $this->categoryService->update($category, $data['name']);
 
-        $data = ['status' => 'ok'];
-
-        return $this->formatter->asJson($response, $data);
+        return $response->withStatus(204);
     }
 
     /**

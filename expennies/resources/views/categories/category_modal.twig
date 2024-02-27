@@ -7,13 +7,12 @@
             </div>
             <form id="form">
                 <div class="modal-body">
-                    <div class="form-outline form-white mb-4">
+                    <label class="form-outline form-white mb-4">
                         <input type="hidden" name="id" />
                         <input type="text" name="name" required
                                class="form-control form-control-lg"
                                placeholder="Category Name" />
-                    </div>
-                    {{ csrf.fields | raw }}
+                    </label>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
