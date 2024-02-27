@@ -3,8 +3,17 @@ import { del, get, post } from './ajax'
 import DataTables from 'datatables.net'
 
 function init () {
-    const editCategoryModal = new Modal(document.getElementById('editCategoryModal'))
-    const newCategoryModal = new Modal(document.getElementById('newCategoryModal'))
+    const categoryModal = new Modal(document.getElementById('categoryModal'))
+    const form = categoryModal._element.querySelector('#form')
+
+    form.onsubmit = async function (event) {
+        event.preventDefault();
+
+        const { id, name } = getFormData(form)
+        if (id) await edit(id, name)
+        else await create(name)
+    }
+
     const tableEl = document.querySelector('#categoriesTable')
     const table = new DataTables(tableEl, {
         serverSide: true,
@@ -38,7 +47,9 @@ function init () {
             const id = editBtn.getAttribute('data-id')
             const res = await get(`/categories/${id}`)
             const data = await res.json()
-            openEditCategoryModal(editCategoryModal, data)
+
+            setFormData(form, data)
+            categoryModal.show()
         }
 
         if (deleteBtn) {
@@ -51,33 +62,39 @@ function init () {
     }
 
     document.querySelector('#createCategoryBtn').onclick = async function () {
-        newCategoryModal.show()
+        form.reset()
+        categoryModal.show()
     }
 
-    document.querySelector('.save-category-btn').onclick = async function (event) {
-        const id = event.currentTarget.getAttribute('data-id')
-        const name = editCategoryModal._element.querySelector('input[name="name"]').value
-        const res = await post(`/categories/${id}`, { name }, editCategoryModal._element)
+    function refresh (res) {
         if (!res.ok) return
         table.draw()
-        editCategoryModal.hide()
+        categoryModal.hide()
     }
 
-    document.querySelector('.create-category-btn').onclick = async function () {
-        const name = newCategoryModal._element.querySelector('input[name="name"]').value
-        const res = await post(`/categories`, { name }, newCategoryModal._element)
-        if (!res.ok) return
-        table.draw()
-        newCategoryModal.hide()
+    async function edit (id, name) {
+        const res = await post(`/categories/${id}`, { name }, categoryModal._element)
+        refresh(res)
+    }
+
+    async function create (name) {
+        const res = await post(`/categories`, { name }, categoryModal._element)
+        refresh(res)
     }
 }
 
 window.addEventListener('DOMContentLoaded', init, { once: true })
 
-function openEditCategoryModal (modal, { id, name }) {
-    const nameInput = modal._element.querySelector('input[name="name"]')
-    nameInput.value = name
+function setFormData (form, data) {
+    for (const [field, value] of Object.entries(data)) {
+        form.elements[field].value = value
+    }
+}
 
-    modal._element.querySelector('.save-category-btn').setAttribute('data-id', id)
-    modal.show()
+function getFormData (form) {
+    const { id, name } = form.elements
+    return {
+        id: id.value,
+        name: name.value
+    }
 }
