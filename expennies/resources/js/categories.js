@@ -64,7 +64,7 @@ function init () {
     }
 
     document.querySelector('#createBtn').onclick = async function () {
-        form.reset()
+        resetForm(form)
         categoryModal.show()
     }
 
@@ -91,6 +91,12 @@ function setFormData (form, data) {
     for (const [field, value] of Object.entries(data)) {
         form.elements[field].value = value
     }
+}
+
+function resetForm (form) {
+    form.reset()
+    const hiddenFields = form.querySelectorAll('input[type=hidden]')
+    hiddenFields.forEach(input => input.value = '')
 }
 
 function getFormData (form) {

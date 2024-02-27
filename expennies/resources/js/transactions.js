@@ -77,14 +77,14 @@ function init () {
     }
 
     document.querySelector('#createBtn').onclick = async function () {
-        form.reset()
+        resetForm(form)
         modal.show()
     }
 
     function refresh (res) {
         if (!res.ok) return
-        // table.draw()
-        // modal.hide()
+        table.draw()
+        modal.hide()
     }
 
     async function edit (data) {
@@ -104,6 +104,12 @@ function setFormData (form, data) {
     for (const [field, value] of Object.entries(data)) {
         form.elements[field].value = value
     }
+}
+
+function resetForm (form) {
+    form.reset()
+    const hiddenFields = form.querySelectorAll('input[type=hidden]')
+    hiddenFields.forEach(input => input.value = '')
 }
 
 function getFormData (form) {
