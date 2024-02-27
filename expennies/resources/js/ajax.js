@@ -47,7 +47,7 @@ function handleValidationErrors (errors, domElement) {
     }
 
     for (const name in errors) {
-        const el = domElement.querySelector(`input[name="${name}"]`)
+        const el = domElement.querySelector(`[name="${name}"]`)
         el.classList.add('is-invalid')
 
         for (const error of errors[name]) {

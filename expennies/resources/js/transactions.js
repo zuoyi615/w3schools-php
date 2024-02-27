@@ -10,10 +10,9 @@ function init () {
         event.preventDefault();
 
         const data = getFormData(form)
-        const { id, name } = data
 
-        if (id) await edit(data)
-        else await create(name)
+        if (data.id) await edit(data)
+        else await create(data)
     }
 
     const tableEl = document.querySelector('#transactionsTable')
@@ -22,9 +21,23 @@ function init () {
         ajax: '/transactions/load',
         orderMulti: false,
         columns: [
-            { data: 'name' },
-            { data: 'createdAt' },
-            { data: 'updatedAt' },
+            { data: 'description' },
+            {
+                data (row) {
+                    return new Intl()
+                        .NumberFormat(
+                            'en-US',
+                            {
+                                style: 'currency',
+                                currency: 'USD',
+                                currencySign: 'accounting'
+                            }
+                        )
+                        .format(row.amount)
+                }
+            },
+            { data: 'category' },
+            { data: 'date' },
             {
                 sortable: false,
                 data: row => `
@@ -70,8 +83,8 @@ function init () {
 
     function refresh (res) {
         if (!res.ok) return
-        table.draw()
-        modal.hide()
+        // table.draw()
+        // modal.hide()
     }
 
     async function edit (data) {
@@ -79,8 +92,8 @@ function init () {
         refresh(res)
     }
 
-    async function create (name) {
-        const res = await post(`/transations`, { name }, modal._element)
+    async function create (data) {
+        const res = await post(`/transactions`, data, modal._element)
         refresh(res)
     }
 }
@@ -94,9 +107,13 @@ function setFormData (form, data) {
 }
 
 function getFormData (form) {
-    const { id, name } = form.elements
+    const { id, description, amount, date, category } = form.elements
+
     return {
         id: id.value,
-        name: name.value
+        amount: amount.value,
+        description: description.value,
+        date: date.value,
+        category: category.value
     }
 }
