@@ -2,12 +2,14 @@
 
 namespace App\Services;
 
+use App\DataObjects\DataTableQueryParams;
 use App\DataObjects\TransactionData;
 use App\Entity\Transaction;
 use App\Entity\User;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 
 readonly class TransactionService
 {
@@ -41,5 +43,35 @@ readonly class TransactionService
 
         return $transaction;
     }
+
+    public function getPaginatedTransactions(DataTableQueryParams $params): Paginator
+    {
+        $query = $this
+            ->em
+            ->getRepository(Transaction::class)
+            ->createQueryBuilder('t')
+            ->leftJoin('t.category', 'c')
+            ->setFirstResult($params->start)
+            ->setMaxResults($params->length);
+
+        $orderBy = $params->orderBy;
+        $orderBy = in_array($orderBy, ['description', 'amount', 'date', 'category']) ? $orderBy : 'date';
+        $orderDir = $params->orderDir;
+        $orderDir = strtolower($orderDir) === 'asc' ? 'asc' : 'desc';
+        if ($orderBy === 'category') {
+            $query->orderBy('c.name', $orderDir);
+        } else {
+            $query->orderBy('t.'.$orderBy, $orderDir);
+        }
+
+        $search = $params->search;
+        if (!empty($search)) {
+            $search = addcslashes($search, '%_');
+            $query->where('t.description LIKE :desc')->setParameter('desc', '%'.$search.'%');
+        }
+
+        return new Paginator($query);
+    }
+
 
 }

@@ -2,6 +2,19 @@ import { Modal } from 'bootstrap'
 import { del, get, post } from './ajax'
 import DataTables from 'datatables.net'
 
+function currency (amount) {
+    return Intl
+        .NumberFormat(
+            'en-US',
+            {
+                style: 'currency',
+                currency: 'USD',
+                currencySign: 'accounting'
+            }
+        )
+        .format(amount)
+}
+
 function init () {
     const modal = new Modal(document.getElementById('transactionModal'))
     const form = modal._element.querySelector('#form')
@@ -22,21 +35,8 @@ function init () {
         orderMulti: false,
         columns: [
             { data: 'description' },
-            {
-                data (row) {
-                    return new Intl()
-                        .NumberFormat(
-                            'en-US',
-                            {
-                                style: 'currency',
-                                currency: 'USD',
-                                currencySign: 'accounting'
-                            }
-                        )
-                        .format(row.amount)
-                }
-            },
-            { data: 'category' },
+            { data: ({ amount }) => currency(amount) },
+            { data: 'categoryName' },
             { data: 'date' },
             {
                 sortable: false,

@@ -4,13 +4,16 @@ namespace App\Controllers;
 
 use App\Contracts\RequestValidatorFactoryInterface;
 use App\DataObjects\TransactionData;
+use App\Entity\Transaction;
 use App\RequestValidators\CreateTransactionRequestValidator;
 use App\ResponseFormatter;
 use App\Services\CategoryService;
+use App\Services\RequestService;
 use App\Services\TransactionService;
 use DateTime;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
+use Exception;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Views\Twig;
@@ -26,12 +29,13 @@ readonly class TransactionsController
         private ResponseFormatter                $formatter,
         private RequestValidatorFactoryInterface $validatorFactory,
         private TransactionService               $transactionService,
+        private RequestService                   $requestService
     ) {}
 
     /**
      * @throws OptimisticLockException
      * @throws ORMException
-     * @throws \Exception
+     * @throws Exception
      */
     public function store(Request $request, Response $response): Response
     {
@@ -62,15 +66,30 @@ readonly class TransactionsController
         return $this->twig->render($response, 'transactions/index.twig', ['categories' => $categories]);
     }
 
+    /**
+     * @throws Exception
+     */
     public function load(Request $request, Response $response): Response
     {
-        return $this->formatter->asJson($response,
-            [
-                'data'            => [],
-                'draw'            => 1,
-                'recordsTotal'    => 0,
-                'recordsFiltered' => 0,
-            ]
+        $params = $this->requestService->getDataTableQueryParameters($request);
+        $transactions = $this->transactionService->getPaginatedTransactions($params);
+
+        $transformer = function (Transaction $transaction) {
+            return [
+                'id'           => $transaction->getId(),
+                'description'  => $transaction->getDescription(),
+                'amount'       => $transaction->getAmount(),
+                'date'         => $transaction->getDate()->format('m/d/Y g:i A'),
+                'categoryName' => $transaction->getCategory()->getName(),
+                'categoryId'   => $transaction->getCategory()->getId(),
+            ];
+        };
+
+        return $this->formatter->asDataTable(
+            response: $response,
+            data: array_map($transformer, (array) $transactions->getIterator()),
+            draw: $params->draw,
+            total: count($transactions),
         );
     }
 
