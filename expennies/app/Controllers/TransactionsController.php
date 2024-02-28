@@ -79,7 +79,7 @@ readonly class TransactionsController
                 'id'           => $transaction->getId(),
                 'description'  => $transaction->getDescription(),
                 'amount'       => $transaction->getAmount(),
-                'date'         => $transaction->getDate()->format('m/d/Y g:i A'),
+                'date'         => $transaction->getDate()->format('Y-m-d H:i'),
                 'categoryName' => $transaction->getCategory()->getName(),
                 'categoryId'   => $transaction->getCategory()->getId(),
             ];
@@ -106,7 +106,7 @@ readonly class TransactionsController
                 'id'          => $transaction->getId(),
                 'description' => $transaction->getDescription(),
                 'amount'      => $transaction->getAmount(),
-                'date'        => $transaction->getDate()->format('m/d/Y g:i A'),
+                'date'        => $transaction->getDate()->format('Y-m-d H:i'),
                 'category'    => $transaction->getCategory()->getId(),
             ]
         );
@@ -122,8 +122,31 @@ readonly class TransactionsController
         return $response->withStatus(204);
     }
 
-    public function update(Request $request, Response $response): Response
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     * @throws Exception
+     */
+    public function update(Request $request, Response $response, array $args): Response
     {
-        return $response;
+        $data = $args + $request->getParsedBody();
+        $data = $this->validatorFactory->make(CreateTransactionRequestValidator::class)->validate($data);
+
+        $id = (int) $data['id'];
+        if (!$id || !($transaction = $this->transactionService->getById($id))) {
+            return $response->withStatus(404);
+        }
+
+        $this->transactionService->update(
+            $transaction,
+            new TransactionData(
+                description: $data['description'],
+                amount: (float) $data['amount'],
+                date: new DateTime($data['date']),
+                category: $data['category'],
+            )
+        );
+
+        return $response->withStatus(204);
     }
 }

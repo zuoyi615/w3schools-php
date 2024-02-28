@@ -18,7 +18,6 @@ readonly class CreateTransactionRequestValidator implements RVI
 
         $v->rule('required', ['description', 'amount', 'date', 'category']);
         $v->rule('lengthMax', 'description', 255);
-        // $v->rule('dateFormat', 'date', 'm/d/Y g:i A');
         $v->rule('numeric', 'amount');
         $v->rule('integer', 'category');
 
