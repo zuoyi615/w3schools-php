@@ -73,5 +73,22 @@ readonly class TransactionService
         return new Paginator($query);
     }
 
+    public function getById(int $id): ?Transaction
+    {
+        return $this->em->getRepository(Transaction::class)->find($id);
+    }
+
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     */
+    public function delete(int $id): void
+    {
+        $transaction = $this->em->getRepository(Transaction::class)->find($id);
+        if ($transaction) {
+            $this->em->remove($transaction);
+            $this->em->flush();
+        }
+    }
 
 }

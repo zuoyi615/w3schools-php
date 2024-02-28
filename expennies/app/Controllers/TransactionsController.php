@@ -93,4 +93,37 @@ readonly class TransactionsController
         );
     }
 
+    public function get(Request $request, Response $response, array $args): Response
+    {
+        $transaction = $this->transactionService->getById((int) $args['id']);
+        if (!$transaction) {
+            return $response->withStatus(404);
+        }
+
+        return $this->formatter->asJson(
+            response: $response,
+            data: [
+                'id'          => $transaction->getId(),
+                'description' => $transaction->getDescription(),
+                'amount'      => $transaction->getAmount(),
+                'date'        => $transaction->getDate()->format('m/d/Y g:i A'),
+                'category'    => $transaction->getCategory()->getId(),
+            ]
+        );
+    }
+
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     */
+    public function delete(Request $request, Response $response, array $args): Response
+    {
+        $this->transactionService->delete((int) $args['id']);
+        return $response->withStatus(204);
+    }
+
+    public function update(Request $request, Response $response): Response
+    {
+        return $response;
+    }
 }

@@ -47,6 +47,11 @@ return function (App $app) {
             $transactions->get('', [TransactionsController::class, 'index']);
             $transactions->post('', [TransactionsController::class, 'store']);
             $transactions->get('/load', [TransactionsController::class, 'load']);
+
+            $id = '/{id:[0-9]+}';
+            $transactions->delete($id, [TransactionsController::class, 'delete']);
+            $transactions->get($id, [TransactionsController::class, 'get']);
+            $transactions->post($id, [TransactionsController::class, 'update']);
         })
         ->add(AuthMiddleware::class);
 };

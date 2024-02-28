@@ -15,9 +15,7 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 readonly class CategoryService
 {
 
-    public function __construct(private EntityManager $em)
-    {
-    }
+    public function __construct(private EntityManager $em) {}
 
     /**
      * @throws OptimisticLockException
@@ -50,10 +48,10 @@ readonly class CategoryService
         $search = $params->search;
         if (!empty($search)) {
             $search = addcslashes($search, '%_');
-            $query->where('c.name LIKE :name')->setParameter('name', '%' . $search . '%');
+            $query->where('c.name LIKE :name')->setParameter('name', '%'.$search.'%');
         }
 
-        $query->orderBy('c.' . $orderBy, $orderDir);
+        $query->orderBy('c.'.$orderBy, $orderDir);
 
         return new Paginator($query);
     }
@@ -67,8 +65,11 @@ readonly class CategoryService
             ->em
             ->getRepository(Category::class)
             ->find($id);
-        $this->em->remove($category);
-        $this->em->flush();
+
+        if ($category) {
+            $this->em->remove($category);
+            $this->em->flush();
+        }
     }
 
     public function getById(int $id): ?Category
