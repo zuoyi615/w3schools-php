@@ -5,18 +5,14 @@ namespace App;
 use Closure;
 
 use Psr\Http\Message\ResponseFactoryInterface;
-use Psr\Http\Message\ServerRequestInterface as Request;
-use Psr\Http\Server\RequestHandlerInterface as Handler;
 
 readonly class Csrf
 {
-    public function __construct(private ResponseFactoryInterface $responseFactory)
-    {
-    }
+    public function __construct(private ResponseFactoryInterface $responseFactory) { }
 
     public function failureHandler(): Closure
     {
-        return function (Request $request, Handler $handler) {
+        return function () {
             $response = $this->responseFactory->createResponse();
             $body = $response->getBody();
             $body->write(json_encode([

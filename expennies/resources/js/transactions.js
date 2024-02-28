@@ -16,8 +16,11 @@ function currency (amount) {
 }
 
 function init () {
-    const modal = new Modal(document.getElementById('transactionModal'))
+    const modal = new Modal(document.querySelector('#transactionModal'))
     const form = modal._element.querySelector('#form')
+
+    const uploadModal = new Modal(document.querySelector('#uploadReceiptModal'))
+    const uploadForm = uploadModal._element.querySelector('#uploadForm')
 
     form.onsubmit = async function (event) {
         event.preventDefault();
@@ -26,6 +29,12 @@ function init () {
 
         if (data.id) await edit(data)
         else await create(data)
+    }
+
+    uploadForm.onsubmit = async function (event) {
+        event.preventDefault()
+        const data = getUploadFormData(uploadForm)
+        await upload(data)
     }
 
     const tableEl = document.querySelector('#transactionsTable')
@@ -48,6 +57,9 @@ function init () {
                         <button class="ms-2 btn btn-outline-primary edit-btn" data-id="${row.id}">
                             <i class="bi bi-pencil-fill"></i>
                         </button>
+                        <button class="ms-2 btn btn-outline-primary upload-btn" data-id="${row.id}">
+                            <i class="bi bi-upload"></i>
+                        </button>
                     </div>
                 `
             }
@@ -57,6 +69,7 @@ function init () {
     tableEl.onclick = async function (event) {
         const editBtn = event.target.closest('.edit-btn')
         const deleteBtn = event.target.closest('.delete-btn')
+        const uploadBtn = event.target.closest('.upload-btn')
 
         if (editBtn) {
             const id = editBtn.getAttribute('data-id')
@@ -74,6 +87,13 @@ function init () {
                 table.draw()
             }
         }
+
+        if (uploadBtn) {
+            const id = uploadBtn.getAttribute('data-id')
+            resetForm(uploadForm)
+            setFormData(uploadForm, { id })
+            uploadModal.show()
+        }
     }
 
     document.querySelector('#createBtn').onclick = async function () {
@@ -81,7 +101,7 @@ function init () {
         modal.show()
     }
 
-    function refresh (res) {
+    function refresh (res, modal) {
         if (!res.ok) return
         table.draw()
         modal.hide()
@@ -89,12 +109,17 @@ function init () {
 
     async function edit (data) {
         const res = await post(`/transactions/${data.id}`, data, modal._element)
-        refresh(res)
+        refresh(res, modal)
     }
 
     async function create (data) {
         const res = await post(`/transactions`, data, modal._element)
-        refresh(res)
+        refresh(res, modal)
+    }
+
+    async function upload ({ id, receipt }) {
+        const res = await post(`/transactions/${id}/receipts`, receipt, uploadModal._element)
+        refresh(res, uploadModal)
     }
 }
 
@@ -121,5 +146,17 @@ function getFormData (form) {
         description: description.value,
         date: date.value,
         category: category.value
+    }
+}
+
+function getUploadFormData (form) {
+    const { id, receipt } = form.elements
+
+    const formData = new FormData()
+    Array.from(receipt.files).forEach(file => formData.append('receipt', file))
+
+    return {
+        id: id.value,
+        receipt: formData
     }
 }

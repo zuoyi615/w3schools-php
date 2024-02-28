@@ -12,12 +12,23 @@ const ajax = async (url, method = 'get', data = {}, domElement = null) => {
     const csrfMethods = new Set(['post', 'put', 'delete', 'patch'])
 
     if (csrfMethods.has(method)) {
+        const additionalFields = { ...getCsrfFields() }
+
         if (method !== 'post') {
             options.method = 'post'
-            data = { ...data, _METHOD: method.toUpperCase() }
+            additionalFields._METHOD = method.toUpperCase()
         }
 
-        options.body = JSON.stringify({ ...data, ...getCsrfFields() })
+        if (data instanceof FormData) {
+            for (const [field, value] of Object.entries(additionalFields)) {
+                data.append(field, value)
+            }
+            delete options.headers['Content-Type']
+            options.body = data
+        } else {
+            options.body = JSON.stringify({ ...data, ...additionalFields })
+        }
+
     } else if (method === 'get') {
         url += '?' + (new URLSearchParams(data)).toString();
     }

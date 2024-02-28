@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Controllers\AuthController;
 use App\Controllers\CategoryController;
 use App\Controllers\HomeController;
+use App\Controllers\ReceiptController;
 use App\Controllers\TransactionController;
 use App\Middleware\AuthMiddleware;
 use App\Middleware\GuestMiddleware;
@@ -52,6 +53,7 @@ return function (App $app) {
             $transactions->delete($id, [TransactionController::class, 'delete']);
             $transactions->get($id, [TransactionController::class, 'get']);
             $transactions->post($id, [TransactionController::class, 'update']);
+            $transactions->post($id . '/receipts', [ReceiptController::class, 'store']);
         })
         ->add(AuthMiddleware::class);
 };
