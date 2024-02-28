@@ -30,9 +30,7 @@ readonly class CategoriesController
         private CategoryService                  $categoryService,
         private ResponseFormatter                $formatter,
         private RequestService                   $requestService,
-    )
-    {
-    }
+    ) {}
 
     /**
      * @throws RuntimeError
@@ -66,20 +64,20 @@ readonly class CategoriesController
      */
     public function delete(Request $request, Response $response, array $args): Response
     {
-        $this->categoryService->delete((int)$args['id']);
+        $this->categoryService->delete((int) $args['id']);
 
         return $response->withStatus(204);
     }
 
     public function get(Request $request, Response $response, array $args): Response
     {
-        $category = $this->categoryService->getById((int)$args['id']);
+        $category = $this->categoryService->getById((int) $args['id']);
         if (!$category) {
             return $this->formatter->asJson($response->withStatus(404), ['status' => 404, 'message' => 'Not Found']);
         }
 
         $data = [
-            'id' => $category->getId(),
+            'id'   => $category->getId(),
             'name' => $category->getName(),
         ];
 
@@ -97,7 +95,7 @@ readonly class CategoriesController
             ->make(UpdateCategoryRequestValidator::class)
             ->validate($args + $request->getParsedBody());
 
-        $category = $this->categoryService->getById((int)$data['id']);
+        $category = $this->categoryService->getById((int) $data['id']);
         if (!$category) {
             return $response->withStatus(404);
         }
@@ -117,8 +115,8 @@ readonly class CategoriesController
 
         $transformer = function (Category $category) {
             return [
-                'id' => $category->getId(),
-                'name' => $category->getName(),
+                'id'        => $category->getId(),
+                'name'      => $category->getName(),
                 'createdAt' => $category->getCreatedAt()->format('m/d/Y g:i A'),
                 'updatedAt' => $category->getCreatedAt()->format('m/d/Y g:i A'),
             ];
@@ -126,10 +124,10 @@ readonly class CategoriesController
 
         $total = count($categories);
         return $this->formatter->asDataTable(
-            $response,
-            array_map($transformer, (array)$categories->getIterator()),
-            $params->draw,
-            $total,
+            response: $response,
+            data: array_map($transformer, (array) $categories->getIterator()),
+            draw: $params->draw,
+            total: $total,
         );
     }
 
