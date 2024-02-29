@@ -88,9 +88,27 @@ readonly class ReceiptController
     /**
      * @throws OptimisticLockException
      * @throws ORMException
+     * @throws FilesystemException
      */
     public function delete(Request $request, Response $response, array $args): Response
     {
+        $transactionId = (int) $args['transactionId'];
+        $id            = (int) $args['id'];
+        if (!$id || !($receipt = $this->receiptService->getById($id))) {
+            return $response->withStatus(404);
+        }
+
+        if ($receipt->getTransaction()->getId() !== $transactionId) {
+            return $response->withStatus(401);
+        }
+
+        $filename = 'receipts/'.$receipt->getStorageFilename();
+        if (!$this->filesystem->fileExists($filename)) {
+            return $response->withStatus(404);
+        }
+
+        $this->filesystem->delete($filename);
+
         $this->receiptService->delete((int) $args['id']);
 
         return $response->withStatus(204);
