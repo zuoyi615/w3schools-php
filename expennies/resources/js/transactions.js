@@ -59,6 +59,7 @@ function init () {
                         deleteIcon.role = 'button'
 
                         span.classList.add('position-relative')
+                        span.style.marginRight = '24px'
                         icon.classList.add('bi', 'bi-file-earmark-text', 'download-receipt', 'text-primary', 'fs-4')
                         deleteIcon.classList.add('bi', 'bi-x-circle-fill', 'delete-receipt', 'text-danger', 'position-absolute')
 

@@ -17,13 +17,18 @@ readonly class ReceiptService
      * @throws OptimisticLockException
      * @throws ORMException
      */
-    public function create(Transaction $transaction, string $filename, string $storageFilename): Receipt
-    {
+    public function create(
+        Transaction $transaction,
+        string      $filename,
+        string      $storageFilename,
+        string      $mediaType
+    ): Receipt {
         $receipt = new Receipt();
         $receipt
             ->setTransaction($transaction)
             ->setFilename($filename)
             ->setStorageFilename($storageFilename)
+            ->setMediaType($mediaType)
             ->setCreatedAt(new DateTime());
 
         $this->em->persist($receipt);
@@ -31,5 +36,24 @@ readonly class ReceiptService
 
         return $receipt;
     }
+
+    public function getById(int $id): ?Receipt
+    {
+        return $this->em->getRepository(Receipt::class)->find($id);
+    }
+
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     */
+    public function delete(int $id): void
+    {
+        $receipt = $this->em->getRepository(Receipt::class)->find($id);
+        if ($receipt) {
+            $this->em->remove($receipt);
+            $this->em->flush();
+        }
+    }
+
 
 }
