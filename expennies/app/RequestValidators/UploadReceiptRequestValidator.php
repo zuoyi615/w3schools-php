@@ -47,7 +47,7 @@ class UploadReceiptRequestValidator implements RequestValidatorInterface
 
         $tmpFilePath = $file->getStream()->getMetadata('uri');
         $detector    = new FinfoMimeTypeDetector();
-        $mimeType    = $detector->detectMimeType($tmpFilePath, $file->getStream()->getContents());
+        $mimeType    = $detector->detectMimeTypeFromFile($tmpFilePath);
 
         if (!in_array($mimeType, $allowedMimeTypes)) {
             throw new ValidationException(['receipt' => ['Invalid file type']]);
