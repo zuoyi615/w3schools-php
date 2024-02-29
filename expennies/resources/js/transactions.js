@@ -46,6 +46,39 @@ function init () {
             { data: 'description' },
             { data: ({ amount }) => currency(amount) },
             { data: 'categoryName' },
+            {
+                data: row => {
+                    const icons = []
+
+                    row.receipts?.forEach(receipt => {
+                        const span = document.createElement('span')
+                        const anchor = document.createElement('a')
+                        const icon = document.createElement('i')
+                        const deleteIcon = document.createElement('i')
+
+                        deleteIcon.role = 'button'
+
+                        span.classList.add('position-relative')
+                        icon.classList.add('bi', 'bi-file-earmark-text', 'download-receipt', 'text-primary', 'fs-4')
+                        deleteIcon.classList.add('bi', 'bi-x-circle-fill', 'delete-receipt', 'text-danger', 'position-absolute')
+
+                        anchor.href = `/transactions/${row.id}/receipts/${receipt.id}`
+                        anchor.target = 'blank'
+                        anchor.title = receipt.name
+
+                        deleteIcon.setAttribute('data-id', receipt.id)
+                        deleteIcon.setAttribute('data-transactionId', row.id)
+
+                        anchor.append(icon)
+                        span.append(anchor)
+                        span.append(deleteIcon)
+
+                        icons.push(span.outerHTML)
+                    })
+
+                    return icons.join('')
+                }
+            },
             { data: 'date' },
             {
                 sortable: false,
@@ -70,6 +103,7 @@ function init () {
         const editBtn = event.target.closest('.edit-btn')
         const deleteBtn = event.target.closest('.delete-btn')
         const uploadBtn = event.target.closest('.upload-btn')
+        const deleteReceiptBtn = event.target.closest('.delete-receipt')
 
         if (editBtn) {
             const id = editBtn.getAttribute('data-id')
@@ -94,6 +128,15 @@ function init () {
             setFormData(uploadForm, { id })
             uploadModal.show()
         }
+
+        if (deleteReceiptBtn) {
+            const receiptId = deleteReceiptBtn.getAttribute('data-id')
+            const transactionId = deleteReceiptBtn.getAttribute('data-transactionid')
+            if (confirm('Are you sure you want to delete this receipt?')) {
+                const res = await del(`/transactions/${transactionId}/receipts/${receiptId}`);
+                refresh(res)
+            }
+        }
     }
 
     document.querySelector('#createBtn').onclick = async function () {
@@ -104,7 +147,7 @@ function init () {
     function refresh (res, modal) {
         if (!res.ok) return
         table.draw()
-        modal.hide()
+        modal?.hide()
     }
 
     async function edit (data) {

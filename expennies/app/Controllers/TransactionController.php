@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Contracts\RequestValidatorFactoryInterface;
 use App\DataObjects\TransactionData;
+use App\Entity\Receipt;
 use App\Entity\Transaction;
 use App\RequestValidators\CreateTransactionRequestValidator;
 use App\ResponseFormatter;
@@ -44,9 +45,9 @@ readonly class TransactionController
         $this->transactionService->create(
             new TransactionData(
                 description: $data['description'],
-                amount: (float) $data['amount'],
-                date: new DateTime($data['date']),
-                category: $data['category']
+                amount     : (float) $data['amount'],
+                date       : new DateTime($data['date']),
+                category   : $data['category']
             ),
             $request->getAttribute('user'),
         );
@@ -71,7 +72,7 @@ readonly class TransactionController
      */
     public function load(Request $request, Response $response): Response
     {
-        $params = $this->requestService->getDataTableQueryParameters($request);
+        $params       = $this->requestService->getDataTableQueryParameters($request);
         $transactions = $this->transactionService->getPaginatedTransactions($params);
 
         $transformer = function (Transaction $transaction) {
@@ -82,14 +83,23 @@ readonly class TransactionController
                 'date'         => $transaction->getDate()->format('Y-m-d H:i'),
                 'categoryName' => $transaction->getCategory()->getName(),
                 'categoryId'   => $transaction->getCategory()->getId(),
+                'receipts'     => $transaction
+                    ->getReceipts()
+                    ->map(function (Receipt $receipt) {
+                        return [
+                            'name' => $receipt->getFilename(),
+                            'id'   => $receipt->getId()
+                        ];
+                    })
+                    ->toArray(),
             ];
         };
 
         return $this->formatter->asDataTable(
             response: $response,
-            data: array_map($transformer, (array) $transactions->getIterator()),
-            draw: $params->draw,
-            total: count($transactions),
+            data    : array_map($transformer, (array) $transactions->getIterator()),
+            draw    : $params->draw,
+            total   : count($transactions),
         );
     }
 
@@ -102,7 +112,7 @@ readonly class TransactionController
 
         return $this->formatter->asJson(
             response: $response,
-            data: [
+            data    : [
                 'id'          => $transaction->getId(),
                 'description' => $transaction->getDescription(),
                 'amount'      => $transaction->getAmount(),
@@ -141,9 +151,9 @@ readonly class TransactionController
             $transaction,
             new TransactionData(
                 description: $data['description'],
-                amount: (float) $data['amount'],
-                date: new DateTime($data['date']),
-                category: $data['category'],
+                amount     : (float) $data['amount'],
+                date       : new DateTime($data['date']),
+                category   : $data['category'],
             )
         );
 
