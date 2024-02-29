@@ -4,15 +4,20 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Contracts\RequestValidatorFactoryInterface;
+use App\RequestValidators\UploadReceiptRequestValidator;
 use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemException;
-use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\UploadedFileInterface;
 
 readonly class ReceiptController
 {
-    public function __construct(private Filesystem $filesystem) { }
+    public function __construct(
+        private Filesystem                       $filesystem,
+        private RequestValidatorFactoryInterface $validatorFactory,
+    ) {}
 
     /**
      * @throws FilesystemException
@@ -20,15 +25,13 @@ readonly class ReceiptController
     public function store(Request $request, Response $response, array $args): Response
     {
         /** @var UploadedFileInterface $file */
-        $file = $request->getUploadedFiles()['receipt'];
-        if (!$file) {
-            return $response->withStatus(400);
-        }
+        $files = $this->validatorFactory->make(UploadReceiptRequestValidator::class)->validate($request->getUploadedFiles());
+        $file = $files['receipt'];
+
+        $id = (int) $args['id'];
 
         $filename = $file->getClientFilename();
-        $id = (int)$args['id'];
-
-        $this->filesystem->write('receipts/' . $filename, $file->getStream()->getContents());
+        $this->filesystem->write('receipts/'.$filename, $file->getStream()->getContents());
 
         return $response;
     }
