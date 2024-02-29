@@ -47,7 +47,7 @@ readonly class ReceiptController
         $filename       = $file->getClientFilename();
         $this->filesystem->write('receipts/'.$randomFilename, $file->getStream()->getContents());
 
-        $this->receiptService->create($transaction, $filename);
+        $this->receiptService->create($transaction, $filename, $randomFilename);
 
         return $response;
     }

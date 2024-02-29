@@ -17,12 +17,13 @@ readonly class ReceiptService
      * @throws OptimisticLockException
      * @throws ORMException
      */
-    public function create(Transaction $transaction, ?string $filename): Receipt
+    public function create(Transaction $transaction, string $filename, string $storageFilename): Receipt
     {
         $receipt = new Receipt();
         $receipt
             ->setTransaction($transaction)
             ->setFilename($filename)
+            ->setStorageFilename($storageFilename)
             ->setCreatedAt(new DateTime());
 
         $this->em->persist($receipt);
