@@ -22,6 +22,9 @@ function init () {
     const uploadModal = new Modal(document.querySelector('#uploadReceiptModal'))
     const uploadForm = uploadModal._element.querySelector('#uploadForm')
 
+    const importTransactionsModal = new Modal(document.querySelector('#importTransactionsModal'))
+    const importTransactionsForm = importTransactionsModal._element.querySelector('#importTransactionsForm')
+
     form.onsubmit = async function (event) {
         event.preventDefault();
 
@@ -143,6 +146,11 @@ function init () {
     document.querySelector('#createBtn').onclick = async function () {
         resetForm(form)
         modal.show()
+    }
+
+    document.querySelector('#importBtn').onclick = async function () {
+        resetForm(importTransactionsForm)
+        importTransactionsModal.show()
     }
 
     function refresh (res, modal) {
