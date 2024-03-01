@@ -40,6 +40,12 @@ function init () {
         await upload(data)
     }
 
+    importTransactionsForm.onsubmit = async function (event) {
+        event.preventDefault()
+        const data = getImportFormData(importTransactionsForm)
+        await importTransactions(data)
+    }
+
     const tableEl = document.querySelector('#transactionsTable')
     const table = new DataTables(tableEl, {
         serverSide: true,
@@ -173,6 +179,11 @@ function init () {
         const res = await post(`/transactions/${id}/receipts`, receipt, uploadModal._element)
         refresh(res, uploadModal)
     }
+
+    async function importTransactions ({ transaction }) {
+        const res = await post(`/transactions/import`, transaction, importTransactionsModal._element)
+        refresh(res, importTransactionsModal)
+    }
 }
 
 window.addEventListener('DOMContentLoaded', init, { once: true })
@@ -203,8 +214,8 @@ function getFormData (form) {
 
 function getUploadFormData (form) {
     const { id, receipt } = form.elements
-
     const formData = new FormData()
+
     Array.from(receipt.files).forEach(file => formData.append('receipt', file))
 
     return {
@@ -212,3 +223,16 @@ function getUploadFormData (form) {
         receipt: formData
     }
 }
+
+function getImportFormData (form) {
+    const { transaction } = form.elements
+    const formData = new FormData()
+
+    Array.from(transaction.files).forEach(file => formData.append('transaction', file))
+
+    return {
+        transaction: formData
+    }
+}
+
+

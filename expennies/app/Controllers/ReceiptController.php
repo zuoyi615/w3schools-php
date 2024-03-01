@@ -46,6 +46,7 @@ readonly class ReceiptController
 
         $randomFilename = bin2hex(random_bytes(24));
         $filename       = $file->getClientFilename();
+
         $this->filesystem->write('receipts/'.$randomFilename, $file->getStream()->getContents());
 
         $this->receiptService->create($transaction, $filename, $randomFilename, $file->getClientMediaType());

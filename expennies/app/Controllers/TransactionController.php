@@ -7,6 +7,7 @@ use App\DataObjects\TransactionData;
 use App\Entity\Receipt;
 use App\Entity\Transaction;
 use App\RequestValidators\CreateTransactionRequestValidator;
+use App\RequestValidators\ImportTransactionsRequestValidator;
 use App\ResponseFormatter;
 use App\Services\CategoryService;
 use App\Services\RequestService;
@@ -15,8 +16,11 @@ use DateTime;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
 use Exception;
+use League\Flysystem\Filesystem;
+use League\Flysystem\FilesystemException;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
+use Random\RandomException;
 use Slim\Views\Twig;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -30,7 +34,8 @@ readonly class TransactionController
         private ResponseFormatter                $formatter,
         private RequestValidatorFactoryInterface $validatorFactory,
         private TransactionService               $transactionService,
-        private RequestService                   $requestService
+        private RequestService                   $requestService,
+        private Filesystem                       $filesystem,
     ) {}
 
     /**
@@ -159,4 +164,20 @@ readonly class TransactionController
 
         return $response->withStatus(204);
     }
+
+    /**
+     * @throws RandomException
+     * @throws FilesystemException
+     */
+    public function import(Request $request, Response $response): Response
+    {
+        $files          = $this->validatorFactory->make(ImportTransactionsRequestValidator::class)->validate($request->getUploadedFiles());
+        $file           = $files['transaction'];
+        $randomFilename = bin2hex(random_bytes(24));
+
+        $this->filesystem->write('transactions/'.$randomFilename, $file->getStream()->getContents());
+
+        return $response->withStatus(201);
+    }
+
 }

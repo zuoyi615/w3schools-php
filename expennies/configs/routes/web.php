@@ -48,6 +48,7 @@ return function (App $app) {
             $transactions->get('', [TransactionController::class, 'index']);
             $transactions->post('', [TransactionController::class, 'store']);
             $transactions->get('/load', [TransactionController::class, 'load']);
+            $transactions->post('/import', [TransactionController::class, 'import']);
 
             $id = '/{id:[0-9]+}';
             $transactions->delete($id, [TransactionController::class, 'delete']);
