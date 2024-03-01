@@ -16,11 +16,9 @@ use DateTime;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
 use Exception;
-use League\Flysystem\Filesystem;
-use League\Flysystem\FilesystemException;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use Random\RandomException;
+use Psr\Http\Message\UploadedFileInterface;
 use Slim\Views\Twig;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -35,7 +33,6 @@ readonly class TransactionController
         private RequestValidatorFactoryInterface $validatorFactory,
         private TransactionService               $transactionService,
         private RequestService                   $requestService,
-        private Filesystem                       $filesystem,
     ) {}
 
     /**
@@ -166,16 +163,39 @@ readonly class TransactionController
     }
 
     /**
-     * @throws RandomException
-     * @throws FilesystemException
+     * @throws Exception
+     * @throws ORMException
      */
     public function import(Request $request, Response $response): Response
     {
-        $files          = $this->validatorFactory->make(ImportTransactionsRequestValidator::class)->validate($request->getUploadedFiles());
-        $file           = $files['transaction'];
-        $randomFilename = bin2hex(random_bytes(24));
+        $files = $this->validatorFactory->make(ImportTransactionsRequestValidator::class)->validate($request->getUploadedFiles());
 
-        $this->filesystem->write('transactions/'.$randomFilename, $file->getStream()->getContents());
+        /** @var UploadedFileInterface $file */
+        $file     = $files['transaction'];
+        $user     = $request->getAttribute('user');
+        $resource = fopen($file->getStream()->getMetadata('uri'), 'r');
+
+        fgetcsv($resource); // first row which we should validate row fields
+
+        while (($row = fgetcsv($resource)) !== false) {
+            [$date, $description, $categoryName, $amount] = $row;
+
+            $date     = new DateTime($date);
+            $category = $this->categoryService->findByName($categoryName);
+            if (!$category) {
+                $category = $this->categoryService->create($categoryName, $user);
+            }
+            $amount = (float) str_replace(['$', ','], '', $amount);
+
+            $transactionData = new TransactionData(
+                description: $description,
+                amount     : $amount,
+                date       : $date,
+                category   : $category,
+            );
+
+            $this->transactionService->create($transactionData, $user);
+        }
 
         return $response->withStatus(201);
     }

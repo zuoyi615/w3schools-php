@@ -41,8 +41,8 @@ readonly class CategoryService
             ->setFirstResult($params->start)
             ->setMaxResults($params->length);
 
-        $orderBy = $params->orderBy;
-        $orderBy = in_array($orderBy, ['name', 'createdAt', 'updatedAt']) ? $orderBy : 'createdAt';
+        $orderBy  = $params->orderBy;
+        $orderBy  = in_array($orderBy, ['name', 'createdAt', 'updatedAt']) ? $orderBy : 'createdAt';
         $orderDir = strtolower($params->orderDir) === 'asc' ? 'asc' : 'desc';
 
         $search = $params->search;
@@ -104,5 +104,11 @@ readonly class CategoryService
             ->getQuery()
             ->getArrayResult();
     }
+
+    public function findByName(string $name): ?Category
+    {
+        return $this->em->getRepository(Category::class)->findOneBy(['name' => $name]) ?? null;
+    }
+
 
 }
