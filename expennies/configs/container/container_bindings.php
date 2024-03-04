@@ -16,6 +16,9 @@ use App\Enum\StorageDriver;
 use App\RequestValidators\RequestValidatorFactory;
 use App\Services\UserProviderService;
 use App\Session;
+use Clockwork\Clockwork;
+use Clockwork\DataSource\DoctrineDataSource;
+use Clockwork\Storage\FileStorage;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\ORMSetup;
@@ -65,8 +68,8 @@ return [
     },
     Config::class                           => create(Config::class)->constructor(require CONFIG_PATH.'/app.php'),
     EntityManager::class                    => function (Config $conf) {
-        $config = ORMSetup::createAttributeMetadataConfiguration(
-            paths: $conf->get('doctrine.entity_dir'),
+        $config     = ORMSetup::createAttributeMetadataConfiguration(
+            paths    : $conf->get('doctrine.entity_dir'),
             isDevMode: $conf->get('doctrine.dev_mode')
         );
         $connection = DriverManager::getConnection(
@@ -91,13 +94,13 @@ return [
     },
     'webpack_encore.packages'               => function () {
         $manifestPath = BUILD_PATH.'/manifest.json';
-        $strategy = new JsonManifestVersionStrategy($manifestPath);
-        $in = new Package($strategy);
+        $strategy     = new JsonManifestVersionStrategy($manifestPath);
+        $in           = new Package($strategy);
 
         return new Packages($in);
     },
     'webpack_encore.tag_renderer'           => function (ContainerInterface $c) {
-        $packages = $c->get('webpack_encore.packages');
+        $packages   = $c->get('webpack_encore.packages');
         $collection = new CustomEntrypointLookup();
 
         return new TagRenderer($collection, $packages);
@@ -113,11 +116,11 @@ return [
     },
     SessionInterface::class                 => function (Config $config) {
         $options = new SessionConfig(
-            name: $config->get('session.name', ''),
+            name     : $config->get('session.name', ''),
             flashName: $config->get('session.flash_name', 'flash'),
-            secure: $config->get('session.secure', true),
-            httpOnly: $config->get('session.httponly', true),
-            sameSite: SameSite::from($config->get('session.samesite', 'lax'))
+            secure   : $config->get('session.secure', true),
+            httpOnly : $config->get('session.httponly', true),
+            sameSite : SameSite::from($config->get('session.samesite', 'lax'))
         );
 
         return new Session($options);
@@ -127,17 +130,24 @@ return [
     },
     'csrf'                                  => function (ResponseFactoryInterface $factory, Csrf $csrf) {
         return new Guard(
-            responseFactory: $factory,
-            failureHandler: $csrf->failureHandler(),
+            responseFactory    : $factory,
+            failureHandler     : $csrf->failureHandler(),
             persistentTokenMode: true,
         );
     },
     Filesystem::class                       => function (Config $config) {
         $adapter = match ($config->get('storage.driver')) {
             StorageDriver::Local => new LocalFilesystemAdapter(STORAGE_PATH),
-            default              => throw new RuntimeException('No matched storage driver found'),
+            default => throw new RuntimeException('No matched storage driver found'),
         };
 
         return new Filesystem($adapter);
-    }
+    },
+    Clockwork::class                        => function (EntityManager $entityManager) {
+        $clockwork = new Clockwork();
+        $clockwork->storage(new FileStorage(STORAGE_PATH.'/clockwork'));
+        $clockwork->addDataSource(new DoctrineDataSource($entityManager));
+
+        return $clockwork;
+    },
 ];
