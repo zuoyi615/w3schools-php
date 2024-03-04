@@ -13,6 +13,7 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 
 readonly class TransactionService
 {
+
     public function __construct(private EntityManager $em) {}
 
     /**
@@ -50,12 +51,14 @@ readonly class TransactionService
             ->em
             ->getRepository(Transaction::class)
             ->createQueryBuilder('t')
+            ->select('t', 'c', 'r')
             ->leftJoin('t.category', 'c')
+            ->leftJoin('t.receipts', 'r')
             ->setFirstResult($params->start)
             ->setMaxResults($params->length);
 
-        $orderBy = $params->orderBy;
-        $orderBy = in_array($orderBy, ['description', 'amount', 'date', 'category']) ? $orderBy : 'date';
+        $orderBy  = $params->orderBy;
+        $orderBy  = in_array($orderBy, ['description', 'amount', 'date', 'category']) ? $orderBy : 'date';
         $orderDir = $params->orderDir;
         $orderDir = strtolower($orderDir) === 'asc' ? 'asc' : 'desc';
         if ($orderBy === 'category') {

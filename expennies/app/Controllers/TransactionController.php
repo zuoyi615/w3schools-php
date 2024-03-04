@@ -89,15 +89,12 @@ readonly class TransactionController
                 'date'         => $transaction->getDate()->format('Y-m-d H:i'),
                 'categoryName' => $transaction->getCategory()?->getName(),
                 'categoryId'   => $transaction->getCategory()?->getId(),
-                'receipts'     => $transaction
-                    ->getReceipts()
-                    ->map(function (Receipt $receipt) {
-                        return [
-                            'name' => $receipt->getFilename(),
-                            'id'   => $receipt->getId(),
-                        ];
-                    })
-                    ->toArray(),
+                'receipts'     => $transaction->getReceipts()->map(function (Receipt $receipt) {
+                    return [
+                        'name' => $receipt->getFilename(),
+                        'id'   => $receipt->getId(),
+                    ];
+                })->toArray(),
             ];
         };
 
