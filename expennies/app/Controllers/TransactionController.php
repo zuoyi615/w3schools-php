@@ -187,7 +187,7 @@ readonly class TransactionController
             [$date, $description, $categoryName, $amount] = $row;
 
             $date     = new DateTime($date);
-            $category = $categories[$categoryName] ?? null;
+            $category = $categories[strtolower($categoryName)] ?? null;
             $amount   = (float) str_replace(['$', ','], '', $amount);
 
             $transactionData = new TransactionData(
