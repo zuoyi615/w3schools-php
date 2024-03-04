@@ -18,7 +18,7 @@ use Slim\Views\TwigMiddleware;
 
 return function (App $app) {
     $container = $app->getContainer();
-    /** @var \App\Config $config */
+    /** @var Config $config */
     $config = $container->get(Config::class);
 
     $app->add(MethodOverrideMiddleware::class);
