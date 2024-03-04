@@ -26,6 +26,7 @@ use Twig\Error\SyntaxError;
 
 readonly class TransactionController
 {
+
     public function __construct(
         private Twig                             $twig,
         private CategoryService                  $categoryService,
@@ -42,7 +43,10 @@ readonly class TransactionController
      */
     public function store(Request $request, Response $response): Response
     {
-        $data = $this->validatorFactory->make(CreateTransactionRequestValidator::class)->validate($request->getParsedBody());
+        $data = $this
+            ->validatorFactory
+            ->make(CreateTransactionRequestValidator::class)
+            ->validate($request->getParsedBody());
 
         $this->transactionService->create(
             new TransactionData(
@@ -83,14 +87,14 @@ readonly class TransactionController
                 'description'  => $transaction->getDescription(),
                 'amount'       => $transaction->getAmount(),
                 'date'         => $transaction->getDate()->format('Y-m-d H:i'),
-                'categoryName' => $transaction->getCategory()->getName(),
+                'categoryName' => $transaction->getCategory()?->getName(),
                 'categoryId'   => $transaction->getCategory()->getId(),
                 'receipts'     => $transaction
                     ->getReceipts()
                     ->map(function (Receipt $receipt) {
                         return [
                             'name' => $receipt->getFilename(),
-                            'id'   => $receipt->getId()
+                            'id'   => $receipt->getId(),
                         ];
                     })
                     ->toArray(),
@@ -131,6 +135,7 @@ readonly class TransactionController
     public function delete(Request $request, Response $response, array $args): Response
     {
         $this->transactionService->delete((int) $args['id']);
+
         return $response->withStatus(204);
     }
 
@@ -168,7 +173,8 @@ readonly class TransactionController
      */
     public function import(Request $request, Response $response): Response
     {
-        $files = $this->validatorFactory->make(ImportTransactionsRequestValidator::class)->validate($request->getUploadedFiles());
+        $files = $this->validatorFactory->make(ImportTransactionsRequestValidator::class)
+            ->validate($request->getUploadedFiles());
 
         /** @var UploadedFileInterface $file */
         $file     = $files['transaction'];
@@ -182,10 +188,7 @@ readonly class TransactionController
 
             $date     = new DateTime($date);
             $category = $this->categoryService->findByName($categoryName);
-            if (!$category) {
-                $category = $this->categoryService->create($categoryName, $user);
-            }
-            $amount = (float) str_replace(['$', ','], '', $amount);
+            $amount   = (float) str_replace(['$', ','], '', $amount);
 
             $transactionData = new TransactionData(
                 description: $description,
