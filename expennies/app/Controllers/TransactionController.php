@@ -88,7 +88,7 @@ readonly class TransactionController
                 'amount'       => $transaction->getAmount(),
                 'date'         => $transaction->getDate()->format('Y-m-d H:i'),
                 'categoryName' => $transaction->getCategory()?->getName(),
-                'categoryId'   => $transaction->getCategory()->getId(),
+                'categoryId'   => $transaction->getCategory()?->getId(),
                 'receipts'     => $transaction
                     ->getReceipts()
                     ->map(function (Receipt $receipt) {
