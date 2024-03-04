@@ -170,21 +170,24 @@ readonly class TransactionController
      */
     public function import(Request $request, Response $response): Response
     {
-        $files = $this->validatorFactory->make(ImportTransactionsRequestValidator::class)
+        $files = $this
+            ->validatorFactory
+            ->make(ImportTransactionsRequestValidator::class)
             ->validate($request->getUploadedFiles());
 
         /** @var UploadedFileInterface $file */
-        $file     = $files['transaction'];
-        $user     = $request->getAttribute('user');
-        $resource = fopen($file->getStream()->getMetadata('uri'), 'r');
+        $file       = $files['transaction'];
+        $user       = $request->getAttribute('user');
+        $resource   = fopen($file->getStream()->getMetadata('uri'), 'r');
+        $categories = $this->categoryService->getAllKeyedByName();
 
-        fgetcsv($resource); // first row which we should validate row fields
+        fgetcsv($resource); // first line is fields columns
 
         while (($row = fgetcsv($resource)) !== false) {
             [$date, $description, $categoryName, $amount] = $row;
 
             $date     = new DateTime($date);
-            $category = $this->categoryService->findByName($categoryName);
+            $category = $categories[$categoryName] ?? null;
             $amount   = (float) str_replace(['$', ','], '', $amount);
 
             $transactionData = new TransactionData(

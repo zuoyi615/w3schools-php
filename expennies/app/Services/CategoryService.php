@@ -110,5 +110,17 @@ readonly class CategoryService
         return $this->em->getRepository(Category::class)->findOneBy(['name' => $name]) ?? null;
     }
 
+    public function getAllKeyedByName(): array
+    {
+        $categories  = $this->em->getRepository(Category::class)->findAll();
+        $categoryMap = [];
+
+        foreach ($categories as $category) {
+            $key               = strtolower($category->getName());
+            $categoryMap[$key] = $category;
+        }
+
+        return $categoryMap;
+    }
 
 }
