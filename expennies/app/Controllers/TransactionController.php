@@ -11,6 +11,7 @@ use App\RequestValidators\ImportTransactionsRequestValidator;
 use App\ResponseFormatter;
 use App\Services\CategoryService;
 use App\Services\RequestService;
+use App\Services\TransactionImportService;
 use App\Services\TransactionService;
 use DateTime;
 use Doctrine\ORM\Exception\ORMException;
@@ -33,6 +34,7 @@ readonly class TransactionController
         private ResponseFormatter                $formatter,
         private RequestValidatorFactoryInterface $validatorFactory,
         private TransactionService               $transactionService,
+        private TransactionImportService         $transactionImportService,
         private RequestService                   $requestService,
     ) {}
 
@@ -176,29 +178,11 @@ readonly class TransactionController
             ->validate($request->getUploadedFiles());
 
         /** @var UploadedFileInterface $file */
-        $file       = $files['transaction'];
-        $user       = $request->getAttribute('user');
-        $resource   = fopen($file->getStream()->getMetadata('uri'), 'r');
-        $categories = $this->categoryService->getAllKeyedByName();
+        $file = $files['transaction'];
+        $user = $request->getAttribute('user');
+        $path = $file->getStream()->getMetadata('uri');
 
-        fgetcsv($resource); // first line is fields columns
-
-        while (($row = fgetcsv($resource)) !== false) {
-            [$date, $description, $categoryName, $amount] = $row;
-
-            $date     = new DateTime($date);
-            $category = $categories[strtolower($categoryName)] ?? null;
-            $amount   = (float) str_replace(['$', ','], '', $amount);
-
-            $transactionData = new TransactionData(
-                description: $description,
-                amount     : $amount,
-                date       : $date,
-                category   : $category,
-            );
-
-            $this->transactionService->create($transactionData, $user);
-        }
+        $this->transactionImportService->importFromCSV($path, $user);
 
         return $response->withStatus(201);
     }
