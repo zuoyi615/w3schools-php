@@ -57,6 +57,7 @@ readonly class TransactionImportService
 
             if ($count % $batchSize === 0) {
                 $this->em->flush();
+                $this->em->clear();
                 $count = 1;
             } else {
                 $count++;
@@ -65,6 +66,7 @@ readonly class TransactionImportService
 
         if ($count > 1) {
             $this->em->flush();
+            $this->em->clear();
         }
 
         $this->clockwork->log(LogLevel::DEBUG, 'Memory Usage After: '.memory_get_usage());
