@@ -5,15 +5,13 @@ namespace App\RequestValidators;
 use App\Contracts\RequestValidatorInterface as RVI;
 use App\Entity\User;
 use App\Exception\ValidationException;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Valitron\Validator;
 
 readonly class UpdateCategoryRequestValidator implements RVI
 {
 
-    public function __construct(private EntityManager $em)
-    {
-    }
+    public function __construct(private EntityManagerInterface $em) {}
 
     public function validate(array $data): array
     {

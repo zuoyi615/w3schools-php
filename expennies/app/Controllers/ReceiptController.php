@@ -8,8 +8,6 @@ use App\Contracts\RequestValidatorFactoryInterface;
 use App\RequestValidators\UploadReceiptRequestValidator;
 use App\Services\ReceiptService;
 use App\Services\TransactionService;
-use Doctrine\ORM\Exception\ORMException;
-use Doctrine\ORM\OptimisticLockException;
 use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemException;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -20,6 +18,7 @@ use Slim\Psr7\Stream;
 
 readonly class ReceiptController
 {
+
     public function __construct(
         private Filesystem                       $filesystem,
         private RequestValidatorFactoryInterface $validatorFactory,
@@ -28,15 +27,16 @@ readonly class ReceiptController
     ) {}
 
     /**
-     * @throws OptimisticLockException
-     * @throws ORMException
      * @throws FilesystemException
      * @throws RandomException
      */
     public function store(Request $request, Response $response, array $args): Response
     {
         /** @var UploadedFileInterface $file */
-        $files = $this->validatorFactory->make(UploadReceiptRequestValidator::class)->validate($request->getUploadedFiles());
+        $files = $this
+            ->validatorFactory
+            ->make(UploadReceiptRequestValidator::class)
+            ->validate($request->getUploadedFiles());
         $file  = $files['receipt'];
 
         $id = (int) $args['id'];
@@ -50,6 +50,7 @@ readonly class ReceiptController
         $this->filesystem->write('receipts/'.$randomFilename, $file->getStream()->getContents());
 
         $this->receiptService->create($transaction, $filename, $randomFilename, $file->getClientMediaType());
+        $this->receiptService->flush();
 
         return $response;
     }
@@ -87,8 +88,6 @@ readonly class ReceiptController
     }
 
     /**
-     * @throws OptimisticLockException
-     * @throws ORMException
      * @throws FilesystemException
      */
     public function delete(Request $request, Response $response, array $args): Response
@@ -112,6 +111,9 @@ readonly class ReceiptController
 
         $this->receiptService->delete((int) $args['id']);
 
+        $this->receiptService->flush();
+
         return $response->withStatus(204);
     }
+
 }

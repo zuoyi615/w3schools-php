@@ -56,7 +56,6 @@ class CategoryService extends EntityManagerService
 
         if ($category) {
             $this->em->remove($category);
-            $this->em->flush();
         }
     }
 
@@ -73,7 +72,6 @@ class CategoryService extends EntityManagerService
         $category->setName($name);
 
         $this->em->persist($category);
-        $this->em->flush();
 
         return $category;
     }

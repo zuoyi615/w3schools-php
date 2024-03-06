@@ -7,21 +7,20 @@ use App\Entity\User;
 use Clockwork\Clockwork;
 use Clockwork\Request\LogLevel;
 use DateTime;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 
 readonly class TransactionImportService
 {
 
     public function __construct(
-        private CategoryService    $categoryService,
-        private Clockwork          $clockwork,
-        private EntityManager      $em,
-        private TransactionService $transactionService,
+        private CategoryService        $categoryService,
+        private Clockwork              $clockwork,
+        private EntityManagerInterface $em,
+        private TransactionService     $transactionService,
     ) {}
 
     /**
      * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws \Doctrine\ORM\Exception\ORMException
      * @throws \Exception
      */
     public

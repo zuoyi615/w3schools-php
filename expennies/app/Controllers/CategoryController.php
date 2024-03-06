@@ -11,8 +11,6 @@ use App\RequestValidators\UpdateCategoryRequestValidator;
 use App\ResponseFormatter;
 use App\Services\CategoryService;
 use App\Services\RequestService;
-use Doctrine\ORM\Exception\ORMException;
-use Doctrine\ORM\OptimisticLockException;
 use Exception;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -42,10 +40,6 @@ readonly class CategoryController
         return $this->twig->render($response, 'categories/index.twig');
     }
 
-    /**
-     * @throws OptimisticLockException
-     * @throws ORMException
-     */
     public function store(Request $request, Response $response): Response
     {
         $data = $this
@@ -55,16 +49,15 @@ readonly class CategoryController
 
         $user = $request->getAttribute('user');
         $this->categoryService->create($data['name'], $user);
+        $this->categoryService->flush();
 
         return $response->withStatus(201);
     }
 
-    /**
-     * @throws ORMException
-     */
     public function delete(Request $request, Response $response, array $args): Response
     {
         $this->categoryService->delete((int) $args['id']);
+        $this->categoryService->flush();
 
         return $response->withStatus(204);
     }
@@ -84,10 +77,6 @@ readonly class CategoryController
         return $this->formatter->asJson($response, $data);
     }
 
-    /**
-     * @throws OptimisticLockException
-     * @throws ORMException
-     */
     public function update(Request $request, Response $response, array $args): Response
     {
         $data = $this
@@ -101,6 +90,7 @@ readonly class CategoryController
         }
 
         $this->categoryService->update($category, $data['name']);
+        $this->categoryService->flush();
 
         return $response->withStatus(204);
     }
@@ -110,7 +100,7 @@ readonly class CategoryController
      */
     public function load(Request $request, Response $response): Response
     {
-        $params = $this->requestService->getDataTableQueryParameters($request);
+        $params     = $this->requestService->getDataTableQueryParameters($request);
         $categories = $this->categoryService->getPaginatedCategories($params);
 
         $transformer = function (Category $category) {
@@ -123,11 +113,12 @@ readonly class CategoryController
         };
 
         $total = count($categories);
+
         return $this->formatter->asDataTable(
             response: $response,
-            data: array_map($transformer, (array) $categories->getIterator()),
-            draw: $params->draw,
-            total: $total,
+            data    : array_map($transformer, (array) $categories->getIterator()),
+            draw    : $params->draw,
+            total   : $total,
         );
     }
 

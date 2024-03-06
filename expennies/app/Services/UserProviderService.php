@@ -6,12 +6,12 @@ use App\Contracts\UserInterface;
 use App\Contracts\UserProviderServiceInterface;
 use App\DataObjects\RegisterUserData;
 use App\Entity\User;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 
 readonly class UserProviderService implements UserProviderServiceInterface
 {
 
-    public function __construct(private EntityManager $em) {}
+    public function __construct(private EntityManagerInterface $em) {}
 
     public function getById(int $id): ?UserInterface
     {
@@ -29,10 +29,6 @@ readonly class UserProviderService implements UserProviderServiceInterface
             ->findOneBy(['email' => $data['email']]);
     }
 
-    /**
-     * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws \Doctrine\ORM\Exception\ORMException
-     */
     public function createUser(RegisterUserData $data): UserInterface
     {
         $pass   = $data->password;
