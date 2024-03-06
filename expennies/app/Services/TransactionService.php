@@ -40,7 +40,6 @@ readonly class TransactionService
         $transaction->setCategory($data->category);
 
         $this->em->persist($transaction);
-        $this->em->flush();
 
         return $transaction;
     }

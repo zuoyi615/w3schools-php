@@ -32,7 +32,7 @@ readonly class TransactionImportService
         $resource   = fopen($path, 'r');
         $categories = $this->categoryService->getAllKeyedByName();
 
-        fgetcsv($resource); // first line is fields columns
+        fgetcsv($resource);
 
         $this->clockwork->log(LogLevel::DEBUG, 'Memory Usage Before: '.memory_get_usage());
         $this->clockwork->log(LogLevel::DEBUG, 'Unit Of Work Before: '.$this->em->getUnitOfWork()->size());
@@ -53,14 +53,16 @@ readonly class TransactionImportService
                 category   : $category,
             );
 
-            $this->transactionService->create($transactionData, $user);
+            $transaction = $this->transactionService->create($transactionData, $user);
 
             if ($count % $batchSize === 0) {
                 $this->em->flush();
-                $this->em->clear();
+                $this->em->detach($transaction);
+                // $this->em->clear(Transaction::class); // no longer support argument, because of its side effects
                 $count = 1;
             } else {
                 $count++;
+                $this->em->clear();
             }
         }
 
@@ -68,6 +70,8 @@ readonly class TransactionImportService
             $this->em->flush();
             $this->em->clear();
         }
+
+        // gc_collect_cycles();
 
         $this->clockwork->log(LogLevel::DEBUG, 'Memory Usage After: '.memory_get_usage());
         $this->clockwork->log(LogLevel::DEBUG, 'Unit Of Work After: '.$this->em->getUnitOfWork()->size());
