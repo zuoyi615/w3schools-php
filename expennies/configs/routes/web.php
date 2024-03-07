@@ -54,8 +54,9 @@ return function (App $app) {
             $transactions->delete($id, [TransactionController::class, 'delete']);
             $transactions->get($id, [TransactionController::class, 'get']);
             $transactions->post($id, [TransactionController::class, 'update']);
-            $transactions->post($id.'/receipts', [ReceiptController::class, 'store']);
+            $transactions->post($id.'/review', [TransactionController::class, 'toggleReviewed']);
 
+            $transactions->post($id.'/receipts', [ReceiptController::class, 'store']);
             $transactionId = '/{transactionId:[0-9]+}';
             $transactions->get($transactionId.'/receipts'.$id, [ReceiptController::class, 'download']);
             $transactions->delete($transactionId.'/receipts'.$id, [ReceiptController::class, 'delete']);

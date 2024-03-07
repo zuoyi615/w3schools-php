@@ -84,6 +84,7 @@ readonly class TransactionController
         $transformer = function (Transaction $transaction) {
             return [
                 'id'           => $transaction->getId(),
+                'wasReviewed'  => $transaction->isWasReviewed(),
                 'description'  => $transaction->getDescription(),
                 'amount'       => $transaction->getAmount(),
                 'date'         => $transaction->getDate()->format('Y-m-d H:i'),
@@ -117,6 +118,7 @@ readonly class TransactionController
             response: $response,
             data    : [
                 'id'          => $transaction->getId(),
+                'wasReviewed' => $transaction->isWasReviewed(),
                 'description' => $transaction->getDescription(),
                 'amount'      => $transaction->getAmount(),
                 'date'        => $transaction->getDate()->format('Y-m-d H:i'),
@@ -179,6 +181,19 @@ readonly class TransactionController
         $this->transactionImportService->importFromCSV($path, $user);
 
         return $response->withStatus(201);
+    }
+
+    public function toggleReviewed(Request $request, Response $response, array $args): Response
+    {
+        $id = (int) $args['id'];
+        if (!$id || !($transaction = $this->transactionService->getById($id))) {
+            return $response->withStatus(404);
+        }
+
+        $this->transactionService->toggleReviewed($transaction);
+        $this->transactionService->flush();
+
+        return $response->withStatus(204);
     }
 
 }

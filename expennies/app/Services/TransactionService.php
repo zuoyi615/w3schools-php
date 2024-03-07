@@ -76,4 +76,10 @@ class TransactionService extends EntityManagerService
         }
     }
 
+    public function toggleReviewed(Transaction $transaction): void
+    {
+        $transaction->setWasReviewed(!$transaction->isWasReviewed());
+        $this->em->persist($transaction);
+    }
+
 }
