@@ -3,20 +3,16 @@
 namespace App\Services;
 
 use App\DataObjects\TransactionData;
+use App\Entity\Transaction;
 use App\Entity\User;
-use Clockwork\Clockwork;
-use Clockwork\Request\LogLevel;
 use DateTime;
-use Doctrine\ORM\EntityManagerInterface;
 
 readonly class TransactionImportService
 {
 
     public function __construct(
-        private CategoryService        $categoryService,
-        private Clockwork              $clockwork,
-        private EntityManagerInterface $em,
-        private TransactionService     $transactionService,
+        private CategoryService    $categoryService,
+        private TransactionService $transactionService,
     ) {}
 
     /**
@@ -32,9 +28,6 @@ readonly class TransactionImportService
         $categories = $this->categoryService->getAllKeyedByName();
 
         fgetcsv($resource);
-
-        $this->clockwork->log(LogLevel::DEBUG, 'Memory Usage Before: '.memory_get_usage());
-        $this->clockwork->log(LogLevel::DEBUG, 'Unit Of Work Before: '.$this->em->getUnitOfWork()->size());
 
         $count     = 0;
         $batchSize = 250;
@@ -52,28 +45,21 @@ readonly class TransactionImportService
                 category   : $category,
             );
 
-            $transaction = $this->transactionService->create($transactionData, $user);
+            $this->transactionService->create($transactionData, $user);
 
             if ($count % $batchSize === 0) {
-                $this->em->flush();
-                $this->em->detach($transaction);
-                // $this->em->clear(Transaction::class); // no longer support argument, because of its side effects
+                $this->transactionService->flush();
+                $this->transactionService->clear(Transaction::class);
                 $count = 1;
             } else {
                 $count++;
-                $this->em->clear();
             }
         }
 
         if ($count > 1) {
-            $this->em->flush();
-            $this->em->clear();
+            $this->transactionService->flush();
+            $this->transactionService->clear();
         }
-
-        // gc_collect_cycles();
-
-        $this->clockwork->log(LogLevel::DEBUG, 'Memory Usage After: '.memory_get_usage());
-        $this->clockwork->log(LogLevel::DEBUG, 'Unit Of Work After: '.$this->em->getUnitOfWork()->size());
     }
 
 }

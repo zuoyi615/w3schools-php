@@ -16,7 +16,7 @@ class EntityManagerService
         $this->em->flush();
     }
 
-    public function clear(?string $entityName): void
+    public function clear(string $entityName = null): void
     {
         if ($entityName === null) {
             $this->em->clear();
