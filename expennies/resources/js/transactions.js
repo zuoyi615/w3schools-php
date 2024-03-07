@@ -53,7 +53,12 @@ function init () {
         orderMulti: false,
         columns: [
             { data: 'description' },
-            { data: ({ amount }) => currency(amount) },
+            { data: ({ amount, wasReviewed }) => {
+                const value = Math.abs(amount)
+                const data = currency(value)
+                
+                return `<span class="${ wasReviewed ? 'text-success fw-bold' : '' }">${amount>0?'':'-'}${data}</span>`
+            }},
             { data: 'categoryName' },
             {
                 data: row => {
@@ -93,16 +98,11 @@ function init () {
             {
                 sortable: false,
                 data: row => `
-                    <div class="d-flex flex-">
-                        <button type="submit" class="btn btn-outline-primary delete-btn" data-id="${row.id}">
-                            <i class="bi bi-trash3-fill"></i>
-                        </button>
-                        <button class="ms-2 btn btn-outline-primary edit-btn" data-id="${row.id}">
-                            <i class="bi bi-pencil-fill"></i>
-                        </button>
-                        <button class="ms-2 btn btn-outline-primary upload-btn" data-id="${row.id}">
-                            <i class="bi bi-upload"></i>
-                        </button>
+                    <div class="d-flex gap-2">
+                        <i class="bi ${row.wasReviewed ? 'bi-check-circle-fill text-success' : 'bi-check-circle'} toggle-btn fs-5" data-id="${row.id}"></i>
+                        <i class="bi bi-trash3-fill delete-btn fs-5" data-id="${row.id}"></i>
+                        <i class="bi bi-pencil-fill edit-btn fs-5" data-id="${row.id}"></i>
+                        <i class="bi bi-upload upload-btn fs-5" data-id="${row.id}"></i>
                     </div>
                 `
             }
@@ -110,6 +110,7 @@ function init () {
     })
 
     tableEl.onclick = async function (event) {
+        const toggleBtn = event.target.closest('.toggle-btn')
         const editBtn = event.target.closest('.edit-btn')
         const deleteBtn = event.target.closest('.delete-btn')
         const uploadBtn = event.target.closest('.upload-btn')
@@ -127,8 +128,8 @@ function init () {
         if (deleteBtn) {
             const id = deleteBtn.getAttribute('data-id')
             if (confirm('Are you sure you want to delete this transaction')) {
-                await del(`/transactions/${id}`)
-                table.draw()
+                const res = await del(`/transactions/${id}`)
+                refresh(res)
             }
         }
 
@@ -146,6 +147,12 @@ function init () {
                 const res = await del(`/transactions/${transactionId}/receipts/${receiptId}`);
                 refresh(res)
             }
+        }
+        
+        if(toggleBtn) {
+            const id = toggleBtn.getAttribute('data-id')
+            const res = await post(`/transactions/${id}/review`)
+            refresh(res)
         }
     }
 
