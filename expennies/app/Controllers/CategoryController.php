@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Contracts\EntityManagerServiceInterface;
 use App\Contracts\RequestValidatorFactoryInterface;
 use App\Entity\Category;
 use App\RequestValidators\CreateCategoryRequestValidator;
@@ -28,6 +29,7 @@ readonly class CategoryController
         private CategoryService                  $categoryService,
         private ResponseFormatter                $formatter,
         private RequestService                   $requestService,
+        private EntityManagerServiceInterface    $em,
     ) {}
 
     /**
@@ -47,17 +49,22 @@ readonly class CategoryController
             ->make(CreateCategoryRequestValidator::class)
             ->validate($request->getParsedBody());
 
-        $user = $request->getAttribute('user');
-        $this->categoryService->create($data['name'], $user);
-        $this->categoryService->flush();
+        $user     = $request->getAttribute('user');
+        $category = $this->categoryService->create($data['name'], $user);
+
+        $this->em->sync($category);
 
         return $response->withStatus(201);
     }
 
     public function delete(Request $request, Response $response, array $args): Response
     {
-        $this->categoryService->delete((int) $args['id']);
-        $this->categoryService->flush();
+        $category = $this->categoryService->getById((int) $args['id']);
+        if (!$category) {
+            return $response->withStatus(404);
+        }
+
+        $this->em->delete($category, true);
 
         return $response->withStatus(204);
     }
@@ -89,8 +96,9 @@ readonly class CategoryController
             return $response->withStatus(404);
         }
 
-        $this->categoryService->update($category, $data['name']);
-        $this->categoryService->flush();
+        $category = $this->categoryService->update($category, $data['name']);
+
+        $this->em->sync($category);
 
         return $response->withStatus(204);
     }

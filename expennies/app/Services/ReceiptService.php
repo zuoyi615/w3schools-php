@@ -2,12 +2,15 @@
 
 namespace App\Services;
 
+use App\Contracts\EntityManagerServiceInterface;
 use App\Entity\Receipt;
 use App\Entity\Transaction;
 use DateTime;
 
-class ReceiptService extends EntityManagerService
+readonly class ReceiptService
 {
+
+    public function __construct(private EntityManagerServiceInterface $em) {}
 
     public function create(
         Transaction $transaction,
@@ -23,22 +26,12 @@ class ReceiptService extends EntityManagerService
             ->setMediaType($mediaType)
             ->setCreatedAt(new DateTime());
 
-        $this->em->persist($receipt);
-
         return $receipt;
     }
 
     public function getById(int $id): ?Receipt
     {
         return $this->em->getRepository(Receipt::class)->find($id);
-    }
-
-    public function delete(int $id): void
-    {
-        $receipt = $this->em->getRepository(Receipt::class)->find($id);
-        if ($receipt) {
-            $this->em->remove($receipt);
-        }
     }
 
 }

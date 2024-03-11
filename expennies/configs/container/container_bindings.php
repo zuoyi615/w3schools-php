@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Auth;
 use App\Config;
 use App\Contracts\AuthInterface;
+use App\Contracts\EntityManagerServiceInterface;
 use App\Contracts\RequestValidatorFactoryInterface;
 use App\Contracts\SessionInterface;
 use App\Contracts\UserProviderServiceInterface;
@@ -14,6 +15,7 @@ use App\Enum\AppEnvironment;
 use App\Enum\SameSite;
 use App\Enum\StorageDriver;
 use App\RequestValidators\RequestValidatorFactory;
+use App\Services\EntityManagerService;
 use App\Services\UserProviderService;
 use App\Session;
 use Clockwork\Clockwork;
@@ -150,5 +152,8 @@ return [
         $clockwork->addDataSource(new DoctrineDataSource($em));
 
         return $clockwork;
+    },
+    EntityManagerServiceInterface::class    => function (EntityManagerInterface $em) {
+        return new EntityManagerService($em);
     },
 ];

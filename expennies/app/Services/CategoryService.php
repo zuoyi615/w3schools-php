@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Contracts\EntityManagerServiceInterface;
 use App\DataObjects\DataTableQueryParams;
 use App\Entity\Category;
 use App\Entity\User;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
-class CategoryService extends EntityManagerService
+readonly class CategoryService
 {
+
+    public function __construct(private EntityManagerServiceInterface $em) {}
 
     public function create(string $name, User $user): Category
     {
@@ -47,31 +50,14 @@ class CategoryService extends EntityManagerService
         return new Paginator($query);
     }
 
-    public function delete(int $id): void
-    {
-        $category = $this
-            ->em
-            ->getRepository(Category::class)
-            ->find($id);
-
-        if ($category) {
-            $this->em->remove($category);
-        }
-    }
-
     public function getById(int $id): ?Category
     {
-        return $this
-            ->em
-            ->getRepository(Category::class)
-            ->find($id);
+        return $this->em->getRepository(Category::class)->find($id);
     }
 
     public function update(Category $category, string $name): Category
     {
         $category->setName($name);
-
-        $this->em->persist($category);
 
         return $category;
     }

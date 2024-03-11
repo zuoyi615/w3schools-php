@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Contracts\EntityManagerServiceInterface;
 use App\Contracts\RequestValidatorFactoryInterface;
 use App\DataObjects\TransactionData;
 use App\Entity\Receipt;
@@ -35,6 +36,7 @@ readonly class TransactionController
         private TransactionService               $transactionService,
         private TransactionImportService         $transactionImportService,
         private RequestService                   $requestService,
+        private EntityManagerServiceInterface    $em,
     ) {}
 
     /**
@@ -47,7 +49,7 @@ readonly class TransactionController
             ->make(CreateTransactionRequestValidator::class)
             ->validate($request->getParsedBody());
 
-        $this->transactionService->create(
+        $transaction = $this->transactionService->create(
             new TransactionData(
                 description: $data['description'],
                 amount     : (float) $data['amount'],
@@ -56,7 +58,8 @@ readonly class TransactionController
             ),
             $request->getAttribute('user'),
         );
-        $this->transactionService->flush();
+
+        $this->em->sync($transaction);
 
         return $response->withStatus(201);
     }
@@ -122,15 +125,19 @@ readonly class TransactionController
                 'description' => $transaction->getDescription(),
                 'amount'      => $transaction->getAmount(),
                 'date'        => $transaction->getDate()->format('Y-m-d H:i'),
-                'category'    => $transaction->getCategory()->getId(),
+                'category'    => $transaction->getCategory()?->getId(),
             ]
         );
     }
 
     public function delete(Request $request, Response $response, array $args): Response
     {
-        $this->transactionService->delete((int) $args['id']);
-        $this->transactionService->flush();
+        $transaction = $this->transactionService->getById((int) $args['id']);
+        if (!$transaction) {
+            return $response->withStatus(404);
+        }
+
+        $this->em->delete($transaction, true);
 
         return $response->withStatus(204);
     }
@@ -148,7 +155,7 @@ readonly class TransactionController
             return $response->withStatus(404);
         }
 
-        $this->transactionService->update(
+        $transaction = $this->transactionService->update(
             $transaction,
             new TransactionData(
                 description: $data['description'],
@@ -157,7 +164,8 @@ readonly class TransactionController
                 category   : $data['category'],
             )
         );
-        $this->transactionService->flush();
+
+        $this->em->sync($transaction);
 
         return $response->withStatus(204);
     }
@@ -191,7 +199,8 @@ readonly class TransactionController
         }
 
         $this->transactionService->toggleReviewed($transaction);
-        $this->transactionService->flush();
+
+        $this->em->sync($transaction);
 
         return $response->withStatus(204);
     }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Contracts\EntityManagerServiceInterface;
 use App\Contracts\RequestValidatorFactoryInterface;
 use App\RequestValidators\UploadReceiptRequestValidator;
 use App\Services\ReceiptService;
@@ -24,6 +25,7 @@ readonly class ReceiptController
         private RequestValidatorFactoryInterface $validatorFactory,
         private TransactionService               $transactionService,
         private ReceiptService                   $receiptService,
+        private EntityManagerServiceInterface    $em,
     ) {}
 
     /**
@@ -49,8 +51,9 @@ readonly class ReceiptController
 
         $this->filesystem->write('receipts/'.$randomFilename, $file->getStream()->getContents());
 
-        $this->receiptService->create($transaction, $filename, $randomFilename, $file->getClientMediaType());
-        $this->receiptService->flush();
+        $receipt = $this->receiptService->create($transaction, $filename, $randomFilename, $file->getClientMediaType());
+
+        $this->em->sync($receipt);
 
         return $response;
     }
@@ -92,12 +95,12 @@ readonly class ReceiptController
      */
     public function delete(Request $request, Response $response, array $args): Response
     {
-        $transactionId = (int) $args['transactionId'];
-        $id            = (int) $args['id'];
+        $id = (int) $args['id'];
         if (!$id || !($receipt = $this->receiptService->getById($id))) {
             return $response->withStatus(404);
         }
 
+        $transactionId = (int) $args['transactionId'];
         if ($receipt->getTransaction()->getId() !== $transactionId) {
             return $response->withStatus(401);
         }
@@ -108,10 +111,7 @@ readonly class ReceiptController
         }
 
         $this->filesystem->delete($filename);
-
-        $this->receiptService->delete((int) $args['id']);
-
-        $this->receiptService->flush();
+        $this->em->delete($receipt, true);
 
         return $response->withStatus(204);
     }

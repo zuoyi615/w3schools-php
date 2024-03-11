@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Contracts\EntityManagerServiceInterface;
 use App\DataObjects\TransactionData;
 use App\Entity\Transaction;
 use App\Entity\User;
@@ -11,19 +12,17 @@ readonly class TransactionImportService
 {
 
     public function __construct(
-        private CategoryService    $categoryService,
-        private TransactionService $transactionService,
+        private CategoryService               $categoryService,
+        private TransactionService            $transactionService,
+        private EntityManagerServiceInterface $em
     ) {}
 
     /**
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Exception
      */
-    public
-    function importFromCSV(
-        string $path,
-        User   $user
-    ): void {
+    public function importFromCSV(string $path, User $user): void
+    {
         $resource   = fopen($path, 'r');
         $categories = $this->categoryService->getAllKeyedByName();
 
@@ -48,8 +47,8 @@ readonly class TransactionImportService
             $this->transactionService->create($transactionData, $user);
 
             if ($count % $batchSize === 0) {
-                $this->transactionService->flush();
-                $this->transactionService->clear(Transaction::class);
+                $this->em->sync();
+                $this->em->clear(Transaction::class);
                 $count = 1;
             } else {
                 $count++;
@@ -57,8 +56,8 @@ readonly class TransactionImportService
         }
 
         if ($count > 1) {
-            $this->transactionService->flush();
-            $this->transactionService->clear();
+            $this->em->sync();
+            $this->em->clear();
         }
     }
 
