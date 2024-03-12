@@ -15,6 +15,7 @@ use App\Enum\AppEnvironment;
 use App\Enum\SameSite;
 use App\Enum\StorageDriver;
 use App\RequestValidators\RequestValidatorFactory;
+use App\RouterEntityBindStrategy;
 use App\Services\EntityManagerService;
 use App\Services\UserProviderService;
 use App\Session;
@@ -59,12 +60,15 @@ class CustomEntrypointLookup implements EntrypointLookupCollectionInterface
 return [
     App::class                              => function (ContainerInterface $c) {
         AppFactory::setContainer($c);
-        $app = AppFactory::create();
 
-        $router = require CONFIG_PATH.'/routes/web.php';
+        $app            = AppFactory::create();
+        $router         = require CONFIG_PATH.'/routes/web.php';
+        $addMiddlewares = require CONFIG_PATH.'/middleware.php';
+
+        $app->getRouteCollector()->setDefaultInvocationStrategy(new RouterEntityBindStrategy());
+
         $router($app);
 
-        $addMiddlewares = require CONFIG_PATH.'/middleware.php';
         $addMiddlewares($app);
 
         return $app;

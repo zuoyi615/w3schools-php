@@ -110,7 +110,7 @@ readonly class TransactionController
         );
     }
 
-    public function get(Request $request, Response $response, array $args): Response
+    public function get(Request $request, Response $response, array $args, Transaction $transaction): Response
     {
         $transaction = $this->transactionService->getById((int) $args['id']);
         if (!$transaction) {
