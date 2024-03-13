@@ -69,7 +69,7 @@ readonly class TransactionController
      * @throws RuntimeError
      * @throws LoaderError
      */
-    public function index(Request $request, Response $response): Response
+    public function index(Response $response): Response
     {
         $categories = $this->categoryService->getCategoryNames();
 
@@ -125,13 +125,8 @@ readonly class TransactionController
         );
     }
 
-    public function delete(Request $request, Response $response, array $args): Response
+    public function delete(Response $response, Transaction $transaction): Response
     {
-        $transaction = $this->transactionService->getById((int) $args['id']);
-        if (!$transaction) {
-            return $response->withStatus(404);
-        }
-
         $this->em->delete($transaction, true);
 
         return $response->withStatus(204);
@@ -140,15 +135,10 @@ readonly class TransactionController
     /**
      * @throws Exception
      */
-    public function update(Request $request, Response $response, array $args): Response
+    public function update(Request $request, Response $response, Transaction $transaction): Response
     {
-        $data = $args + $request->getParsedBody();
+        $data = $request->getParsedBody();
         $data = $this->validatorFactory->make(CreateTransactionRequestValidator::class)->validate($data);
-
-        $id = (int) $data['id'];
-        if (!$id || !($transaction = $this->transactionService->getById($id))) {
-            return $response->withStatus(404);
-        }
 
         $transaction = $this->transactionService->update(
             $transaction,
@@ -186,15 +176,9 @@ readonly class TransactionController
         return $response->withStatus(201);
     }
 
-    public function toggleReviewed(Request $request, Response $response, array $args): Response
+    public function toggleReviewed(Response $response, Transaction $transaction): Response
     {
-        $id = (int) $args['id'];
-        if (!$id || !($transaction = $this->transactionService->getById($id))) {
-            return $response->withStatus(404);
-        }
-
         $this->transactionService->toggleReviewed($transaction);
-
         $this->em->sync($transaction);
 
         return $response->withStatus(204);

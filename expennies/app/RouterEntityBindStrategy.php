@@ -59,7 +59,7 @@ readonly class RouterEntityBindStrategy implements InvocationStrategyInterface
 
                     $entity = $this->em->getRepository($typeName)->find($entityId);
                     if (!$entity) {
-                        return $this->factory->createResponse(404);
+                        return $this->factory->createResponse(404, 'Resource Not Found');
                     }
 
                     $resolvedArguments[] = $entity;

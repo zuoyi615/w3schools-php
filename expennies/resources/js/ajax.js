@@ -41,6 +41,8 @@ const ajax = async (url, method = 'get', data = {}, domElement = null) => {
     if (!ok) {
         if (status === 422) {
             handleValidationErrors(await res.json(), domElement)
+        }else if(status === 404) {
+            alert(res.statusText)
         }
     }
 

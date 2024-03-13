@@ -37,7 +37,7 @@ readonly class CategoryController
      * @throws SyntaxError
      * @throws LoaderError
      */
-    public function index(Request $request, Response $response): Response
+    public function index(Response $response): Response
     {
         return $this->twig->render($response, 'categories/index.twig');
     }
@@ -57,25 +57,15 @@ readonly class CategoryController
         return $response->withStatus(201);
     }
 
-    public function delete(Request $request, Response $response, array $args): Response
+    public function delete(Response $response, Category $category): Response
     {
-        $category = $this->categoryService->getById((int) $args['id']);
-        if (!$category) {
-            return $response->withStatus(404);
-        }
-
         $this->em->delete($category, true);
 
         return $response->withStatus(204);
     }
 
-    public function get(Request $request, Response $response, array $args): Response
+    public function get(Response $response, Category $category): Response
     {
-        $category = $this->categoryService->getById((int) $args['id']);
-        if (!$category) {
-            return $this->formatter->asJson($response->withStatus(404), ['status' => 404, 'message' => 'Not Found']);
-        }
-
         $data = [
             'id'   => $category->getId(),
             'name' => $category->getName(),
@@ -84,17 +74,12 @@ readonly class CategoryController
         return $this->formatter->asJson($response, $data);
     }
 
-    public function update(Request $request, Response $response, array $args): Response
+    public function update(Request $request, Response $response, Category $category): Response
     {
         $data = $this
             ->factory
             ->make(UpdateCategoryRequestValidator::class)
-            ->validate($args + $request->getParsedBody());
-
-        $category = $this->categoryService->getById((int) $data['id']);
-        if (!$category) {
-            return $response->withStatus(404);
-        }
+            ->validate($request->getParsedBody());
 
         $category = $this->categoryService->update($category, $data['name']);
 

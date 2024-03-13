@@ -36,7 +36,7 @@ return function (App $app) {
             $categories->post('', [CategoryController::class, 'store']);
             $categories->get('/load', [CategoryController::class, 'load']);
 
-            $id = '/{id:[0-9]+}';
+            $id = '/{category:[0-9]+}';
             $categories->delete($id, [CategoryController::class, 'delete']);
             $categories->get($id, [CategoryController::class, 'get']);
             $categories->post($id, [CategoryController::class, 'update']);
@@ -50,16 +50,16 @@ return function (App $app) {
             $transactions->get('/load', [TransactionController::class, 'load']);
             $transactions->post('/import', [TransactionController::class, 'import']);
 
-            $id = '/{id:[0-9]+}';
-            $transactions->delete($id, [TransactionController::class, 'delete']);
-            $transactions->get('/{transaction}', [TransactionController::class, 'get']);
-            $transactions->post($id, [TransactionController::class, 'update']);
-            $transactions->post($id.'/review', [TransactionController::class, 'toggleReviewed']);
+            $transactionId = '/{transaction:[0-9]+}';
+            $transactions->delete($transactionId, [TransactionController::class, 'delete']);
+            $transactions->get($transactionId, [TransactionController::class, 'get']);
+            $transactions->post($transactionId, [TransactionController::class, 'update']);
+            $transactions->post($transactionId.'/review', [TransactionController::class, 'toggleReviewed']);
 
-            $transactions->post($id.'/receipts', [ReceiptController::class, 'store']);
-            $transactionId = '/{transactionId:[0-9]+}';
-            $transactions->get($transactionId.'/receipts'.$id, [ReceiptController::class, 'download']);
-            $transactions->delete($transactionId.'/receipts'.$id, [ReceiptController::class, 'delete']);
+            $receiptId = '/{receipt:[0-9]+}';
+            $transactions->post($transactionId.'/receipts', [ReceiptController::class, 'store']);
+            $transactions->get($transactionId.'/receipts'.$receiptId, [ReceiptController::class, 'download']);
+            $transactions->delete($transactionId.'/receipts'.$receiptId, [ReceiptController::class, 'delete']);
         })
         ->add(AuthMiddleware::class);
 };

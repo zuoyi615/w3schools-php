@@ -6,9 +6,10 @@ namespace App\Controllers;
 
 use App\Contracts\EntityManagerServiceInterface;
 use App\Contracts\RequestValidatorFactoryInterface;
+use App\Entity\Receipt;
+use App\Entity\Transaction;
 use App\RequestValidators\UploadReceiptRequestValidator;
 use App\Services\ReceiptService;
-use App\Services\TransactionService;
 use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemException;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -23,7 +24,6 @@ readonly class ReceiptController
     public function __construct(
         private Filesystem                       $filesystem,
         private RequestValidatorFactoryInterface $validatorFactory,
-        private TransactionService               $transactionService,
         private ReceiptService                   $receiptService,
         private EntityManagerServiceInterface    $em,
     ) {}
@@ -32,20 +32,15 @@ readonly class ReceiptController
      * @throws FilesystemException
      * @throws RandomException
      */
-    public function store(Request $request, Response $response, array $args): Response
+    public function store(Request $request, Response $response, Transaction $transaction): Response
     {
         /** @var UploadedFileInterface $file */
         $files = $this
             ->validatorFactory
             ->make(UploadReceiptRequestValidator::class)
             ->validate($request->getUploadedFiles());
-        $file  = $files['receipt'];
 
-        $id = (int) $args['id'];
-        if (!$id || !($transaction = $this->transactionService->getById($id))) {
-            return $response->withStatus(404);
-        }
-
+        $file           = $files['receipt'];
         $randomFilename = bin2hex(random_bytes(24));
         $filename       = $file->getClientFilename();
 
@@ -61,19 +56,9 @@ readonly class ReceiptController
     /**
      * @throws FilesystemException
      */
-    public function download(Request $request, Response $response, array $args): Response
+    public function download(Response $response, Transaction $transaction, Receipt $receipt): Response
     {
-        $transactionId = (int) $args['transactionId'];
-        if (!$transactionId || !$this->transactionService->getById($transactionId)) {
-            return $response->withStatus(404);
-        }
-
-        $id = (int) $args['id'];
-        if (!$id || !($receipt = $this->receiptService->getById($id))) {
-            return $response->withStatus(404);
-        }
-
-        if ($receipt->getTransaction()->getId() !== $transactionId) {
+        if ($receipt->getTransaction()->getId() !== $transaction->getId()) {
             return $response->withStatus(401);
         }
 
@@ -93,15 +78,9 @@ readonly class ReceiptController
     /**
      * @throws FilesystemException
      */
-    public function delete(Request $request, Response $response, array $args): Response
+    public function delete(Response $response, Transaction $transaction, Receipt $receipt): Response
     {
-        $id = (int) $args['id'];
-        if (!$id || !($receipt = $this->receiptService->getById($id))) {
-            return $response->withStatus(404);
-        }
-
-        $transactionId = (int) $args['transactionId'];
-        if ($receipt->getTransaction()->getId() !== $transactionId) {
+        if ($receipt->getTransaction()->getId() !== $transaction->getId()) {
             return $response->withStatus(401);
         }
 
