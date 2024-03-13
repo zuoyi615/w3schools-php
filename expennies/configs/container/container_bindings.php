@@ -65,7 +65,13 @@ return [
         $router         = require CONFIG_PATH.'/routes/web.php';
         $addMiddlewares = require CONFIG_PATH.'/middleware.php';
 
-        $app->getRouteCollector()->setDefaultInvocationStrategy(new RouterEntityBindStrategy());
+        $app
+            ->getRouteCollector()
+            ->setDefaultInvocationStrategy(new RouterEntityBindStrategy(
+                $c->get(EntityManagerServiceInterface::class),
+                // $c->get(ResponseFactoryInterface::class), // would cause Circular dependency
+                $app->getResponseFactory()
+            ));
 
         $router($app);
 

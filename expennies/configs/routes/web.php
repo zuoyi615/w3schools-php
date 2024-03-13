@@ -52,7 +52,7 @@ return function (App $app) {
 
             $id = '/{id:[0-9]+}';
             $transactions->delete($id, [TransactionController::class, 'delete']);
-            $transactions->get($id, [TransactionController::class, 'get']);
+            $transactions->get('/{transaction}', [TransactionController::class, 'get']);
             $transactions->post($id, [TransactionController::class, 'update']);
             $transactions->post($id.'/review', [TransactionController::class, 'toggleReviewed']);
 

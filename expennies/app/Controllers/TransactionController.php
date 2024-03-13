@@ -110,13 +110,8 @@ readonly class TransactionController
         );
     }
 
-    public function get(Request $request, Response $response, array $args, Transaction $transaction): Response
+    public function get(Response $response, Transaction $transaction): Response
     {
-        $transaction = $this->transactionService->getById((int) $args['id']);
-        if (!$transaction) {
-            return $response->withStatus(404);
-        }
-
         return $this->formatter->asJson(
             response: $response,
             data    : [

@@ -18,10 +18,7 @@ use Slim\Interfaces\InvocationStrategyInterface;
 readonly class RouterEntityBindStrategy implements InvocationStrategyInterface
 {
 
-    public function __construct(
-        private EntityManagerServiceInterface $em,
-        private ResponseFactoryInterface      $factory,
-    ) {}
+    public function __construct(private EntityManagerServiceInterface $em, private ResponseFactoryInterface $factory) {}
 
     public function __invoke(
         callable               $callable,
