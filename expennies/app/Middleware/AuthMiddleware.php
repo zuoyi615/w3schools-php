@@ -3,6 +3,7 @@
 namespace App\Middleware;
 
 use App\Contracts\AuthInterface;
+use App\Contracts\EntityManagerServiceInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -14,13 +15,14 @@ readonly class AuthMiddleware implements MiddlewareInterface
 {
 
     public function __construct(
-        private Twig $twig,
-        private ResponseFactoryInterface $factory,
-        private AuthInterface $auth
+        private Twig                          $twig,
+        private ResponseFactoryInterface      $factory,
+        private AuthInterface                 $auth,
+        private EntityManagerServiceInterface $em,
     ) {}
 
     public function process(
-        ServerRequestInterface $request,
+        ServerRequestInterface  $request,
         RequestHandlerInterface $handler
     ): ResponseInterface {
         if ($user = $this->auth->getUser()) {
@@ -28,6 +30,13 @@ readonly class AuthMiddleware implements MiddlewareInterface
                 'id'   => $user->getId(),
                 'name' => $user->getName(),
             ]);
+
+            $this
+                ->em
+                ->getFilters()
+                ->enable('user')
+                ->setParameter('user_id', $user->getId());
+
             $request = $request->withAttribute('user', $user);
 
             return $handler->handle($request);
