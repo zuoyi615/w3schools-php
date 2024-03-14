@@ -33,9 +33,7 @@ readonly class AuthMiddleware implements MiddlewareInterface
 
             $this
                 ->em
-                ->getFilters()
-                ->enable('user')
-                ->setParameter('user_id', $user->getId());
+                ->enableUserAuthFilter($user->getId());
 
             $request = $request->withAttribute('user', $user);
 
