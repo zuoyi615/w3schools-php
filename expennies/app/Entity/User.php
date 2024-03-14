@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Contracts\OwnableInterface;
 use App\Contracts\UserInterface;
 use App\Entity\Traits\HasTimestamps;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -110,6 +111,11 @@ class User implements UserInterface
         $this->categories->add($category);
 
         return $this;
+    }
+
+    public function canManage(OwnableInterface $entity): bool
+    {
+        return $this->getId() === $entity->getUser()->getId();
     }
 
 }
