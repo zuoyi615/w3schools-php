@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Contracts\OwnableInterface;
 use App\Entity\Traits\HasTimestamps;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -20,7 +21,7 @@ use Doctrine\ORM\Mapping\Table;
 
 #[Entity, Table('transactions')]
 #[HasLifecycleCallbacks]
-class Transaction
+class Transaction implements OwnableInterface
 {
 
     use HasTimestamps;
@@ -57,7 +58,8 @@ class Transaction
 
     public function __construct()
     {
-        $this->receipts = new ArrayCollection();
+        $this->receipts    = new ArrayCollection();
+        $this->wasReviewed = false;
     }
 
     public function getId(): int
