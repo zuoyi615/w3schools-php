@@ -53,7 +53,7 @@ class Transaction implements OwnableInterface
     #[ManyToOne(inversedBy: 'transactions')]
     private ?Category  $category;
 
-    #[OneToMany(targetEntity: Receipt::class, mappedBy: 'transaction')]
+    #[OneToMany(targetEntity: Receipt::class, mappedBy: 'transaction', cascade: ['remove'])]
     private Collection $receipts;
 
     public function __construct()
