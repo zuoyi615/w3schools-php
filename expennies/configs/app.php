@@ -5,7 +5,7 @@ declare(strict_types=1);
 use App\Enum\AppEnvironment;
 use App\Enum\StorageDriver;
 
-$appEnv = $_ENV['APP_ENV'] ?? AppEnvironment::Production->value;
+$appEnv       = $_ENV['APP_ENV'] ?? AppEnvironment::Production->value;
 $appSnakeName = strtolower(str_replace(' ', '_', $_ENV['APP_NAME']));
 
 return [
@@ -36,6 +36,10 @@ return [
         'samesite'   => 'lax',
     ],
     'storage'               => [
-        'driver' => StorageDriver::Local
-    ]
+        'driver' => StorageDriver::Local,
+    ],
+    'mailer'                => [
+        'dsn'  => $_ENV['MAILER_DSN'],
+        'from' => $_ENV['MAILER_FROM'],
+    ],
 ];
