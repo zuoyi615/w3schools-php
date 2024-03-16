@@ -7,31 +7,18 @@ use App\Controllers\CategoryController;
 use App\Controllers\HomeController;
 use App\Controllers\ReceiptController;
 use App\Controllers\TransactionController;
+use App\Controllers\VerifyController;
 use App\Middleware\AuthMiddleware;
 use App\Middleware\GuestMiddleware;
+use App\Middleware\VerifyEmailMiddleware;
 use Slim\App;
 use Slim\Routing\RouteCollectorProxy;
 
 return function (App $app) {
-    $app
-        ->get('/', [HomeController::class, 'index'])
-        ->add(AuthMiddleware::class);
+    $app->group('', function (RouteCollectorProxy $route) {
+        $route->get('/', [HomeController::class, 'index']);
 
-    $app
-        ->group('', function (RouteCollectorProxy $guest) {
-            $guest->get('/login', [AuthController::class, 'loginView']);
-            $guest->post('/login', [AuthController::class, 'login']);
-            $guest->get('/register', [AuthController::class, 'registerView']);
-            $guest->post('/register', [AuthController::class, 'register']);
-        })
-        ->add(GuestMiddleware::class);
-
-    $app
-        ->post('/logout', [AuthController::class, 'logout'])
-        ->add(AuthMiddleware::class);
-
-    $app
-        ->group('/categories', function (RouteCollectorProxy $categories) {
+        $route->group('/categories', function (RouteCollectorProxy $categories) {
             $categories->get('', [CategoryController::class, 'index']);
             $categories->post('', [CategoryController::class, 'store']);
             $categories->get('/load', [CategoryController::class, 'load']);
@@ -40,11 +27,9 @@ return function (App $app) {
             $categories->delete($id, [CategoryController::class, 'delete']);
             $categories->get($id, [CategoryController::class, 'get']);
             $categories->post($id, [CategoryController::class, 'update']);
-        })
-        ->add(AuthMiddleware::class);
+        });
 
-    $app
-        ->group('/transactions', function (RouteCollectorProxy $transactions) {
+        $route->group('/transactions', function (RouteCollectorProxy $transactions) {
             $transactions->get('', [TransactionController::class, 'index']);
             $transactions->post('', [TransactionController::class, 'store']);
             $transactions->get('/load', [TransactionController::class, 'load']);
@@ -60,6 +45,22 @@ return function (App $app) {
             $transactions->post($transactionId.'/receipts', [ReceiptController::class, 'store']);
             $transactions->get($transactionId.'/receipts'.$receiptId, [ReceiptController::class, 'download']);
             $transactions->delete($transactionId.'/receipts'.$receiptId, [ReceiptController::class, 'delete']);
+        });
+    })->add(VerifyEmailMiddleware::class)->add(AuthMiddleware::class);
+
+    $app
+        ->group('', function (RouteCollectorProxy $guest) {
+            $guest->get('/login', [AuthController::class, 'loginView']);
+            $guest->post('/login', [AuthController::class, 'login']);
+            $guest->get('/register', [AuthController::class, 'registerView']);
+            $guest->post('/register', [AuthController::class, 'register']);
+        })
+        ->add(GuestMiddleware::class);
+
+    $app
+        ->group('', function (RouteCollectorProxy $route) {
+            $route->post('/logout', [AuthController::class, 'logout']);
+            $route->get('/verify', [VerifyController::class, 'index']);
         })
         ->add(AuthMiddleware::class);
 };
