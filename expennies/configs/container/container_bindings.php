@@ -34,6 +34,7 @@ use Psr\Http\Message\ResponseFactoryInterface;
 use Slim\App;
 use Slim\Csrf\Guard;
 use Slim\Factory\AppFactory;
+use Slim\Interfaces\RouteParserInterface;
 use Slim\Views\Twig;
 use Symfony\Bridge\Twig\Extension\AssetExtension;
 use Symfony\Bridge\Twig\Mime\BodyRenderer;
@@ -182,5 +183,8 @@ return [
     },
     BodyRendererInterface::class            => function (Twig $twig) {
         return new BodyRenderer($twig->getEnvironment());
+    },
+    RouteParserInterface::class             => function (App $app) {
+        return $app->getRouteCollector()->getRouteParser();
     },
 ];

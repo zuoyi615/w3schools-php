@@ -18,4 +18,9 @@ readonly class VerifyController
         return $this->twig->render($response, 'auth/verify.twig');
     }
 
+    public function verify(Request $request, Response $response): Response
+    {
+        return $response;
+    }
+
 }

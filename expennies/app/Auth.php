@@ -72,12 +72,14 @@ class Auth implements AuthInterface
         $this->user = null;
     }
 
+    /**
+     * @throws \Symfony\Component\Mailer\Exception\TransportExceptionInterface
+     */
     public function register(RegisterUserData $data): UserInterface
     {
         $user = $this->userProvider->createUser($data);
 
-        // Send Email
-        $this->signupEmail->sendTo($user->getEmail());
+        $this->signupEmail->sendTo($user);
 
         $this->login($user);
 
