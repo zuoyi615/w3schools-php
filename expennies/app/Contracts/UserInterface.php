@@ -2,6 +2,8 @@
 
 namespace App\Contracts;
 
+use DateTime;
+
 interface UserInterface
 {
 
@@ -10,5 +12,7 @@ interface UserInterface
     public function getPassword(): string;
 
     public function getName(): string;
+
+    public function setVerifiedAt(DateTime $dateTime): UserInterface;
 
 }

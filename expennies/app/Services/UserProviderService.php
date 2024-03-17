@@ -2,16 +2,17 @@
 
 namespace App\Services;
 
+use App\Contracts\EntityManagerServiceInterface;
 use App\Contracts\UserInterface;
 use App\Contracts\UserProviderServiceInterface;
 use App\DataObjects\RegisterUserData;
 use App\Entity\User;
-use Doctrine\ORM\EntityManagerInterface;
+use DateTime;
 
 readonly class UserProviderService implements UserProviderServiceInterface
 {
 
-    public function __construct(private EntityManagerInterface $em) {}
+    public function __construct(private EntityManagerServiceInterface $em) {}
 
     public function getById(int $id): ?UserInterface
     {
@@ -43,6 +44,12 @@ readonly class UserProviderService implements UserProviderServiceInterface
         $this->em->flush();
 
         return $user;
+    }
+
+    public function verifyUser(UserInterface $user): void
+    {
+        $user->setVerifiedAt(new DateTime());
+        $this->em->sync($user);
     }
 
 }

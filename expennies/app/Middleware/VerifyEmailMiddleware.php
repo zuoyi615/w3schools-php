@@ -18,8 +18,6 @@ readonly class VerifyEmailMiddleware implements MiddlewareInterface
         /** @var \App\Entity\User $user */
         $user = $request->getAttribute('user');
         if ($user->getVerifiedAt()) {
-            var_dump($user->getVerifiedAt());
-
             return $handler->handle($request);
         }
 

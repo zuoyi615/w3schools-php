@@ -13,4 +13,6 @@ interface UserProviderServiceInterface
 
     public function createUser(RegisterUserData $data): UserInterface;
 
+    public function verifyUser(UserInterface $user);
+
 }

@@ -10,6 +10,7 @@ use App\Controllers\TransactionController;
 use App\Controllers\VerifyController;
 use App\Middleware\AuthMiddleware;
 use App\Middleware\GuestMiddleware;
+use App\Middleware\ValidateSignatureMiddleware;
 use App\Middleware\VerifyEmailMiddleware;
 use Slim\App;
 use Slim\Routing\RouteCollectorProxy;
@@ -61,7 +62,10 @@ return function (App $app) {
         ->group('', function (RouteCollectorProxy $route) {
             $route->post('/logout', [AuthController::class, 'logout']);
             $route->get('/verify', [VerifyController::class, 'index']);
-            $route->get('/verify/{id:[0-9]+}/{hash}', [VerifyController::class, 'verify'])->setName('verify');
+            $route
+                ->get('/verify/{id:[0-9]+}/{hash}', [VerifyController::class, 'verify'])
+                ->setName('verify')
+                ->add(ValidateSignatureMiddleware::class);
         })
         ->add(AuthMiddleware::class);
 };
