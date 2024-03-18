@@ -30,7 +30,7 @@ readonly class ValidateSignatureMiddleware implements MiddlewareInterface
 
         $newSignature = hash_hmac('sha256', $url, $this->config->get('app_key'));
         if ($expiration <= time() || !hash_equals($newSignature, $originalSignature)) {
-            throw  new RuntimeException('Failed to verify signature');
+            throw new RuntimeException('Failed to verify signature');
         }
 
         return $handler->handle($request);

@@ -13,4 +13,5 @@ readonly class DataTableQueryParams
         public string $search,
         public int    $draw,
     ) {}
+
 }
