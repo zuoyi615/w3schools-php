@@ -24,7 +24,7 @@ readonly class RouterEntityBindStrategy implements InvocationStrategyInterface
         callable               $callable,
         ServerRequestInterface $request,
         ResponseInterface      $response,
-        array                  $routeArguments
+        array                  $routeArguments,
     ): ResponseInterface {
         $callableReflection = $this->createReflectionForCallable($callable);
         if ($callableReflection === null) {
