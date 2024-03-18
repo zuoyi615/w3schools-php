@@ -53,6 +53,7 @@ return function (App $app) {
         ->group('', function (RouteCollectorProxy $guest) {
             $guest->get('/login', [AuthController::class, 'loginView']);
             $guest->post('/login', [AuthController::class, 'login']);
+            $guest->post('/login/two-factor', [AuthController::class, 'twoFactorLogin']);
             $guest->get('/register', [AuthController::class, 'registerView']);
             $guest->post('/register', [AuthController::class, 'register']);
         })

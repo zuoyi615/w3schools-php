@@ -7,9 +7,11 @@ namespace App\Controllers;
 use App\Contracts\AuthInterface;
 use App\Contracts\RequestValidatorFactoryInterface;
 use App\DataObjects\RegisterUserData;
+use App\Enum\AuthAttemptStatus;
 use App\Exception\ValidationException;
 use App\RequestValidators\RegisterUserRequestValidator;
 use App\RequestValidators\UserLoginRequestValidator;
+use App\ResponseFormatter;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Views\Twig;
@@ -21,6 +23,7 @@ readonly class AuthController
         private Twig                             $twig,
         private RequestValidatorFactoryInterface $factory,
         private AuthInterface                    $auth,
+        private ResponseFormatter                $formatter,
     ) {}
 
     /**
@@ -40,11 +43,17 @@ readonly class AuthController
             ->make(UserLoginRequestValidator::class)
             ->validate($request->getParsedBody());
 
-        if (!$this->auth->attemptLogin($data)) {
+        $loginStatus = $this->auth->attemptLogin($data);
+
+        if ($loginStatus === AuthAttemptStatus::FAILED) {
             throw new ValidationException(['password' => ['You have entered an invalid username or password']]);
         }
 
-        return $response->withHeader('Location', '/')->withStatus(302);
+        if ($loginStatus === AuthAttemptStatus::TWO_FACTOR_AUTH) {
+            return $this->formatter->asJson($response, ['two_factor' => true]);
+        }
+
+        return $this->formatter->asJson($response, []);
     }
 
     /**
@@ -77,6 +86,11 @@ readonly class AuthController
         $this->auth->logout();
 
         return $response->withHeader('Location', '/login')->withStatus(302);
+    }
+
+    public function twoFactorLogin(Request $request, Response $response): Response
+    {
+        return $response;
     }
 
 }

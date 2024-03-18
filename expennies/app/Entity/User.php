@@ -127,11 +127,16 @@ class User implements UserInterface
         return $this->verifiedAt;
     }
 
-    public function setVerifiedAt(?DateTime $verifiedAt): User
+    public function setVerifiedAt(?DateTime $dateTime): User
     {
-        $this->verifiedAt = $verifiedAt;
+        $this->verifiedAt = $dateTime;
 
         return $this;
+    }
+
+    public function hasTwoFactorAuthEnabled(): bool
+    {
+        return true;
     }
 
 }

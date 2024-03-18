@@ -15,4 +15,6 @@ interface UserInterface
 
     public function setVerifiedAt(DateTime $dateTime): UserInterface;
 
+    public function hasTwoFactorAuthEnabled(): bool;
+
 }
