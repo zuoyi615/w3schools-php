@@ -34,11 +34,18 @@ readonly class UserLoginCodeService
 
     public function verify(User $user, string $code): bool
     {
-        $c             = [
-            'code' => $code,
-            'user' => $user,
-        ];
-        $userLoginCode = $this->em->getRepository(UserLoginCode::class)->findOneBy($c);
+        $criteria      = ['code' => $code, 'user' => $user];
+        $userLoginCode = $this->em->getRepository(UserLoginCode::class)->findOneBy($criteria);
+
+        if (!$userLoginCode) {
+            return false;
+        }
+
+        if ($userLoginCode->getExpiration() <= new DateTime()) {
+            return false;
+        }
+
+        return true;
     }
 
 }

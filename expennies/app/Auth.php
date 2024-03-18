@@ -136,6 +136,8 @@ class Auth implements AuthInterface
             return false;
         }
 
+        $this->session->forget('2fa');
+
         $this->login($user);
 
         return true;
