@@ -16,6 +16,11 @@ use Doctrine\ORM\Mapping\Table;
 class UserLoginCode
 {
 
+    public function __construct()
+    {
+        $this->isActive = true;
+    }
+
     #[Id, Column(options: ['unsigned' => true]), GeneratedValue]
     private int      $id;
 
