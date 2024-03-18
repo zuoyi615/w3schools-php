@@ -15,6 +15,11 @@ readonly class VerifyController
 
     public function __construct(private Twig $twig, private UserProviderServiceInterface $userProviderService) {}
 
+    /**
+     * @throws \Twig\Error\SyntaxError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\LoaderError
+     */
     public function index(Response $response): Response
     {
         return $this->twig->render($response, 'auth/verify.twig');

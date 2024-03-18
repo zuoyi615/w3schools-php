@@ -18,9 +18,9 @@ readonly class AuthController
 {
 
     public function __construct(
-        private Twig $twig,
+        private Twig                             $twig,
         private RequestValidatorFactoryInterface $factory,
-        private AuthInterface $auth,
+        private AuthInterface                    $auth,
     ) {}
 
     /**
@@ -28,7 +28,7 @@ readonly class AuthController
      * @throws \Twig\Error\RuntimeError
      * @throws \Twig\Error\LoaderError
      */
-    public function loginView(Request $request, Response $response): Response
+    public function loginView(Response $response): Response
     {
         return $this->twig->render($response, 'auth/login.twig');
     }
@@ -52,22 +52,19 @@ readonly class AuthController
      * @throws \Twig\Error\RuntimeError
      * @throws \Twig\Error\LoaderError
      */
-    public function registerView(Request $request, Response $response): Response
+    public function registerView(Response $response): Response
     {
         return $this->twig->render($response, 'auth/register.twig');
     }
 
     public function register(Request $request, Response $response): Response
     {
-        $data = $this
-            ->factory
-            ->make(RegisterUserRequestValidator::class)
-            ->validate($request->getParsedBody());
+        $data = $this->factory->make(RegisterUserRequestValidator::class)->validate($request->getParsedBody());
 
         $this->auth->register(
             new RegisterUserData(
-                name: $data['name'],
-                email: $data['email'],
+                name    : $data['name'],
+                email   : $data['email'],
                 password: $data['password']
             )
         );
@@ -75,7 +72,7 @@ readonly class AuthController
         return $response->withHeader('Location', '/')->withStatus(302);
     }
 
-    public function logout(Request $request, Response $response): Response
+    public function logout(Response $response): Response
     {
         $this->auth->logout();
 
