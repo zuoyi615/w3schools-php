@@ -48,4 +48,19 @@ readonly class UserLoginCodeService
         return true;
     }
 
+    public function deactivateAllActiveCodes(User $user): void
+    {
+        $this
+            ->em
+            ->getRepository(UserLoginCode::class)
+            ->createQueryBuilder('c')
+            ->update()
+            ->set('c.isActive', 0)
+            ->where('c.user=:user')
+            ->andWhere('c.isActive=1')
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->execute();
+    }
+
 }
