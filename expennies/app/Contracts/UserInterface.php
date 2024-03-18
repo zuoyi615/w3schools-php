@@ -11,6 +11,8 @@ interface UserInterface
 
     public function getPassword(): string;
 
+    public function getEmail(): string;
+
     public function getName(): string;
 
     public function setVerifiedAt(DateTime $dateTime): UserInterface;

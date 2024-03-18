@@ -10,6 +10,7 @@ use App\DataObjects\RegisterUserData;
 use App\Enum\AuthAttemptStatus;
 use App\Exception\ValidationException;
 use App\RequestValidators\RegisterUserRequestValidator;
+use App\RequestValidators\TwoFactorLoginRequestValidator;
 use App\RequestValidators\UserLoginRequestValidator;
 use App\ResponseFormatter;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -92,8 +93,12 @@ readonly class AuthController
     {
         $data = $this
             ->factory
-            ->make(UserLoginRequestValidator::class)
+            ->make(TwoFactorLoginRequestValidator::class)
             ->validate($request->getParsedBody());
+
+        if (!$this->auth->attemptTwoFactorLogin($data)) {
+            throw new ValidationException(['code' => 'Invalid Code']);
+        }
 
         return $response;
     }

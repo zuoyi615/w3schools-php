@@ -32,4 +32,13 @@ readonly class UserLoginCodeService
         return $userLoginCode;
     }
 
+    public function verify(User $user, string $code): bool
+    {
+        $c             = [
+            'code' => $code,
+            'user' => $user,
+        ];
+        $userLoginCode = $this->em->getRepository(UserLoginCode::class)->findOneBy($c);
+    }
+
 }
