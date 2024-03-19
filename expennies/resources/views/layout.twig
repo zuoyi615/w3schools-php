@@ -41,7 +41,7 @@
                 <form action="/logout" method="post">
                     {{ csrf.fields | raw }}
 
-                    <span class="btn btn-info rounded">{{ auth.name }}</span>
+                    <a href="/profile" class="btn btn-info rounded">{{ auth.name }}</a>
                     <button href="#" class="btn btn-link" role="button">
                         Logout
                     </button>
