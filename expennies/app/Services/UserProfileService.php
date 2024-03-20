@@ -24,4 +24,11 @@ readonly class UserProfileService
         );
     }
 
+    public function update(User $user, UserProfileData $data): void
+    {
+        $user->setName($data->name);
+        $user->setTwoFactor($data->twoFactor);
+        $this->em->sync($user);
+    }
+
 }
