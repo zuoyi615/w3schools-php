@@ -3,23 +3,22 @@ import { post } from './ajax'
 window.addEventListener('DOMContentLoaded', function () {
   const saveProfileBtn = document.querySelector('.save-profile')
   
-  saveProfileBtn.onclick = function (event) {
+  saveProfileBtn.onclick = async function (event) {
     event.preventDefault()
     
     const form = this.closest('form')
     const formData = new FormData(form)
     const data = Object.fromEntries(formData.entries())
     
-    saveProfileBtn.classList.add('disabled')
-    
-    post('/profile', data, form).then(response => {
-      saveProfileBtn.classList.remove('disabled')
-      
-      if (response.ok) {
-        alert('Profile has been updated.')
+    try {
+      saveProfileBtn.classList.add('disabled')
+      const res = await post('/profile', data, form)
+      if (!res.ok) {
+        return
       }
-    }).catch(() => {
+      location.reload()
+    } catch (e) {
       saveProfileBtn.classList.remove('disabled')
-    })
+    }
   }
 })
