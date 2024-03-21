@@ -35,6 +35,7 @@ window.addEventListener('DOMContentLoaded', function () {
         return
       }
       alert('Password has been updated.')
+      location.reload()
     } finally {
       updatePasswordBtn.classList.remove('disabled')
     }

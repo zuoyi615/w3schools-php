@@ -7,7 +7,9 @@ namespace App\Controllers;
 use App\Contracts\RequestValidatorFactoryInterface;
 use App\DataObjects\UserProfileData;
 use App\Entity\User;
+use App\RequestValidators\UpdatePasswordRequestValidator;
 use App\RequestValidators\UpdateProfileRequestValidator;
+use App\Services\PasswordResetService;
 use App\Services\UserProfileService;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -20,6 +22,7 @@ readonly class ProfileController
         private Twig                             $twig,
         private UserProfileService               $userProfileService,
         private RequestValidatorFactoryInterface $requestValidatorFactory,
+        private PasswordResetService             $passwordResetService,
     ) {}
 
     /**
@@ -62,7 +65,15 @@ readonly class ProfileController
 
     public function updatePassword(Request $request, Response $response): Response
     {
-        return $response;
+        /** @var User $user */
+        $user = $request->getAttribute('user');
+        $data = $this
+            ->requestValidatorFactory->make(UpdatePasswordRequestValidator::class)
+            ->validate($request->getParsedBody() + ['user' => $user]);
+
+        $this->passwordResetService->updatePassword($user, $data['newPassword']);
+
+        return $response->withStatus(204);
     }
 
 }
