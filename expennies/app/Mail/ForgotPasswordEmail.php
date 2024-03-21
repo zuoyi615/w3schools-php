@@ -13,20 +13,20 @@ use Symfony\Component\Mime\BodyRendererInterface;
 
 readonly class ForgotPasswordEmail
 {
-
     public function __construct(
         private Config                $config,
         private MailerInterface       $mailer,
         private BodyRendererInterface $renderer,
         private SignedUrl             $signedUrl,
-    ) {}
+    ) {
+    }
 
     /**
      * @throws \Symfony\Component\Mailer\Exception\TransportExceptionInterface
      */
     public function sendLink(PasswordReset $passwordReset): void
     {
-        $email          = $passwordReset->getUser();
+        $email          = $passwordReset->getEmail();
         $sender         = $this->config->get('mailer.from');
         $templatedEmail = new TemplatedEmail();
 

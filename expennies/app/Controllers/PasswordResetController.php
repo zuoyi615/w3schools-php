@@ -15,14 +15,14 @@ use Slim\Views\Twig;
 
 readonly class PasswordResetController
 {
-
     public function __construct(
         private Twig                             $twig,
         private RequestValidatorFactoryInterface $requestValidatorFactory,
         private UserProviderServiceInterface     $userProviderService,
         private PasswordResetService             $passwordResetService,
         private ForgotPasswordEmail              $forgotPasswordEmail,
-    ) {}
+    ) {
+    }
 
     /**
      * @throws \Twig\Error\RuntimeError
@@ -48,7 +48,10 @@ readonly class PasswordResetController
         $user = $this->userProviderService->getByCredentials($data);
 
         if ($user) {
-            $passwordReset = $this->passwordResetService->generate($data['email']);
+            $email = $data['email'];
+
+            $this->passwordResetService->deactivateAllPasswordReset($email);
+            $passwordReset = $this->passwordResetService->generate($email);
             $this->forgotPasswordEmail->sendLink($passwordReset);
         }
 
@@ -57,9 +60,14 @@ readonly class PasswordResetController
 
     public function showResetPasswordForm(Request $request, Response $response, array $args): Response
     {
-        $token = $args['token'];
+        $token         = $args['token'];
+        $passwordReset = $this->passwordResetService->findByToken($token);
 
-        return $response;
+        if(!$passwordReset) {
+            return $response->withHeader('Location', '/')->withStatus(302);
+        }
+
+        return $this->twig->render($response, 'auth/reset_password.twig');
     }
 
 }

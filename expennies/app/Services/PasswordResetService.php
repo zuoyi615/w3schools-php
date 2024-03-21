@@ -12,8 +12,9 @@ use DateTime;
 
 readonly class PasswordResetService
 {
-
-    public function __construct(private EntityManagerServiceInterface $em) {}
+    public function __construct(private EntityManagerServiceInterface $em)
+    {
+    }
 
     /**
      * @throws \Random\RandomException
@@ -32,20 +33,39 @@ readonly class PasswordResetService
         return $passwordReset;
     }
 
-    public function verify(User $user, string $code): bool
+    public function findByToken(string $token): ?PasswordReset
     {
-        $criteria      = ['code' => $code, 'user' => $user];
-        $userLoginCode = $this->em->getRepository(UserLoginCode::class)->findOneBy($criteria);
-
-        if (!$userLoginCode) {
-            return false;
-        }
-
-        if ($userLoginCode->getExpiration() <= new DateTime()) {
-            return false;
-        }
-
-        return true;
+        return $this
+            ->em
+            ->getRepository(PasswordReset::class)
+            ->createQueryBuilder('pr')
+            ->select('pr')
+            ->where('pr.token=:token')
+            ->andWhere('pr.isActive=:active')
+            ->andWhere('pr.expiration>:now')
+            ->setParameters(
+                [
+                    'token' => $token,
+                    'active' => true,
+                    'now' => new DateTime(),
+                ]
+            )
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 
+    public function deactivateAllPasswordReset(string $email): void
+    {
+        $this
+        ->em
+        ->getRepository(PasswordReset::class)
+        ->createQueryBuilder('pr')
+        ->update()
+        ->set('pr.isActive', 0)
+        ->where('pr.email = :email')
+        ->andWhere('pr.isActive = 1')
+        ->setParameter('email', $email)
+        ->getQuery()
+        ->execute();
+    }
 }
