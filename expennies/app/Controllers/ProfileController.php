@@ -6,12 +6,12 @@ namespace App\Controllers;
 
 use App\Contracts\RequestValidatorFactoryInterface;
 use App\DataObjects\UserProfileData;
+use App\Entity\User;
 use App\RequestValidators\UpdateProfileRequestValidator;
 use App\Services\UserProfileService;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Views\Twig;
-use App\Entity\User;
 
 readonly class ProfileController
 {
@@ -58,6 +58,11 @@ readonly class ProfileController
         );
 
         return $response->withStatus(204);
+    }
+
+    public function updatePassword(Request $request, Response $response): Response
+    {
+        return $response;
     }
 
 }

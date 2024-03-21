@@ -53,6 +53,7 @@ return function (App $app) {
         $route->group('/profile', function (RouteCollectorProxy $profile) {
             $profile->get('', [ProfileController::class, 'index']);
             $profile->post('', [ProfileController::class, 'update']);
+            $profile->post('/update-password', [ProfileController::class, 'updatePassword']);
         });
     })->add(VerifyEmailMiddleware::class)->add(AuthMiddleware::class);
 
