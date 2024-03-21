@@ -6,8 +6,10 @@ namespace App\Controllers;
 
 use App\Contracts\RequestValidatorFactoryInterface;
 use App\Contracts\UserProviderServiceInterface;
+use App\Exception\ValidationException;
 use App\Mail\ForgotPasswordEmail;
 use App\RequestValidators\ForgotPasswordRequestValidator;
+use App\RequestValidators\ResetPasswordRequestValidator;
 use App\Services\PasswordResetService;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -58,7 +60,12 @@ readonly class PasswordResetController
         return $response;
     }
 
-    public function showResetPasswordForm(Request $request, Response $response, array $args): Response
+    /**
+     * @throws \Twig\Error\SyntaxError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\LoaderError
+     */
+    public function showResetPasswordForm(Response $response, array $args): Response
     {
         $token         = $args['token'];
         $passwordReset = $this->passwordResetService->findByToken($token);
@@ -67,7 +74,30 @@ readonly class PasswordResetController
             return $response->withHeader('Location', '/')->withStatus(302);
         }
 
-        return $this->twig->render($response, 'auth/reset_password.twig');
+        return $this->twig->render($response, 'auth/reset_password.twig', ['token' => $token]);
+    }
+
+    public function resetPassword(Request $request, Response $response, array $args): Response
+    {
+        $token = $args['token'];
+        $data  = $this
+            ->requestValidatorFactory
+            ->make(ResetPasswordRequestValidator::class)
+            ->validate($request->getParsedBody() + $args);
+
+        $passwordReset = $this->passwordResetService->findByToken($token);
+        if (!$passwordReset) {
+            throw new ValidationException(['confirmPassword' => ['Invalid Token']]);
+        }
+
+        $user = $this->userProviderService->getByCredentials(['email' => $passwordReset->getEmail()]);
+        if (!$user) {
+            throw new ValidationException(['confirmPassword' => ['Invalid Token']]);
+        }
+
+        $this->passwordResetService->updatePassword($user, $data['password']);
+
+        return $response;
     }
 
 }

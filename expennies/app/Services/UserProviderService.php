@@ -12,7 +12,10 @@ use DateTime;
 readonly class UserProviderService implements UserProviderServiceInterface
 {
 
-    public function __construct(private EntityManagerServiceInterface $em) {}
+    public function __construct(
+        private EntityManagerServiceInterface $em,
+        private HashService                   $hashService,
+    ) {}
 
     public function getById(int $id): ?UserInterface
     {
@@ -32,8 +35,7 @@ readonly class UserProviderService implements UserProviderServiceInterface
 
     public function createUser(RegisterUserData $data): UserInterface
     {
-        $pass   = $data->password;
-        $hashed = password_hash($pass, PASSWORD_BCRYPT, ['cost' => 12]);
+        $hashed = $this->hashService->hashPassword($data->password);
         $user   = new User();
 
         $user->setName($data->name);

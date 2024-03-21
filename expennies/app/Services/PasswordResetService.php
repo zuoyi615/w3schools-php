@@ -6,12 +6,16 @@ namespace App\Services;
 
 use App\Contracts\EntityManagerServiceInterface;
 use App\Entity\PasswordReset;
+use App\Entity\User;
 use DateTime;
 
 readonly class PasswordResetService
 {
 
-    public function __construct(private EntityManagerServiceInterface $em) {}
+    public function __construct(
+        private EntityManagerServiceInterface $em,
+        private HashService                   $hashService,
+    ) {}
 
     /**
      * @throws \Random\RandomException
@@ -60,6 +64,15 @@ readonly class PasswordResetService
             ->setParameter('email', $email)
             ->getQuery()
             ->execute();
+    }
+
+    public function updatePassword(User $user, string $password): void
+    {
+        $this->em->wrapInTransaction(function () use ($user, $password) {
+            $this->deactivateAllPasswordReset($user->getEmail());
+            $user->setPassword($this->hashService->hashPassword($password));
+            $this->em->sync($user);
+        });
     }
 
 }
