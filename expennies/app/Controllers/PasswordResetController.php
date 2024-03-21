@@ -15,14 +15,14 @@ use Slim\Views\Twig;
 
 readonly class PasswordResetController
 {
+
     public function __construct(
         private Twig                             $twig,
         private RequestValidatorFactoryInterface $requestValidatorFactory,
         private UserProviderServiceInterface     $userProviderService,
         private PasswordResetService             $passwordResetService,
         private ForgotPasswordEmail              $forgotPasswordEmail,
-    ) {
-    }
+    ) {}
 
     /**
      * @throws \Twig\Error\RuntimeError
@@ -63,7 +63,7 @@ readonly class PasswordResetController
         $token         = $args['token'];
         $passwordReset = $this->passwordResetService->findByToken($token);
 
-        if(!$passwordReset) {
+        if (!$passwordReset) {
             return $response->withHeader('Location', '/')->withStatus(302);
         }
 

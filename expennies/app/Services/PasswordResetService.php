@@ -6,15 +6,12 @@ namespace App\Services;
 
 use App\Contracts\EntityManagerServiceInterface;
 use App\Entity\PasswordReset;
-use App\Entity\User;
-use App\Entity\UserLoginCode;
 use DateTime;
 
 readonly class PasswordResetService
 {
-    public function __construct(private EntityManagerServiceInterface $em)
-    {
-    }
+
+    public function __construct(private EntityManagerServiceInterface $em) {}
 
     /**
      * @throws \Random\RandomException
@@ -40,16 +37,12 @@ readonly class PasswordResetService
             ->getRepository(PasswordReset::class)
             ->createQueryBuilder('pr')
             ->select('pr')
-            ->where('pr.token=:token')
-            ->andWhere('pr.isActive=:active')
-            ->andWhere('pr.expiration>:now')
-            ->setParameters(
-                [
-                    'token' => $token,
-                    'active' => true,
-                    'now' => new DateTime(),
-                ]
-            )
+            ->where('pr.token = :token')
+            ->andWhere('pr.isActive = :active')
+            ->andWhere('pr.expiration > :now')
+            ->setParameter('token', $token)
+            ->setParameter('active', true)
+            ->setParameter('now', new DateTime())
             ->getQuery()
             ->getOneOrNullResult();
     }
@@ -57,15 +50,16 @@ readonly class PasswordResetService
     public function deactivateAllPasswordReset(string $email): void
     {
         $this
-        ->em
-        ->getRepository(PasswordReset::class)
-        ->createQueryBuilder('pr')
-        ->update()
-        ->set('pr.isActive', 0)
-        ->where('pr.email = :email')
-        ->andWhere('pr.isActive = 1')
-        ->setParameter('email', $email)
-        ->getQuery()
-        ->execute();
+            ->em
+            ->getRepository(PasswordReset::class)
+            ->createQueryBuilder('pr')
+            ->update()
+            ->set('pr.isActive', 0)
+            ->where('pr.email = :email')
+            ->andWhere('pr.isActive = 1')
+            ->setParameter('email', $email)
+            ->getQuery()
+            ->execute();
     }
+
 }

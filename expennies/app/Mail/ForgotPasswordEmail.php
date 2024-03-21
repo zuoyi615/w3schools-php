@@ -13,13 +13,13 @@ use Symfony\Component\Mime\BodyRendererInterface;
 
 readonly class ForgotPasswordEmail
 {
+
     public function __construct(
         private Config                $config,
         private MailerInterface       $mailer,
         private BodyRendererInterface $renderer,
         private SignedUrl             $signedUrl,
-    ) {
-    }
+    ) {}
 
     /**
      * @throws \Symfony\Component\Mailer\Exception\TransportExceptionInterface
@@ -30,7 +30,7 @@ readonly class ForgotPasswordEmail
         $sender         = $this->config->get('mailer.from');
         $templatedEmail = new TemplatedEmail();
 
-        $expiration = $passwordReset->getExpiration();
+        $expiration = $passwordReset->getExpiration()->getTimestamp();
         $params     = ['token' => $passwordReset->getToken()];
         $query      = ['expiration' => $expiration];
         $resetLink  = $this->signedUrl->fromRoute('password-reset', $params, $query);
