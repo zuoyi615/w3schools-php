@@ -18,13 +18,12 @@ readonly class TransactionImportService
     ) {}
 
     /**
-     * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Exception
      */
     public function importFromCSV(string $path, User $user): void
     {
         $resource   = fopen($path, 'r');
-        $categories = $this->categoryService->getAllKeyedByName($user->getId());
+        $categories = $this->categoryService->getAllKeyedByName();
 
         fgetcsv($resource);
 

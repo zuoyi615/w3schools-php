@@ -9,12 +9,11 @@ use App\DataObjects\DataTableQueryParams;
 use App\Entity\Category;
 use App\Entity\User;
 use Doctrine\ORM\Tools\Pagination\Paginator;
-use Psr\SimpleCache\CacheInterface;
 
 readonly class CategoryService
 {
 
-    public function __construct(private EntityManagerServiceInterface $em, private CacheInterface $cache) {}
+    public function __construct(private EntityManagerServiceInterface $em) {}
 
     /**
      * @throws \Psr\SimpleCache\InvalidArgumentException
@@ -22,11 +21,9 @@ readonly class CategoryService
     public function create(string $name, User $user): Category
     {
         $category = new Category();
-        $userId   = $user->getId();
 
         $category->setUser($user);
-        $this->update($category, $name, $userId);
-        $this->cache->delete($this->getCacheKey($userId));
+        $this->update($category, $name);
 
         return $category;
     }
@@ -63,10 +60,9 @@ readonly class CategoryService
     /**
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    public function update(Category $category, string $name, int $userId): Category
+    public function update(Category $category, string $name): Category
     {
         $category->setName($name);
-        $this->cache->delete($this->getCacheKey($userId));
 
         return $category;
     }
@@ -85,13 +81,8 @@ readonly class CategoryService
     /**
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    public function getAllKeyedByName(int $userId): array
+    public function getAllKeyedByName(): array
     {
-        $key = $this->getCacheKey($userId);
-        if ($this->cache->has($key)) {
-            return $this->cache->get($key);
-        }
-
         $categories  = $this->em->getRepository(Category::class)->findAll();
         $categoryMap = [];
 
@@ -100,14 +91,7 @@ readonly class CategoryService
             $categoryMap[$key] = $category;
         }
 
-        $this->cache->set($key, $categoryMap);
-
         return $categoryMap;
-    }
-
-    private function getCacheKey(int $userId): string
-    {
-        return 'categories_keyed_by_name_'.$userId;
     }
 
 }

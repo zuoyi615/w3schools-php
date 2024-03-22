@@ -84,7 +84,7 @@ readonly class CategoryController
             ->make(UpdateCategoryRequestValidator::class)
             ->validate($request->getParsedBody());
 
-        $category = $this->categoryService->update($category, $data['name'], $request->getAttribute('user')->getId());
+        $category = $this->categoryService->update($category, $data['name']);
 
         $this->em->sync($category);
 
