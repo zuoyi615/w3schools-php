@@ -48,6 +48,8 @@ use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mime\BodyRendererInterface;
+use Symfony\Component\RateLimiter\RateLimiterFactory;
+use Symfony\Component\RateLimiter\Storage\CacheStorage;
 use Symfony\WebpackEncoreBundle\Asset\EntrypointLookup;
 use Symfony\WebpackEncoreBundle\Asset\EntrypointLookupCollectionInterface;
 use Symfony\WebpackEncoreBundle\Asset\EntrypointLookupInterface;
@@ -79,7 +81,6 @@ return [
             ->getRouteCollector()
             ->setDefaultInvocationStrategy(new RouterEntityBindStrategy(
                 $c->get(EntityManagerServiceInterface::class),
-                // $c->get(ResponseFactoryInterface::class), // would cause Circular dependency
                 $app->getResponseFactory()
             ));
 
@@ -190,15 +191,24 @@ return [
     RouteParserInterface::class             => function (App $app) {
         return $app->getRouteCollector()->getRouteParser();
     },
-    CacheInterface::class                   => function (Config $config) {
+    RedisAdapter::class                     => function (Config $config) {
         $config = $config->get('redis');
         $redis  = new Redis();
-
         $redis->connect(host: $config['host'], port: (int) $config['port']);
         $redis->auth([$config['user'], $config['password']]);
 
-        $adapter = new RedisAdapter($redis);
+        return new RedisAdapter($redis);
+    },
+    CacheInterface::class                   => fn(RedisAdapter $adapter) => new Psr16Cache($adapter),
+    RateLimiterFactory::class               => function (RedisAdapter $adapter) {
+        $storage = new CacheStorage($adapter);
+        $config  = [
+            'id'       => 'default',
+            'policy'   => 'fixed_window',
+            'interval' => '1 minute',
+            'limit'    => 3,
+        ];
 
-        return new Psr16Cache($adapter);
+        return new RateLimiterFactory($config, $storage);
     },
 ];

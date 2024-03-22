@@ -9,18 +9,16 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Psr\SimpleCache\CacheInterface;
+use Symfony\Component\RateLimiter\RateLimiterFactory;
 
 readonly class RateLimitMiddleware implements MiddlewareInterface
 {
 
-    private const int MAX_TIMES = 5;
-
     public function __construct(
-        private CacheInterface           $cache,
         private ResponseFactoryInterface $responseFactory,
         private RequestService           $requestService,
         private Config                   $config,
+        private RateLimiterFactory       $rateLimiterFactory,
     ) {}
 
     /**
@@ -28,14 +26,12 @@ readonly class RateLimitMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $cacheKey = 'rate_limit_'.$this->requestService->getClientIp($request, $this->config->get('trusted_proxies'));
-        $times    = (int) $this->cache->get($cacheKey, 0);
+        $clientIp = $this->requestService->getClientIp($request, $this->config->get('trusted_proxies'));
+        $limiter  = $this->rateLimiterFactory->create($clientIp);
 
-        if ($times > self::MAX_TIMES) {
+        if ($limiter->consume()->isAccepted() === false) {
             return $this->responseFactory->createResponse(429, 'Too many requests.');
         }
-
-        $this->cache->set($cacheKey, $times + 1, 60);
 
         return $handler->handle($request);
     }
