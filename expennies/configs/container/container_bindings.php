@@ -195,7 +195,7 @@ return [
         $config = $config->get('redis');
         $redis  = new Redis();
         $redis->connect(host: $config['host'], port: (int) $config['port']);
-        $redis->auth([$config['user'], $config['password']]);
+        $redis->auth($config['password']);
 
         return new RedisAdapter($redis);
     },
