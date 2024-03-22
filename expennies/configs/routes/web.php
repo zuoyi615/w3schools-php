@@ -12,6 +12,7 @@ use App\Controllers\TransactionController;
 use App\Controllers\VerifyController;
 use App\Middleware\AuthMiddleware;
 use App\Middleware\GuestMiddleware;
+use App\Middleware\RateLimitMiddleware;
 use App\Middleware\ValidateSignatureMiddleware;
 use App\Middleware\VerifyEmailMiddleware;
 use Slim\App;
@@ -60,7 +61,7 @@ return function (App $app) {
     $app
         ->group('', function (RouteCollectorProxy $guest) {
             $guest->get('/login', [AuthController::class, 'loginView']);
-            $guest->post('/login', [AuthController::class, 'login']);
+            $guest->post('/login', [AuthController::class, 'login'])->add(RateLimitMiddleware::class);
             $guest->post('/login/two-factor', [AuthController::class, 'twoFactorLogin']);
             $guest->get('/register', [AuthController::class, 'registerView']);
             $guest->post('/register', [AuthController::class, 'register']);

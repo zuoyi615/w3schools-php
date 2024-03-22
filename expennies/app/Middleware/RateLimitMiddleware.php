@@ -12,7 +12,7 @@ use Psr\SimpleCache\CacheInterface;
 readonly class RateLimitMiddleware implements MiddlewareInterface
 {
 
-    const int MAX_TIMES = 5;
+    private const int MAX_TIMES = 5;
 
     public function __construct(private CacheInterface $cache, private ResponseFactoryInterface $responseFactory) {}
 
