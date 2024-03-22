@@ -55,8 +55,8 @@ readonly class RequestService
     public function getClientIp(Request $request, array $trustedProxies): ?string
     {
         $serverParams = $request->getServerParams();
-        $clientIp     = $serverParams['REMOTE_ADDRESS'];
-        $forwarded    = $serverParams['HTTP_X_FORWARDED_FOR'];
+        $clientIp     = $serverParams['REMOTE_ADDR'];
+        $forwarded    = $serverParams['HTTP_X_FORWARDED_FOR'] ?? null;
 
         if (in_array($clientIp, $trustedProxies, true) && isset($forwarded)) {
             $ipTable = explode(',', $forwarded);
