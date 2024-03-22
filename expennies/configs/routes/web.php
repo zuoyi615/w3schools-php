@@ -19,44 +19,47 @@ use Slim\App;
 use Slim\Routing\RouteCollectorProxy;
 
 return function (App $app) {
-    $app->group('', function (RouteCollectorProxy $route) {
-        $route->get('/', [HomeController::class, 'index']);
+    $app
+        ->group('', function (RouteCollectorProxy $route) {
+            $route->get('/', [HomeController::class, 'index']);
 
-        $route->group('/categories', function (RouteCollectorProxy $categories) {
-            $categories->get('', [CategoryController::class, 'index']);
-            $categories->post('', [CategoryController::class, 'store']);
-            $categories->get('/load', [CategoryController::class, 'load']);
+            $route->group('/categories', function (RouteCollectorProxy $categories) {
+                $categories->get('', [CategoryController::class, 'index']);
+                $categories->post('', [CategoryController::class, 'store']);
+                $categories->get('/load', [CategoryController::class, 'load']);
 
-            $id = '/{category:[0-9]+}';
-            $categories->delete($id, [CategoryController::class, 'delete']);
-            $categories->get($id, [CategoryController::class, 'get']);
-            $categories->post($id, [CategoryController::class, 'update']);
-        });
+                $id = '/{category:[0-9]+}';
+                $categories->delete($id, [CategoryController::class, 'delete']);
+                $categories->get($id, [CategoryController::class, 'get']);
+                $categories->post($id, [CategoryController::class, 'update']);
+            });
 
-        $route->group('/transactions', function (RouteCollectorProxy $transactions) {
-            $transactions->get('', [TransactionController::class, 'index']);
-            $transactions->post('', [TransactionController::class, 'store']);
-            $transactions->get('/load', [TransactionController::class, 'load']);
-            $transactions->post('/import', [TransactionController::class, 'import']);
+            $route->group('/transactions', function (RouteCollectorProxy $transactions) {
+                $transactions->get('', [TransactionController::class, 'index']);
+                $transactions->post('', [TransactionController::class, 'store']);
+                $transactions->get('/load', [TransactionController::class, 'load']);
+                $transactions->post('/import', [TransactionController::class, 'import']);
 
-            $transactionId = '/{transaction:[0-9]+}';
-            $transactions->delete($transactionId, [TransactionController::class, 'delete']);
-            $transactions->get($transactionId, [TransactionController::class, 'get']);
-            $transactions->post($transactionId, [TransactionController::class, 'update']);
-            $transactions->post($transactionId.'/review', [TransactionController::class, 'toggleReviewed']);
+                $transactionId = '/{transaction:[0-9]+}';
+                $transactions->delete($transactionId, [TransactionController::class, 'delete']);
+                $transactions->get($transactionId, [TransactionController::class, 'get']);
+                $transactions->post($transactionId, [TransactionController::class, 'update']);
+                $transactions->post($transactionId.'/review', [TransactionController::class, 'toggleReviewed']);
 
-            $receiptId = '/{receipt:[0-9]+}';
-            $transactions->post($transactionId.'/receipts', [ReceiptController::class, 'store']);
-            $transactions->get($transactionId.'/receipts'.$receiptId, [ReceiptController::class, 'download']);
-            $transactions->delete($transactionId.'/receipts'.$receiptId, [ReceiptController::class, 'delete']);
-        });
+                $receiptId = '/{receipt:[0-9]+}';
+                $transactions->post($transactionId.'/receipts', [ReceiptController::class, 'store']);
+                $transactions->get($transactionId.'/receipts'.$receiptId, [ReceiptController::class, 'download']);
+                $transactions->delete($transactionId.'/receipts'.$receiptId, [ReceiptController::class, 'delete']);
+            });
 
-        $route->group('/profile', function (RouteCollectorProxy $profile) {
-            $profile->get('', [ProfileController::class, 'index']);
-            $profile->post('', [ProfileController::class, 'update']);
-            $profile->post('/update-password', [ProfileController::class, 'updatePassword']);
-        });
-    })->add(VerifyEmailMiddleware::class)->add(AuthMiddleware::class);
+            $route->group('/profile', function (RouteCollectorProxy $profile) {
+                $profile->get('', [ProfileController::class, 'index']);
+                $profile->post('', [ProfileController::class, 'update']);
+                $profile->post('/update-password', [ProfileController::class, 'updatePassword']);
+            });
+        })
+        ->add(VerifyEmailMiddleware::class)
+        ->add(AuthMiddleware::class);
 
     $app
         ->group('', function (RouteCollectorProxy $guest) {
