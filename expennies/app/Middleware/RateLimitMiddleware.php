@@ -2,6 +2,8 @@
 
 namespace App\Middleware;
 
+use App\Config;
+use App\Services\RequestService;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -14,15 +16,19 @@ readonly class RateLimitMiddleware implements MiddlewareInterface
 
     private const int MAX_TIMES = 5;
 
-    public function __construct(private CacheInterface $cache, private ResponseFactoryInterface $responseFactory) {}
+    public function __construct(
+        private CacheInterface           $cache,
+        private ResponseFactoryInterface $responseFactory,
+        private RequestService           $requestService,
+        private Config                   $config,
+    ) {}
 
     /**
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $clientIp = $request->getServerParams()['REMOTE_ADDRESS'];
-        $cacheKey = 'rate_limit_'.$clientIp;
+        $cacheKey = 'rate_limit_'.$this->requestService->getClientIp($request, $this->config->get('trusted_proxies'));
         $times    = (int) $this->cache->get($cacheKey, 0);
 
         if ($times > self::MAX_TIMES) {
