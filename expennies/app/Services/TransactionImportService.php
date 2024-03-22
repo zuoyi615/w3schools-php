@@ -24,7 +24,7 @@ readonly class TransactionImportService
     public function importFromCSV(string $path, User $user): void
     {
         $resource   = fopen($path, 'r');
-        $categories = $this->categoryService->getAllKeyedByName();
+        $categories = $this->categoryService->getAllKeyedByName($user->getId());
 
         fgetcsv($resource);
 

@@ -74,6 +74,9 @@ readonly class CategoryController
         return $this->formatter->asJson($response, $data);
     }
 
+    /**
+     * @throws \Psr\SimpleCache\InvalidArgumentException
+     */
     public function update(Request $request, Response $response, Category $category): Response
     {
         $data = $this
@@ -81,7 +84,7 @@ readonly class CategoryController
             ->make(UpdateCategoryRequestValidator::class)
             ->validate($request->getParsedBody());
 
-        $category = $this->categoryService->update($category, $data['name']);
+        $category = $this->categoryService->update($category, $data['name'], $request->getAttribute('user')->getId());
 
         $this->em->sync($category);
 
