@@ -61,18 +61,27 @@ return function (App $app) {
     $app
         ->group('', function (RouteCollectorProxy $guest) {
             $guest->get('/login', [AuthController::class, 'loginView']);
-            $guest->post('/login', [AuthController::class, 'login'])->add(RateLimitMiddleware::class);
+            $guest
+                ->post('/login', [AuthController::class, 'login'])
+                ->setName('login')
+                ->add(RateLimitMiddleware::class);
             $guest
                 ->post('/login/two-factor', [AuthController::class, 'twoFactorLogin'])
+                ->setName('twoFactorLogin')
                 ->add(RateLimitMiddleware::class);
             $guest->get('/register', [AuthController::class, 'registerView']);
-            $guest->post('/register', [AuthController::class, 'register'])->add(RateLimitMiddleware::class);
+            $guest
+                ->post('/register', [AuthController::class, 'register'])
+                ->setName('register')
+                ->add(RateLimitMiddleware::class);
             $guest->get('/forgot-password', [PasswordResetController::class, 'showForgotPasswordForm']);
             $guest
                 ->post('/forgot-password', [PasswordResetController::class, 'handleForgotPasswordRequest'])
+                ->setName('handleForgotPasswordRequest')
                 ->add(RateLimitMiddleware::class);
             $guest
                 ->post('/reset-password/{token}', [PasswordResetController::class, 'resetPassword'])
+                ->setName('resetPassword')
                 ->add(RateLimitMiddleware::class);
             $guest
                 ->get('/reset-password/{token}', [PasswordResetController::class, 'showResetPasswordForm'])
@@ -85,7 +94,10 @@ return function (App $app) {
         ->group('', function (RouteCollectorProxy $route) {
             $route->post('/logout', [AuthController::class, 'logout']);
             $route->get('/verify', [VerifyController::class, 'index']);
-            $route->post('/verify', [VerifyController::class, 'resend'])->add(RateLimitMiddleware::class);
+            $route
+                ->post('/verify', [VerifyController::class, 'resend'])
+                ->setName('resendVerification')
+                ->add(RateLimitMiddleware::class);
             $route
                 ->get('/verify/{id:[0-9]+}/{hash}', [VerifyController::class, 'verify'])
                 ->setName('verify')
