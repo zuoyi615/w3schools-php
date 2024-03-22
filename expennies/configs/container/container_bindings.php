@@ -15,6 +15,7 @@ use App\Enum\AppEnvironment;
 use App\Enum\SameSite;
 use App\Enum\StorageDriver;
 use App\Filters\UserFilter;
+use App\RedisCache;
 use App\RequestValidators\RequestValidatorFactory;
 use App\RouterEntityBindStrategy;
 use App\Services\EntityManagerService;
@@ -31,6 +32,7 @@ use League\Flysystem\Filesystem;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
+use Psr\SimpleCache\CacheInterface;
 use Slim\App;
 use Slim\Csrf\Guard;
 use Slim\Factory\AppFactory;
@@ -186,5 +188,14 @@ return [
     },
     RouteParserInterface::class             => function (App $app) {
         return $app->getRouteCollector()->getRouteParser();
+    },
+    CacheInterface::class                   => function (Config $config) {
+        $config = $config->get('redis');
+        $redis  = new Redis();
+
+        $redis->connect(host: $config['host'], port: (int) $config['port']);
+        $redis->auth([$config['user'], $config['password']]);
+
+        return new RedisCache($redis);
     },
 ];
