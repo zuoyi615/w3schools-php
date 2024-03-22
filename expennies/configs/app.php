@@ -45,9 +45,8 @@ return [
         'from' => $_ENV['MAILER_FROM'],
     ],
     'redis'                 => [
-        'user'     => $_ENV['REDIS_USER'],
-        'password' => $_ENV['REDIS_PASSWORD'],
         'host'     => $_ENV['REDIS_HOST'],
         'port'     => $_ENV['REDIS_PORT'],
+        'password' => $_ENV['REDIS_PASSWORD'],
     ],
 ];
