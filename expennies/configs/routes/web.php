@@ -21,10 +21,11 @@ use Slim\Routing\RouteCollectorProxy;
 return function (App $app) {
     $app
         ->group('', function (RouteCollectorProxy $route) {
-            $route->get('/', [HomeController::class, 'index']);
+            $route->get('/', [HomeController::class, 'index'])->setName('home');
+            $route->get('/stats/ytd', [HomeController::class, 'getYearToDateStatistics']);
 
             $route->group('/categories', function (RouteCollectorProxy $categories) {
-                $categories->get('', [CategoryController::class, 'index']);
+                $categories->get('', [CategoryController::class, 'index'])->setName('categories');
                 $categories->post('', [CategoryController::class, 'store']);
                 $categories->get('/load', [CategoryController::class, 'load']);
 
@@ -35,7 +36,7 @@ return function (App $app) {
             });
 
             $route->group('/transactions', function (RouteCollectorProxy $transactions) {
-                $transactions->get('', [TransactionController::class, 'index']);
+                $transactions->get('', [TransactionController::class, 'index'])->setName('transactions');
                 $transactions->post('', [TransactionController::class, 'store']);
                 $transactions->get('/load', [TransactionController::class, 'load']);
                 $transactions->post('/import', [TransactionController::class, 'import']);

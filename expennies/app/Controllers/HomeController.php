@@ -23,4 +23,9 @@ readonly class HomeController
         return $this->twig->render($response, 'dashboard.twig');
     }
 
+    public function getYearToDateStatistics(Response $response): Response
+    {
+        return $response;
+    }
+
 }
