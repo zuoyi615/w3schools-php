@@ -15,9 +15,8 @@
     "file-loader": "^6.2.0",
     "sass": "^1.54.9",
     "sass-loader": "^13.0.2",
-    "webpack-notifier": "^1.15.0"
-  },
-  "dependencies": {
+    "webpack-notifier": "^1.15.0",
+    "chart.js": "^4.4.2",
     "datatables.net": "^1.13.1",
     "datatables.net-dt": "^1.13.1"
   }
