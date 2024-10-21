@@ -12,10 +12,11 @@
       <li>
         <?php
           // define('PI', 3.14); // old syntax, not recommend
-          const BLACK = '#000000';
+          const BLACK = '#000000'; // not editable
           $color = BLACK;
           echo "<h2 style='background: $color;color: white;'>$color</h2>";
           // echo $GLOBALS['BLACK'] // error
+          // $GLOBALS['PI'] = 321; // editable
           // echo $GLOBALS['PI'];
         ?>
       </li>
