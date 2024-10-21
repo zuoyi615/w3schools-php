@@ -12,30 +12,30 @@
       <li>
         <?php
           /**
-           * String
-           * Integer
-           * Float (floating point numbers - also called double)
-           * Boolean
-           * Array
-           * Object
-           * NULL
-           * Resource
+           * - String
+           * - Integer
+           * - Float (floating point numbers - also called double)
+           * - Boolean
+           * - Array
+           * - Object
+           * - NULL
+           * - Resource
            */
         ?>
       </li>
       <li>
         <?php
-          var_dump('Hello');
+          var_dump('Hello');    // string
           echo '<br />';
-          var_dump(100);
+          var_dump(100);        // int
           echo '<br />';
-          var_dump(pi());
+          var_dump(pi());             // float/double
           echo '<br />';
-          var_dump(true);
+          var_dump(true);       // boolean
           echo '<br />';
-          var_dump(['A', 'B', 'C']);
+          var_dump(['A', 'B', 'C']);  // array
           echo '<br />';
-          var_dump(null);
+          var_dump(null);       // null
           echo '<br />';
         ?>
       </li>
@@ -57,7 +57,8 @@
           $car2 = new Car('Red', 'Toyota');
           echo $car2->message();
           echo '<br/>';
-          var_dump($car2);
+          var_dump($car2);               // object
+                                         // resource type: files
         ?>
       </li>
     </ul>
