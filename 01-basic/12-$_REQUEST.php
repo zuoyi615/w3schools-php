@@ -9,7 +9,6 @@
     <title>Document</title>
   </head>
   <body>
-
     <form method="post" action="<?php echo $_SERVER['PHP_SELF'] ?>">
       <label>
         Name: <input type="text" name="username" />
@@ -17,8 +16,12 @@
       <input type="submit" />
     </form>
 
-
     <?php
+      /**
+       * $_REQUEST
+       * `$_REQUEST` is a php super global variable which contains submitted data, and all cookie data. In other
+       * word, `$_REQUEST` is an array containing data from `$_GET`,`$_POST` and `$_COOKIE`.
+       */
       if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $username = $_REQUEST['username'];
         if (empty($username)) {
