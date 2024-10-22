@@ -24,11 +24,11 @@
       $method = $_SERVER['REQUEST_METHOD'];
 
       if ($method == 'POST') {
-        $name = $_POST['name'];
-        $email = $_POST['email'];
-        $gender = $_POST['gender'] ?? 'other';
-        $comment = $_POST['comment'];
-        $website = $_POST['website'];
+        $name = htmlspecialchars($_POST['name']);
+        $email = htmlspecialchars($_POST['email']);
+        $gender = htmlspecialchars($_POST['gender'] ?? 'other');
+        $comment = htmlspecialchars($_POST['comment']);
+        $website = htmlspecialchars($_POST['website']);
         if (empty($name)) $nameErr = 'Name is required.';
         else $name = refine_input($name);
         if (!preg_match("/^[a-zA-Z-' ]*$/", $name)) $nameErr = 'Only letters and space allowed.';
@@ -45,13 +45,13 @@
 
         if (empty($website)) $website = '';
         else $website = refine_input($website);
-        if (!preg_match("/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i", $website)) {
-          $websiteErr = 'Invalid URL';
-        }
+        if (!filter_var($website, FILTER_VALIDATE_URL)) $websiteErr = 'Invalid URL';
       }
 
       function refine_input($data): string {
-        return htmlspecialchars(stripslashes(trim($data)));
+        $data = trim($data);
+        $data = stripslashes($data);
+        return htmlspecialchars($data);
       }
     ?>
     <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']) ?>" method="post" class="form">
@@ -65,7 +65,10 @@
         <input type="text" name="email" value="<?php echo $email ?>">
         <?php echo $emailErr ? "<span class='error'>$emailErr</span>" : '' ?>
       </div>
-      <div>Website: <input type="text" name="website" value="<?php echo $website ?>"></div>
+      <div>
+        Website: <input type="text" name="website" value="<?php echo $website ?>">
+        <?php echo $websiteErr ? "<span class='error'>$websiteErr </span>" : '' ?>
+      </div>
       <div>
         Comment:
         <textarea name="comment" rows="5" cols="40" style="resize: none;"><?php echo $comment ?></textarea>
