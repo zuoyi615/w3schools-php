@@ -11,6 +11,11 @@
   <body>
     <a href="<?php $_SERVER['PHP_SELF'] ?>?subject=PHP&web=W3schools.com">Test $_GET</a>
     <?php
+      /**
+       * `$_GET`contains an array data received via the *HTTP GET* method
+       * - Query strings in the URL
+       * - HTML Forms by *GET* method
+       */
       if (isset($_GET['subject'])) {
         echo '<br />';
         echo $_GET['subject'];
