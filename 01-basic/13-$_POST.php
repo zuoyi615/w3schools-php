@@ -19,8 +19,13 @@
 
 
     <?php
+      /**
+       * `$_POST` contains an array of variables received via *HTTP POST* method:
+       * - HTML Forms
+       * - JavaScript HTTP requests
+       */
       if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $username = $_POST['username'];
+        $username = htmlspecialchars($_POST['username']);
         if (empty($username)) {
           echo '<p style="color: red;">Name is empty</p>';
         } else {
