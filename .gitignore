@@ -4,3 +4,10 @@
 **/vendor/
 
 *.env
+
+**/.git/
+**/node_modules
+**/.gitignore
+**/.idea
+**/storage
+**/public
