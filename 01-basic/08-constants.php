@@ -11,6 +11,12 @@
     <ul>
       <li>
         <?php
+          /**
+           * Differences between `define()` and `const`
+           * <p> the fundamental difference is that `const` defines constants at compile time,whereas `define` defines
+           * them at runtime</p> [Link](https://stackoverflow.com/questions/2447791/php-define-vs-const)
+           */
+
           // define('PI', 3.14); // old syntax, not recommend
           const BLACK = '#000000'; // not editable
           $color = BLACK;
