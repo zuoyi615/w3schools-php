@@ -11,6 +11,7 @@
     <h2>Create and write</h2>
     <?php
       $file = fopen('test.txt', 'w');
+      fclose($file);
 
       $filename = 'test1.txt';
       $file = fopen($filename, 'w') or die('Unable to open file!');
@@ -19,12 +20,15 @@
       $txt = "Jane Doe\n";
       fwrite($file, $txt);
       fclose($file);
-      // $file = fopen($filename, 'r') or die('Unable to open file!');
-      // echo fread($file, filesize($filename));
-      // fclose($file);
+
+      $file = fopen($filename, 'r') or die('Unable to open file!');
+      echo fread($file, filesize($filename));
+      fclose($file);
+      echo '<br>';
     ?>
     <?php
       $file = fopen('test.txt', 'w');
+      fclose($file);
 
       $filename = 'test1.txt';
       $file = fopen($filename, 'a') or die('Unable to open file!');
@@ -33,9 +37,12 @@
       $txt = "Goofy Goof\n";
       fwrite($file, $txt);
       fclose($file);
-      // $file = fopen($filename, 'r') or die('Unable to open file!');
-      // echo fread($file, filesize($filename));
-      // fclose($file);
+
+      clearstatcache(true, $filename);
+      $file = fopen($filename, 'r') or die('Unable to open file!');
+      echo fread($file, filesize($filename));
+      fclose($file);
+      echo '<br>';
     ?>
   </body>
 </html>
