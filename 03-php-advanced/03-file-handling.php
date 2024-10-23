@@ -54,6 +54,7 @@
           echo htmlspecialchars(fgetc($file));
         }
         fclose($file);
+        echo '<br />', filesize($filename);
       ?>
     </div>
   </body>
