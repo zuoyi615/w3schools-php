@@ -18,7 +18,8 @@
       echo 'Session variables are set.';
 
       // session_unset(); // remove all session variables
-      // session_destroy(); // destroy the session
+      session_destroy(); // destroy all data registered to to session
+      // session_abort();
     ?>
   </body>
 </html>
