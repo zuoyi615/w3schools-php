@@ -39,7 +39,7 @@
           return "$str?";
         }
 
-        function print_formatted(string $str, $format): void {
+        function print_formatted(string $str, callable $format): void {
           echo $format($str) . '<br/>';
         }
 
