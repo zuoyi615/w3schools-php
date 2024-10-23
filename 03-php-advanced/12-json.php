@@ -30,7 +30,7 @@
         $json = '{"Peter":35,"Ben":37,"Joe":43}';
         echo '<br />';
         $obj = json_decode($json);
-        var_dump($obj);
+        var_dump($obj); // object
         echo '<br />';
         echo $obj->Peter;
         echo '<br />';
@@ -49,6 +49,7 @@
       <?php
         $json = '{"Peter":35,"Ben":37,"Joe":43}';
         $arr = json_decode($json, true);
+        var_dump($arr); // array
         // echo $arr->Peter; // Warning
         echo $arr['Peter'];
         echo '<br />';
