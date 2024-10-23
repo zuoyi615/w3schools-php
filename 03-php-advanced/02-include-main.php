@@ -1,3 +1,4 @@
+<?php declare(strict_types=1) ?>
 <!doctype html>
 <html lang="en">
   <head>
@@ -8,16 +9,22 @@
     <title>include main</title>
   </head>
   <body>
-    <?php include './02-include-menu.php' ?>
+    <?php include_once './02-include-menu.php' ?>
     <h1>Welcome to my home page!</h1>
     <p>Some text.</p>
     <p>Some more text.</p>
     <?php
+      /**
+       * The only difference is that the include() statement generates a PHP alert but allows script execution to
+       * proceed if the file to be included cannot be found. At the same time, the require() statement generates a
+       * fatal error and terminates the script
+       */
+
       // include './notExisted.php'; // this will raise a warning
       // require './notExisted.php'; // this will raise a warning
-      include './02-include-vars.php';
+      include_once './02-include-vars.php';
       echo "I have a $color $car";
     ?>
-    <?php include './02-include-footer.php' ?>
+    <?php include_once './02-include-footer.php' ?>
   </body>
 </html>

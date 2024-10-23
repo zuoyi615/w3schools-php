@@ -1,8 +1,5 @@
-<?php
-
-  declare(strict_types=1) ?>
-    <?php
-  date_default_timezone_set("Asia/Shanghai") ?>
+<?php declare(strict_types=1) ?>
+<?php date_default_timezone_set("Asia/Shanghai") ?>
 <!doctype html>
 <html lang="en">
   <head>

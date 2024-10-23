@@ -1,6 +1,9 @@
 <?php
-  echo '<a href="/default.asp">Home</a>
-<a href="/html/default.asp">HTML Tutorial</a>
-<a href="/css/default.asp">CSS Tutorial</a>
-<a href="/js/default.asp">JavaScript Tutorial</a>
-<a href="default.asp">PHP Tutorial</a>';
+
+  echo <<<MENU_ITEMS
+<a href="#">Home</a>
+<a href="#">HTML Tutorial</a>
+<a href="#">CSS Tutorial</a>
+<a href="#">JavaScript Tutorial</a>
+<a href="#">PHP Tutorial</a>';
+MENU_ITEMS;
