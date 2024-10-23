@@ -27,7 +27,7 @@
         } catch (Exception $e) {
           echo 'Unable to divide';
         } finally {
-          echo 'Process complete';
+          echo '<br/>Process complete';
         }
       ?>
     </p>
@@ -42,7 +42,11 @@
           $msg = $e->getMessage();
           $file = $e->getFile();
           $line = $e->getLine();
-          echo "Exception thrown in $file on line $line: [Code $code] $msg";
+          echo "<br /> code: $code";
+          echo "<br /> msg: $msg";
+          echo "<br /> file: $file";
+          echo "<br /> line: $line";
+          echo "<br /> Exception thrown in $file on line $line: [Code $code] $msg";
         }
       ?>
     </p>
