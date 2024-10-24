@@ -1,9 +1,11 @@
 <h2>Using Iterables</h2>
 <?php
   function printIterable(iterable $data): void {
+    echo '<ul>';
     foreach ($data as $item) {
-      echo $item;
+      echo "<li>{$item}</li>";
     }
+      echo '</ul>';
   }
 
   $arr = [1, 2, 3];
@@ -23,12 +25,15 @@
 
 <?php
   /**
-   * An iterator must have these methods:
-   *    current() - Returns the element that the pointer is currently pointing to. It can be any data type
-   *    key() Returns the key associated with the current element in the list. It can only be an integer, float, boolean or string
-   *    next() Moves the pointer to the next element in the list
-   *    rewind() Moves the pointer to the first element in the list
-   *    valid() If the internal pointer is not pointing to any element (for example, if next() was called at the end of the list), this should return false. It returns true in any other case
+   * #### An iterator must have these methods:
+   *
+   *    - `current()` - Returns the element that the pointer is currently pointing to. It can be any data type
+   *    - `key()` Returns the key associated with the current element in the list. It can only be an integer, float,
+   * boolean or string
+   *    - `next()` Moves the pointer to the next element in the list
+   *    - `rewind()` Moves the pointer to the first element in the list
+   *    - `valid()` If the internal pointer is not pointing to any element (for example, if next() was called at the end
+   * of the list), this should return false. It returns true in any other case
    **/
 
   class CIterator implements Iterator {
