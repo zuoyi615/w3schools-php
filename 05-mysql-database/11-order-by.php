@@ -36,8 +36,7 @@
         }
       }
 
-      // $host = '192.168.1.18'
-      $host = 'localhost';
+      $host = '127.0.0.1';
       $user = 'root';
       $pass = '123456';
       $dbname = 'php_tutorial';
@@ -48,9 +47,20 @@
 
         $stmt = $con->prepare('SELECT id, firstname, lastname, email FROM guests ORDER BY lastname DESC');
         $stmt->execute();
-        $results = $stmt->setFetchMode(PDO::FETCH_ASSOC);
-        foreach (new TableRows(new RecursiveArrayIterator($stmt->fetchAll())) as $field => $value) {
-          echo $value;
+        // Set resulting array to object
+        $stmt->setFetchMode(PDO::FETCH_OBJ);
+        $result = $stmt->fetchAll();
+        foreach ($result as $field => $value) {
+          ['id'=>$id,'firstname'=>$firstname,'lastname'=>$lastname,'email'=>$email] = get_object_vars($value);
+          echo <<<Row
+<tr>
+<td>$id</td>
+<td>$firstname</td>
+<td>$lastname</td>
+<td>$email</td>
+</tr>
+Row;
+
         }
       } catch (PDOException $e) {
         echo "Error: " . $e->getMessage();
