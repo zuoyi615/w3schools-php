@@ -1,6 +1,6 @@
 <?php
   global $con;
-  $host = '192.168.1.18';
+  $host = '127.0.0.1';
   $user = 'root';
   $pass = '123456';
   $dbname = 'php_tutorial';

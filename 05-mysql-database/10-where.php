@@ -36,8 +36,7 @@
         }
       }
 
-      // $host = '192.168.1.18'
-      $host = 'localhost';
+      $host = '127.0.0.1';
       $user = 'root';
       $pass = '123456';
       $dbname = 'php_tutorial';
@@ -48,7 +47,8 @@
 
         $stmt = $con->prepare("SELECT id, firstname, lastname, email FROM guests WHERE lastname='Doe'");
         $stmt->execute();
-        $results = $stmt->setFetchMode(PDO::FETCH_ASSOC);
+        // Set the resulting array to associative
+        $stmt->setFetchMode(PDO::FETCH_ASSOC);
         foreach (new TableRows(new RecursiveArrayIterator($stmt->fetchAll())) as $field => $value) {
           echo $value;
         }

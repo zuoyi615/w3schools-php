@@ -1,10 +1,10 @@
 <?php
-  $host = '192.168.1.18';
+  $host = '127.0.0.1';
   $user = 'root';
   $pass = '123456';
 
   try {
-    $connection = new PDO("mysql:host=$host;dbname=nestplus", $user, $pass);
+    $connection = new PDO("mysql:host=$host;dbname=php_tutorial", $user, $pass);
     $connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     echo 'Connected successfully';
   } catch (PDOException $e) {

@@ -46,11 +46,19 @@
         $con = new PDO("mysql:host=$host;dbname=$dbname", $user, $pass);
         $con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        $stmt = $con->prepare('SELECT id, firstname, lastname, email FROM guests LIMIT 2 OFFSET 0');
+        $stmt = $con->prepare('SELECT id, firstname, lastname, email FROM guests LIMIT 2 OFFSET 8');
         $stmt->execute();
-        $results = $stmt->setFetchMode(PDO::FETCH_ASSOC);
-        foreach (new TableRows(new RecursiveArrayIterator($stmt->fetchAll())) as $field => $value) {
-          echo $value;
+        $stmt->setFetchMode(PDO::FETCH_OBJ);
+        $result = $stmt->fetchAll();
+        foreach ($result as $field => $value) {
+          echo <<<Row
+            <tr>
+              <td>$value->id</td>
+              <td>$value->firstname</td>
+              <td>$value->lastname</td>
+              <td>$value->email</td>
+            </tr>
+          Row;
         }
       } catch (PDOException $e) {
         echo "Error: " . $e->getMessage();

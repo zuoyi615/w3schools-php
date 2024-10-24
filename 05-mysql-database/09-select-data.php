@@ -19,8 +19,7 @@
               <th style='padding: 4px 12px;'>email</th>
             </tr>";
 
-      // $host = '192.168.1.18'
-      $host = 'localhost';
+      $host = '127.0.0.1';
       $user = 'root';
       $pass = '123456';
       $dbname = 'php_tutorial';
@@ -29,10 +28,13 @@
         $con = new PDO("mysql:host=$host;dbname=$dbname", $user, $pass);
         $con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        $stmt = $con->prepare('SELECT id, firstname, lastname, email FROM guests');
+        $sql = 'SELECT id, firstname, lastname, email FROM guests';
+        $stmt = $con->prepare($sql);
         $stmt->execute();
+        // set the resulting array to associative
         $stmt->setFetchMode(PDO::FETCH_ASSOC);
-        foreach (new Rows(new RecursiveArrayIterator($stmt->fetchAll())) as $field => $value) {
+        $result = $stmt->fetchAll();
+        foreach (new Rows(new RecursiveArrayIterator($result)) as $field => $value) {
           echo $value;
         }
       } catch (PDOException $e) {

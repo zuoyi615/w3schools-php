@@ -1,15 +1,17 @@
 <?php
-  $host = '192.168.1.18';
+  $host = '127.0.0.1';
   $user = 'root';
   $pass = '123456';
   $dbname = 'php_tutorial';
-  $sql = "CREATE TABLE IF NOT EXISTS guests (
-      id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-      firstname VARCHAR(30) NOT NULL,
-      lastname VARCHAR(30) NOT NULL,
-      email VARCHAR(50),
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-  )";
+  $sql = <<<SQL
+CREATE TABLE IF NOT EXISTS guests (
+  id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  firstname VARCHAR(30) NOT NULL,
+  lastname VARCHAR(30) NOT NULL,
+  email VARCHAR(50),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+SQL;
 
   try {
     $con = new PDO("mysql:host=$host;dbname=$dbname", $user, $pass);
