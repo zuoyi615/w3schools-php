@@ -1,7 +1,7 @@
 <?php
   declare(strict_types=1);
 
-  // Heredoc
+  // Nowdoc
   $x = 1;
   $y = 2;
   $text = <<<'TEXT'
@@ -14,7 +14,7 @@
   echo nl2br($text);
   echo '<br/>';
 
-  // Nowdoc
+  // Heredoc
   $text1 = <<<TEXT
   Line 1 $x
   Line 2 $y
