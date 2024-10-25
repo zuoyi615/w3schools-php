@@ -44,7 +44,7 @@
   $hint = null;
 
   foreach ($names as $name) { // Nina
-    if (stristr($q, substr($name, 0, $len))) { // stristr('ni', 'Ni') // ni
+    if (stristr($q, substr($name, 0, $len))) { // stristr('ni', 'Ni') // ni // equals to str_starts_with(strtolower($name), strtolower($q))
       if (!$hint) $hint = $name;
       else $hint .= ", $name";
     }
