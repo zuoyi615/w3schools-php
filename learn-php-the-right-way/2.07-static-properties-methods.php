@@ -8,7 +8,7 @@
     {
         
         // public static int $count = 8;
-        public static int $count = 0;
+        private static int $count = 0;
         
         public static function getCount(): int
         {
@@ -36,16 +36,16 @@
         
     }
     
-    $transaction = new Transaction(100, 'Transaction 01');
-    echo $transaction::$count;
-    echo '<br>';
-    echo Transaction::$count;
-    echo '<br>';
-    $transaction->process();
-    echo $transaction::$count;
-    echo '<br>';
-    echo Transaction::$count;
-    echo '<br>';
+    // $transaction = new Transaction(100, 'Transaction 01');
+    // echo $transaction::$count;
+    // echo '<br>';
+    // echo Transaction::$count;
+    // echo '<br>';
+    // $transaction->process();
+    // echo $transaction::$count;
+    // echo '<br>';
+    // echo Transaction::$count;
+    // echo '<br>';
     
     $transaction = new Transaction(100, 'Transaction 01');
     echo $transaction::getCount();
