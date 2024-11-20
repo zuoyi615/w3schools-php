@@ -1,4 +1,4 @@
-## PHPUnit
+## Test
 
 ### Testing Types
 
@@ -28,3 +28,14 @@
 - __BDD__ Behavior Driven Development
 
 They are both __Tests First, Code After__
+
+### PHPUnit
+
+[Documentation](https://phpunit.de/index.html)
+
+```shell 
+composer require --dev phpunit/phpunit
+
+# write unit tests, and execute the command below:
+./vendor/bin/phpunit
+```
