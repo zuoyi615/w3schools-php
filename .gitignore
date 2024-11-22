@@ -2,5 +2,10 @@
 **/test*.txt
 **/uploads/
 **/vendor/
+**/node_modules
+**/build
+**/cache
+**/storage
+
 
 *.env
