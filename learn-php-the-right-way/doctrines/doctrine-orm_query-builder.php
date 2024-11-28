@@ -59,6 +59,8 @@ try {
         ->orderBy('i.createdAt', 'desc')
         ->getQuery();
     
+    var_dump($query->getDQL());
+    var_dump($query->getSQL());
     // var_dump($query->getArrayResult());
     $invoices = $query->getResult();
     
@@ -81,9 +83,3 @@ try {
 } catch (MissingMappingDriverImplementation|Exception $e) {
     var_dump($e);
 }
-
-
-
-
-
-
