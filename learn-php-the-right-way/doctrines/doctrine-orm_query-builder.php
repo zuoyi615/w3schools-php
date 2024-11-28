@@ -22,22 +22,20 @@ $connectionParams = [
 
 try {
     $connection    = DriverManager::getConnection($connectionParams);
-    $config        = ORMSetup::createAttributeMetadataConfiguration([
-        __DIR__.'/../src/Entities',
-    ]);
+    $config        = ORMSetup::createAttributeMetadataConfiguration([__DIR__.'/../src/Entities'], true);
     $entityManager = new EntityManager($connection, $config);
-
+    
     // Transaction
     // $entityManager->beginTransaction();
     // $entityManager->commit();
     // $entityManager->rollback();
     // $entityManager->wrapInTransaction();
-
+    
     // native sql
     // $entityManager->createNativeQuery();
-
+    
     $queryBuilder = $entityManager->createQueryBuilder();
-
+    
     $query = $queryBuilder
         ->select('i', 'it')
         ->from(Invoice::class, 'i')
@@ -60,10 +58,10 @@ try {
         ->setParameter('date', '2024-01-19 00:00:00')
         ->orderBy('i.createdAt', 'desc')
         ->getQuery();
-
+    
     // var_dump($query->getArrayResult());
     $invoices = $query->getResult();
-
+    
     foreach ($invoices as $invoice) {
         /** @var Invoice $invoice */
         echo $invoice
@@ -71,7 +69,7 @@ try {
             .$invoice->getAmount().', '
             .$invoice->getStatus()->toString()
             .PHP_EOL;
-
+        
         foreach ($invoice->getItems() as $item) {
             /** @var InvoiceItem $item */
             echo ' - '.$item->getDescription()

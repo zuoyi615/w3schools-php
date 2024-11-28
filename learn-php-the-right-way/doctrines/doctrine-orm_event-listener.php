@@ -28,17 +28,15 @@ $items = [
 
 try {
     $connection    = DriverManager::getConnection($connectionParams);
-    $config        = ORMSetup::createAttributeMetadataConfiguration([
-        __DIR__.'/../src/Entities',
-    ]);
+    $config        = ORMSetup::createAttributeMetadataConfiguration([__DIR__.'/../src/Entities'], true);
     $entityManager = new EntityManager($connection, $config);
     $invoice       = new Invoice();
-
+    
     $invoice
         ->setAmount(45)
         ->setInvoiceNumber('0000_0000_0001')
         ->setStatus(InvoiceStatus::Pending);
-
+    
     foreach ($items as [$description, $quantity, $unitPrice]) {
         $item = new InvoiceItem();
         $item
@@ -46,10 +44,10 @@ try {
             ->setQuantity($quantity)
             ->setUnitPrice($unitPrice)
             ->setCreatedAt(new DateTime());
-
+        
         $invoice->addItem($item);
     }
-
+    
     $entityManager->persist($invoice);
     $entityManager->flush();
 } catch (MissingMappingDriverImplementation|ORMException|Exception $e) {
