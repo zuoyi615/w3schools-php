@@ -16,13 +16,14 @@ try {
             ->where('id', '=', 1)
             ->get();
         var_dump($invoices); // std class objects, which is from Base Query Builder, another is Eloquent Query Builder
-
+        
         $invoices = Capsule::connection()
             ->table('invoices')
-            ->where('status', '=', InvoiceStatus::Paid);
+            ->where('status', '=', InvoiceStatus::Paid)
+            ->get();
         // std class objects, which is from Base Query Builder, another is Eloquent Builder which has Query Builder as dependency
         // same goes with Collections, Laravel has to Collections, one works with the eloquent, another one is base Collection
-        // var_dump($invoices);
+        var_dump($invoices);
     });
 } catch (Throwable $e) {
     var_dump($e->getMessage());
