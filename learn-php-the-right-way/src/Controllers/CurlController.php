@@ -18,6 +18,7 @@ class CurlController
             "limit" => 100,
         ];
         $url    = 'https://picsum.photos/v2/list?'.http_build_query($params);
+        print_r(http_build_query($params));
 
         curl_setopt($handle, CURLOPT_URL, $url);
         curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
