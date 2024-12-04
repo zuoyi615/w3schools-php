@@ -16,13 +16,13 @@ use Slim\Views\Twig;
 
 readonly class AuthController
 {
-
+    
     public function __construct(
         private Twig                             $twig,
         private RequestValidatorFactoryInterface $factory,
         private AuthInterface                    $auth,
     ) {}
-
+    
     /**
      * @throws \Twig\Error\SyntaxError
      * @throws \Twig\Error\RuntimeError
@@ -32,21 +32,21 @@ readonly class AuthController
     {
         return $this->twig->render($response, 'auth/login.twig');
     }
-
+    
     public function login(Request $request, Response $response): Response
     {
         $data = $this
             ->factory
             ->make(UserLoginRequestValidator::class)
             ->validate($request->getParsedBody());
-
+        
         if (!$this->auth->attemptLogin($data)) {
             throw new ValidationException(['password' => ['You have entered an invalid username or password']]);
         }
-
+        
         return $response->withHeader('Location', '/')->withStatus(302);
     }
-
+    
     /**
      * @throws \Twig\Error\SyntaxError
      * @throws \Twig\Error\RuntimeError
@@ -56,11 +56,11 @@ readonly class AuthController
     {
         return $this->twig->render($response, 'auth/register.twig');
     }
-
+    
     public function register(Request $request, Response $response): Response
     {
         $data = $this->factory->make(RegisterUserRequestValidator::class)->validate($request->getParsedBody());
-
+        
         $this->auth->register(
             new RegisterUserData(
                 name    : $data['name'],
@@ -68,15 +68,15 @@ readonly class AuthController
                 password: $data['password']
             )
         );
-
+        
         return $response->withHeader('Location', '/')->withStatus(302);
     }
-
+    
     public function logout(Response $response): Response
     {
         $this->auth->logout();
-
+        
         return $response->withHeader('Location', '/login')->withStatus(302);
     }
-
+    
 }
