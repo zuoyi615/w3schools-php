@@ -11,7 +11,7 @@ class UserFilter extends SQLFilter
 
     public function addFilterConstraint(ClassMetadata $targetEntity, string $targetTableAlias): string
     {
-        if (!$targetEntity->getReflectionClass()->implementsInterface(OwnableInterface::class)) {
+        if (!$targetEntity->getReflectionClass()?->implementsInterface(OwnableInterface::class)) {
             return '';
         }
 
