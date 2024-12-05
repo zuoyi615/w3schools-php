@@ -27,6 +27,9 @@ use Doctrine\DBAL\DriverManager;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMSetup;
+use DoctrineExtensions\Query\Mysql\DateFormat;
+use DoctrineExtensions\Query\Mysql\Month;
+use DoctrineExtensions\Query\Mysql\Year;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use Psr\Container\ContainerInterface;
@@ -61,33 +64,35 @@ use function DI\create;
 
 class CustomEntrypointLookup implements EntrypointLookupCollectionInterface
 {
-
+    
     function getEntrypointLookup(string $buildName = null
     ): EntrypointLookupInterface {
         return new EntrypointLookup(BUILD_PATH.'/entrypoints.json');
     }
-
+    
 }
 
 return [
     App::class                              => function (ContainerInterface $c) {
         AppFactory::setContainer($c);
-
+        
         $app            = AppFactory::create();
         $router         = require CONFIG_PATH.'/routes/web.php';
         $addMiddlewares = require CONFIG_PATH.'/middleware.php';
-
+        
         $app
             ->getRouteCollector()
-            ->setDefaultInvocationStrategy(new RouterEntityBindStrategy(
-                $c->get(EntityManagerServiceInterface::class),
-                $app->getResponseFactory()
-            ));
-
+            ->setDefaultInvocationStrategy(
+                new RouterEntityBindStrategy(
+                    $c->get(EntityManagerServiceInterface::class),
+                    $app->getResponseFactory()
+                )
+            );
+        
         $router($app);
-
+        
         $addMiddlewares($app);
-
+        
         return $app;
     },
     Config::class                           => create(Config::class)->constructor(require CONFIG_PATH.'/app.php'),
@@ -96,14 +101,26 @@ return [
             paths    : $conf->get('doctrine.entity_dir'),
             isDevMode: $conf->get('doctrine.dev_mode')
         );
-
+        
         $config->addFilter('user', UserFilter::class);
-
+        
+        if (class_exists('DoctrineExtensions\Query\Mysql\Year')) {
+            $config->addCustomDatetimeFunction('YEAR', Year::class);
+        }
+        
+        if (class_exists('DoctrineExtensions\Query\Mysql\Month')) {
+            $config->addCustomDatetimeFunction('MONTH', Month::class);
+        }
+        
+        if (class_exists('DoctrineExtensions\Query\Mysql\DateFormat')) {
+            $config->addCustomStringFunction('DATE_FORMAT', DateFormat::class);
+        }
+        
         $connection = DriverManager::getConnection(
             $conf->get('doctrine.connection'),
             $config
         );
-
+        
         return new EntityManager($connection, $config);
     },
     Twig::class                             => function (Config $config, ContainerInterface $c) {
@@ -112,24 +129,24 @@ return [
             'auto_reload' => AppEnvironment::isDevelopment($config->get('app_environment')),
             // 'autoescape'  => true,
         ]);
-
+        
         $twig->addExtension(new IntlExtension());
         $twig->addExtension(new EntryFilesTwigExtension($c));
         $twig->addExtension(new AssetExtension($c->get('webpack_encore.packages')));
-
+        
         return $twig;
     },
     'webpack_encore.packages'               => function () {
         $manifestPath = BUILD_PATH.'/manifest.json';
         $strategy     = new JsonManifestVersionStrategy($manifestPath);
         $in           = new Package($strategy);
-
+        
         return new Packages($in);
     },
     'webpack_encore.tag_renderer'           => function (ContainerInterface $c) {
         $packages   = $c->get('webpack_encore.packages');
         $collection = new CustomEntrypointLookup();
-
+        
         return new TagRenderer($collection, $packages);
     },
     ResponseFactoryInterface::class         => function (App $app) {
@@ -149,7 +166,7 @@ return [
             httpOnly : $config->get('session.httponly', true),
             sameSite : SameSite::from($config->get('session.samesite', 'lax'))
         );
-
+        
         return new Session($options);
     },
     RequestValidatorFactoryInterface::class => function (ContainerInterface $c) {
@@ -167,14 +184,14 @@ return [
             StorageDriver::Local => new LocalFilesystemAdapter(STORAGE_PATH),
             default => throw new RuntimeException('No matched storage driver found'),
         };
-
+        
         return new Filesystem($adapter);
     },
     Clockwork::class                        => function (EntityManagerInterface $em) {
         $clockwork = new Clockwork();
         $clockwork->storage(new FileStorage(STORAGE_PATH.'/clockwork'));
         $clockwork->addDataSource(new DoctrineDataSource($em));
-
+        
         return $clockwork;
     },
     EntityManagerServiceInterface::class    => function (EntityManagerInterface $em) {
@@ -182,7 +199,7 @@ return [
     },
     MailerInterface::class                  => function (Config $config) {
         $transport = Transport::fromDsn($config->get('mailer.dsn'));
-
+        
         return new Mailer($transport);
     },
     BodyRendererInterface::class            => function (Twig $twig) {
@@ -194,9 +211,9 @@ return [
     RedisAdapter::class                     => function (Config $config) {
         $config = $config->get('redis');
         $redis  = new Redis();
-        $redis->connect(host: $config['host'], port: (int) $config['port']);
+        $redis->connect(host: $config['host'], port: (int)$config['port']);
         $redis->auth($config['password']);
-
+        
         return new RedisAdapter($redis);
     },
     CacheInterface::class                   => fn(RedisAdapter $adapter) => new Psr16Cache($adapter),
@@ -208,7 +225,7 @@ return [
             'interval' => '1 minute',
             'limit'    => 3,
         ];
-
+        
         return new RateLimiterFactory($config, $storage);
     },
 ];

@@ -17,6 +17,7 @@
     "ext-fileinfo": "*",
     "ext-pdo": "*",
     "ext-redis": "*",
+    "beberlei/doctrineextensions": "dev-master",
     "doctrine/dbal": "3.8.3",
     "doctrine/migrations": "^3.7",
     "doctrine/orm": "^3.0",
