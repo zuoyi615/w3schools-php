@@ -7,6 +7,7 @@ use App\DataObjects\DataTableQueryParams;
 use App\DataObjects\TransactionData;
 use App\Entity\Transaction;
 use App\Entity\User;
+use DateTime;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
 readonly class TransactionService
@@ -73,25 +74,50 @@ readonly class TransactionService
         $transaction->setWasReviewed(!$transaction->isWasReviewed());
     }
     
-    public function getTotals(\DateTime $startDate, \DateTime $endDate): array
+    public function getTotals(DateTime $startDate, DateTime $endDate): array
     {
-        return ['net' => 800, 'income' => 3000, 'expense' => 2200];
+        $query = $this->em->createQuery(
+            'SELECT SUM(t.amount) AS net,
+                    SUM(CASE WHEN t.amount > 0 THEN t.amount ELSE 0 END) AS income,
+                    SUM(CASE WHEN t.amount < 0 THEN ABS(t.amount) ELSE 0 END) as expense
+             FROM App\Entity\Transaction t
+             WHERE t.date BETWEEN :start AND :end'
+        );
+        
+        $query->setParameter('start', $startDate->format('Y-m-d 00:00:00'));
+        $query->setParameter('end', $endDate->format('Y-m-d 23:59:59'));
+        
+        return $query->getSingleResult();
     }
     
     public function getRecentTransactions(int $limit): array
     {
-        return [];
+        return $this->em
+            ->getRepository(Transaction::class)
+            ->createQueryBuilder('t')
+            ->select('t', 'c')
+            ->leftJoin('t.category', 'c')
+            ->orderBy('t.date', 'desc')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getArrayResult();
     }
     
     public function getMonthlySummary(int $year): array
     {
-        return [
-            ['income' => 1500, 'expense' => 1100, 'm' => '3'],
-            ['income' => 2000, 'expense' => 1800, 'm' => '4'],
-            ['income' => 2500, 'expense' => 1900, 'm' => '5'],
-            ['income' => 2600, 'expense' => 1950, 'm' => '6'],
-            ['income' => 3000, 'expense' => 2200, 'm' => '7'],
-        ];
+        $query = $this->em->createQuery(
+            'SELECT SUM(CASE WHEN t.amount > 0 THEN t.amount ELSE 0 END) as income,
+                    SUM(CASE WHEN t.amount < 0 THEN abs(t.amount) ELSE 0 END) as expense,
+                    MONTH(t.date) as m
+             FROM App\Entity\Transaction t
+             WHERE YEAR(t.date) = :year
+             GROUP BY m
+             ORDER BY m ASC'
+        );
+        
+        $query->setParameter('year', $year);
+        
+        return $query->getArrayResult();
     }
     
 }
