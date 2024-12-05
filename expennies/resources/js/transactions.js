@@ -1,3 +1,4 @@
+import '../css/transactions.scss'
 import { Modal } from 'bootstrap'
 import { del, get, post } from './ajax'
 import DataTables from 'datatables.net'
